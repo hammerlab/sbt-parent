@@ -24,6 +24,10 @@ object ParentPlugin extends AutoPlugin {
       'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4"
     ),
 
+    libraryDependencies <++= libraries { v => Seq(
+      v('scalatest) % "test"
+    )},
+
     parallelExecution in Test := false,
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
