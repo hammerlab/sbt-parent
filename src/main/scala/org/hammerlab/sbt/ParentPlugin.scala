@@ -5,10 +5,25 @@ import Keys._
 
 object ParentPlugin extends AutoPlugin {
 
+  object autoImport {
+    val libraries = settingKey[Map[Symbol, ModuleID]]("Common dependencies")
+  }
+
+  import autoImport._
+
   override def trigger: PluginTrigger = allRequirements
+
+  val sparkVersion = "1.6.1"
 
   override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = Seq(
     organization := "org.hammerlab",
+
+    libraries := Map(
+      'spark -> "org.apache.spark" %% "spark-core" % sparkVersion,
+      'scalatest -> "org.scalatest" %% "scalatest" % "3.0.0",
+      'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4"
+    ),
+
     parallelExecution in Test := false,
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
