@@ -4,7 +4,7 @@ name := "sbt-parent"
 
 organization := "org.hammerlab"
 
-version := "1.0.1"
+version := "1.0.2"
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
@@ -46,3 +46,5 @@ crossPaths := false
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.1.0")
