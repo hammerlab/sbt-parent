@@ -19,9 +19,10 @@ object ParentPlugin extends AutoPlugin {
     organization := "org.hammerlab",
 
     libraries := Map(
-      'spark -> "org.apache.spark" %% "spark-core" % sparkVersion,
       'scalatest -> "org.scalatest" %% "scalatest" % "3.0.0",
-      'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4"
+      'spark -> "org.apache.spark" %% "spark-core" % sparkVersion,
+      'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4",
+      'spire -> "org.spire-math" %% "spire" % "0.11.0"
     ),
 
     libraryDependencies <++= libraries { v => Seq(
