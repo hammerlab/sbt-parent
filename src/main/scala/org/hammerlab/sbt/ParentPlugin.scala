@@ -7,6 +7,7 @@ object ParentPlugin extends AutoPlugin {
 
   object autoImport {
     val libraries = settingKey[Map[Symbol, ModuleID]]("Common dependencies")
+    val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
   }
 
   import autoImport._
@@ -18,18 +19,20 @@ object ParentPlugin extends AutoPlugin {
   override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = Seq(
     organization := "org.hammerlab",
 
-    libraries := Map(
-      'scalatest -> "org.scalatest" %% "scalatest" % "3.0.0",
-      'spark -> "org.apache.spark" %% "spark-core" % sparkVersion,
-      'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4",
-      'spire -> "org.spire-math" %% "spire" % "0.11.0"
-    ),
+    libraries :=
+      Map(
+        'scalatest -> "org.scalatest" %% "scalatest" % Option(scalatestVersion.value).getOrElse("3.0.0"),
+        'spark -> "org.apache.spark" %% "spark-core" % sparkVersion,
+        'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4",
+        'spire -> "org.spire-math" %% "spire" % "0.11.0"
+      ),
 
     libraryDependencies <++= libraries { v => Seq(
       v('scalatest) % "test"
     )},
 
     parallelExecution in Test := false,
+
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value)
