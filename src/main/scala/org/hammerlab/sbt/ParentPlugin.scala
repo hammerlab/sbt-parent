@@ -8,13 +8,12 @@ object ParentPlugin extends AutoPlugin {
   object autoImport {
     val libraries = settingKey[Map[Symbol, ModuleID]]("Common dependencies")
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
+    val sparkVersion = settingKey[String]("Spark version to use")
   }
 
   import autoImport._
 
   override def trigger: PluginTrigger = allRequirements
-
-  val sparkVersion = "1.6.1"
 
   override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = Seq(
     organization := "org.hammerlab",
@@ -22,7 +21,7 @@ object ParentPlugin extends AutoPlugin {
     libraries :=
       Map(
         'scalatest -> "org.scalatest" %% "scalatest" % Option(scalatestVersion.value).getOrElse("3.0.0"),
-        'spark -> "org.apache.spark" %% "spark-core" % sparkVersion,
+        'spark -> "org.apache.spark" %% "spark-core" % sparkVersion.value,
         'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion}_0.4.4",
         'spire -> "org.spire-math" %% "spire" % "0.11.0"
       ),
