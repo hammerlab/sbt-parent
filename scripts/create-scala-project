@@ -52,14 +52,14 @@ EOF
 GITHUB_USER="${GITHUB_USER:-hammerlab}"
 
 mkdir project
-echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.0.5")' > project/plugins.sbt
+echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.1.0")' >> project/plugins.sbt
 
 echo target > .gitignore
 
 wget "https://raw.githubusercontent.com/hammerlab/guacamole/master/LICENSE"
 
 # Make README.md
-echo "# $name" > README.md
+echo "# $name" >> README.md
 echo '' >> README.md
 echo "[![Build Status](https://travis-ci.org/$GITHUB_USER/$name.svg?branch=master)](https://travis-ci.org/$GITHUB_USER/$name)" >> README.md
 echo "[![Coverage Status](https://coveralls.io/repos/github/$GITHUB_USER/$name/badge.svg?branch=master)](https://coveralls.io/github/$GITHUB_USER/$name?branch=master)" >> README.md
@@ -72,7 +72,7 @@ echo "GROUP_PATH: $GROUP_PATH"
 md src/{main,test}/scala/$GROUP_PATH/$name
 git init
 
-cat >.travis.yml <<EOF
+cat >>.travis.yml <<EOF
 language: scala
 sudo: false
 

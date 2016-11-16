@@ -96,6 +96,11 @@ object ParentPlugin extends AutoPlugin {
 
     crossScalaVersions := Seq("2.10.6", "2.11.8"),
 
-    scalaVersion := "2.11.8"
+    scalaVersion := (
+      if (System.getProperty("2.10") != null)
+        "2.10.6"
+      else
+        "2.11.8"
+    )
   )
 }
