@@ -8,11 +8,19 @@ object ParentPlugin extends AutoPlugin {
   object autoImport {
     val libraries = settingKey[Map[Symbol, ModuleID]]("Common dependencies")
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
-    val sparkVersion = settingKey[String]("Spark version to use")
+    val sparkVersion = settingKey[String]("Default Spark version to use")
+    val spark2Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark2 is set.")
     val githubUser = settingKey[String]("Github user/org to point to")
   }
 
   import autoImport._
+
+  // Helper for appending "_spark2" to a project's name iff the "spark2" env var is set.
+  def sparkName(name: String): String =
+    if (System.getProperty("spark2") != null)
+      s"${name}_spark2"
+    else
+      name
 
   override def trigger: PluginTrigger = allRequirements
 
@@ -24,14 +32,22 @@ object ParentPlugin extends AutoPlugin {
 
     scalatestVersion := "3.0.0",
     sparkVersion := "1.6.3",
+    spark2Version := "2.0.0",
 
-    libraries :=
+    libraries := {
+      val sv =
+        if (System.getProperty("spark2") != null)
+          spark2Version.value
+        else
+          sparkVersion.value
+
       Map(
         'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
-        'spark -> "org.apache.spark" %% "spark-core" % sparkVersion.value,
-        'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sparkVersion.value}_0.4.4",
+        'spark -> "org.apache.spark" %% "spark-core" % sv,
+        'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.4",
         'spire -> "org.spire-math" %% "spire" % "0.11.0"
-      ),
+      )
+    },
 
     libraryDependencies <++= libraries { v => Seq(
       v('scalatest) % "test"
