@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+# Create a Scala+SBT org.hammerlab project, inheriting from org.hammerlab:sbt-parent for Maven/Scalatest configuration,
+# and including TravisCI and git configuration.
+#
+# Usage:
+#
+#   $ create-scala-project <path>   # will use `basename <path>` as the project's name.
+#   $ create-scala-project <path> <name>
+#
+# Relevant env variables:
+#
+#   - GROUP: Maven organization to publish to (also affects directory structure under src/).
+#   - GITHUB_USER: Github user or organization to point at in POM license/developer fields.
+#
+
+set -e
+
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <path> [name]" >&2
+  exit 1
+fi
+
+path="$1"
+shift
+
+if [ $# -gt 0 ]; then
+  name="$1"
+  shift
+else
+  name="$(basename "$path")"
+fi
+
+echo "Making $name at $path"
+
+mkdir -p "$path"
+cd "$path"
+
+# Make build.sbt
+
+GROUP="${GROUP:-org.hammerlab}"
+if [ "$GROUP" != "org.hammerlab" ]; then
+  echo "organization := \"$GROUP\"" >> build.sbt
+fi
+echo "name := \"$name\"" >> build.sbt
+cat >>build.sbt <<EOF
+version := "1.0.0"
+libraryDependencies ++= Seq(
+)
+EOF
+
+GITHUB_USER="${GITHUB_USER:-hammerlab}"
+
+mkdir project
+echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.0.5")' > project/plugins.sbt
+
+echo target > .gitignore
+
+wget "https://raw.githubusercontent.com/hammerlab/guacamole/master/LICENSE"
+
+# Make README.md
+echo "# $name" > README.md
+echo '' >> README.md
+echo "[![Build Status](https://travis-ci.org/$GITHUB_USER/$name.svg?branch=master)](https://travis-ci.org/$GITHUB_USER/$name)" >> README.md
+echo "[![Coverage Status](https://coveralls.io/repos/github/$GITHUB_USER/$name/badge.svg?branch=master)](https://coveralls.io/github/$GITHUB_USER/$name?branch=master)" >> README.md
+echo "[![Maven Central](https://img.shields.io/maven-central/v/org.$GITHUB_USER/$name_2.11.svg?maxAge=1800)](http://search.maven.org/#search%7Cga%7C1%7C$name)" >> README.md
+echo '' >> README.md
+
+GROUP_PATH="$(echo "$GROUP" | perl -pe 's/\./\//g')"
+echo "GROUP_PATH: $GROUP_PATH"
+
+md src/{main,test}/scala/$GROUP_PATH/$name
+git init
+
+cat >.travis.yml <<EOF
+language: scala
+sudo: false
+
+script: sbt clean coverage test
+
+cache:
+  directories:
+  - \$HOME/.ivy2/cache
+  - \$HOME/.sbt/boot/
+  - \$HOME/.zinc
+
+after_success: sbt coverageReport coveralls
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find \$HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find \$HOME/.sbt -name "*.lock" -delete
+EOF
