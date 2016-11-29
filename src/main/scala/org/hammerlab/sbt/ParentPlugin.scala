@@ -85,7 +85,7 @@ object ParentPlugin extends AutoPlugin {
       },
 
       // Add a classifier to the default (unshaded) JAR.
-      artifactClassifier := Some("unshaded"),
+      artifactClassifier in packageBin := Some("unshaded"),
 
       artifact in (Compile, assembly) := {
         // Make the assembly JAR the unclassified artifact.
