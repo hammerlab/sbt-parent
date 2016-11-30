@@ -12,8 +12,11 @@ object ParentPlugin extends AutoPlugin {
     val libraries = settingKey[Map[Symbol, ModuleID]]("Some common dependencies/versions")
 
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
-    val sparkVersion = settingKey[String]("Default Spark version to use")
+
+    val sparkVersion = settingKey[String]("Spark version to use")
     val spark2Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark2 is set.")
+
+    val hadoopVersion = settingKey[String]("Hadoop version to use")
 
     val githubUser = settingKey[String]("Github user/org to point to")
 
@@ -147,8 +150,11 @@ object ParentPlugin extends AutoPlugin {
     val versionSettings =
       Seq(
         scalatestVersion := "3.0.0",
+
         sparkVersion := "1.6.3",
         spark2Version := "2.0.2",
+
+        hadoopVersion := "2.6.0",
 
         libraries := {
           val sv =
@@ -160,8 +166,10 @@ object ParentPlugin extends AutoPlugin {
           Map(
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'spark -> "org.apache.spark" %% "spark-core" % sv,
+            'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
             'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.4",
-            'spire -> "org.spire-math" %% "spire" % "0.11.0"
+            'spire -> "org.spire-math" %% "spire" % "0.11.0",
+            'hadoop -> ("org.apache.hadoop" % "hadoop-client" % hadoopVersion.value exclude("javax.servlet", "*"))
           )
         }
       )
@@ -197,6 +205,7 @@ object ParentPlugin extends AutoPlugin {
       organization := "org.hammerlab",
       githubUser := "hammerlab",
       parallelExecution in Test := false,
+      scalaVersion := "2.11.8",
       crossScalaVersions := Seq("2.10.6", "2.11.8")
     ) ++
       depsSettings ++
