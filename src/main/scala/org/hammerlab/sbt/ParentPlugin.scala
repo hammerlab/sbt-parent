@@ -1,6 +1,7 @@
 package org.hammerlab.sbt
 
-import sbt.Keys._
+import sbt.Keys.{ testFrameworks, _ }
+import sbt.TestFrameworks.ScalaTest
 import sbt._
 import sbtassembly.AssemblyPlugin
 import sbtassembly.AssemblyPlugin.autoImport.{ ShadeRule, assembly, assemblyExcludedJars, assemblyJarName, assemblyShadeRules }
@@ -147,10 +148,19 @@ object ParentPlugin extends AutoPlugin {
         }
       )
 
-    val versionSettings =
+    val testSettings =
       Seq(
         scalatestVersion := "3.0.0",
+        testFrameworks := Seq(ScalaTest),
 
+        testDeps := Seq(libraries.value('scalatest)),
+        libraryDependencies ++= testDeps.value.map(_ % "test"),
+
+        parallelExecution in Test := false
+      )
+
+    val versionSettings =
+      Seq(
         sparkVersion := "1.6.3",
         spark2Version := "2.0.2",
 
@@ -167,9 +177,10 @@ object ParentPlugin extends AutoPlugin {
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'spark -> "org.apache.spark" %% "spark-core" % sv,
             'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
-            'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.4",
+            'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.7",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
-            'hadoop -> ("org.apache.hadoop" % "hadoop-client" % hadoopVersion.value exclude("javax.servlet", "*"))
+            'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
+            'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client"))
           )
         }
       )
@@ -193,22 +204,22 @@ object ParentPlugin extends AutoPlugin {
     val depsSettings =
       Seq(
         providedDeps := Nil,
-        testDeps := Seq(libraries.value('scalatest)),
         shadedDeps := Nil,
 
         libraryDependencies ++= providedDeps.value.map(_ % "provided"),
-        libraryDependencies ++= testDeps.value.map(_ % "test"),
-        libraryDependencies ++= shadedDeps.value
+        libraryDependencies ++= shadedDeps.value,
+
+        excludeDependencies += SbtExclusionRule("javax.servlet", "servlet-api")
       )
 
     Seq(
       organization := "org.hammerlab",
       githubUser := "hammerlab",
-      parallelExecution in Test := false,
       scalaVersion := "2.11.8",
       crossScalaVersions := Seq("2.10.6", "2.11.8")
     ) ++
       depsSettings ++
+      testSettings ++
       versionSettings ++
       mavenSettings ++
       assemblySettings
