@@ -99,7 +99,9 @@ object ParentPlugin extends AutoPlugin {
       packagedArtifacts := {
         // Don't publish the unshaded JAR.
         val newArtifacts = packagedArtifacts.value.filterKeys(_.classifier != Some("unshaded"))
-        streams.value.log.debug(s"packagedArtifacts, after removing unshaded JAR:\n${newArtifacts.mkString("\t", "\n\t", "")}")
+        streams.value.log.debug(
+          s"packagedArtifacts, after removing unshaded JAR:\n${newArtifacts.mkString("\t", "\n\t", "")}"
+        )
         newArtifacts
       }
     ) ++ addArtifact(artifact in (Compile, assembly), assembly)  // Publish the assembly JAR.
@@ -174,13 +176,21 @@ object ParentPlugin extends AutoPlugin {
               sparkVersion.value
 
           Map(
+            'args4j -> "args4j" % "args4j" % "2.33",
+            'args4s -> "org.hammerlab" %% "args4s" % "1.0.0",
+            'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
+            'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
+            'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
+            'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.21",
+            'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
+            'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'spark -> "org.apache.spark" %% "spark-core" % sv,
-            'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
+            'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.0",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.1.3",
             'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.7",
-            'spire -> "org.spire-math" %% "spire" % "0.11.0",
-            'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
-            'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client"))
+            'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
+            'spire -> "org.spire-math" %% "spire" % "0.11.0"
           )
         }
       )
