@@ -189,10 +189,11 @@ object ParentPlugin extends AutoPlugin {
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> "org.apache.spark" %% "spark-core" % sv,
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.1.3",
-            'spark_testing_base -> "com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.7",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.2.1",
+            'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.7" exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
-            'spire -> "org.spire-math" %% "spire" % "0.11.0"
+            'spire -> "org.spire-math" %% "spire" % "0.11.0",
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.0.1"
           )
         }
       )
