@@ -193,7 +193,8 @@ object ParentPlugin extends AutoPlugin {
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.7" exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.0.1"
+            'string_utils -> "org.hammerlab" %% "string-utils" % "1.1.1",
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.0"
           )
         }
       )
