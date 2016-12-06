@@ -182,7 +182,7 @@ object ParentPlugin extends AutoPlugin {
             'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % "0.2.10",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
-            'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.21",
+            'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
