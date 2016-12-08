@@ -1,6 +1,6 @@
 # sbt-parent
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.hammerlab/sbt-parent.svg)](http://search.maven.org/#artifactdetails%7Corg.hammerlab%7Csbt-parent%7C1.0.0%7Cjar)
+[![Maven Central](https://img.shields.io/maven-central/v/org.hammerlab/sbt-parent.svg)](http://search.maven.org/#search%7Cga%7C1%7Csbt-parent)
 
 SBT plugin factoring out boilerplate for publishing to Maven Central, optionally cross-building against Apache Spark 1.x and 2.x versions, and building+publishing thin shaded JARs.
 
@@ -31,7 +31,7 @@ This will set create stubs for the following files:
 To use `sbt-parent` in an existing project, add this to its `project/plugins.sbt`:
 
 ```
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.2.0")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.2.10")
 ```
 
 Then you can specify minimal configuration in your `build.sbt`:
