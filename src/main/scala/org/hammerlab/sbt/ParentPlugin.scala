@@ -26,6 +26,8 @@ object ParentPlugin extends AutoPlugin {
 
     val shadedDeps = settingKey[Seq[ModuleID]]("When set, the main JAR produced will include these libraries shaded")
     val shadeRenames = settingKey[Seq[(String, String)]]("Shading renames to perform")
+
+    val assemblyIncludeScala = settingKey[Boolean]("When set, include Scala libraries in the assembled JAR")
   }
 
   import autoImport._
@@ -213,7 +215,9 @@ object ParentPlugin extends AutoPlugin {
 
         test in assembly := {},
 
-        assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)
+        assemblyIncludeScala := false,
+
+        assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = assemblyIncludeScala.value)
       )
 
     val depsSettings =
