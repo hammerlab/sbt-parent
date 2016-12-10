@@ -52,7 +52,7 @@ EOF
 GITHUB_USER="${GITHUB_USER:-hammerlab}"
 
 mkdir project
-echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.3.2")' >> project/plugins.sbt
+echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.3.4")' >> project/plugins.sbt
 echo 'sbt.version=0.13.13' > project/build.properties
 
 echo target > .gitignore
@@ -64,7 +64,7 @@ echo "# $name" >> README.md
 echo '' >> README.md
 echo "[![Build Status](https://travis-ci.org/$GITHUB_USER/$name.svg?branch=master)](https://travis-ci.org/$GITHUB_USER/$name)" >> README.md
 echo "[![Coverage Status](https://coveralls.io/repos/github/$GITHUB_USER/$name/badge.svg?branch=master)](https://coveralls.io/github/$GITHUB_USER/$name?branch=master)" >> README.md
-echo "[![Maven Central](https://img.shields.io/maven-central/v/org.$GITHUB_USER/${name}_2.11.svg?maxAge=600)](http://search.maven.org/#search%7Cga%7C1%7C$name)" >> README.md
+echo "[![Maven Central](https://img.shields.io/maven-central/v/$GROUP/${name}_2.11.svg?maxAge=600)](http://search.maven.org/#search%7Cga%7C1%7C${GROUP}%20${name})" >> README.md
 echo '' >> README.md
 
 GROUP_PATH="$(echo "$GROUP" | perl -pe 's/\./\//g')"

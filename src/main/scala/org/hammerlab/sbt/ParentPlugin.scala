@@ -37,6 +37,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
   }
   import autoImport._
 
+  // Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
+  // Scala version (indicated by travisCoverageScalaVersion).
   val travisReportCmd =
     Command.command("travis-report")(
       state ⇒ {
@@ -70,13 +72,16 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
   override def requires: Plugins = super.requires && AssemblyPlugin && Sonatype
 
-  // Evaluate these settings to publish a "thin" assembly JAR instead of the default, unshaded JAR.
+  // Evaluate these settings to build a "thin" assembly JAR instead of the default and publish it in place of the usual
+  // (unshaded) JAR.
   val publishThinShadedJar: SettingsDefinition =
     Seq(
       assemblyExcludedJars in assembly := {
         val log = streams.value.log
 
         val cp = (fullClasspath in assembly).value
+
+        // Build best-guesses of basenames of JARs corresponding to the deps we want to shade: s"$name-$version.jar".
         val shadedDepJars =
           shadedDeps
             .value
@@ -98,10 +103,13 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         log.debug(s"Looking for jars to shade:\n${shadedDepJars.mkString("\t", "\n\t", "")}")
 
+        // Scan the classpath flagging JARs *to exclude*: all JARs whose basenames don't match our JARs-to-shade list
+        // from above.
         cp filter { path => {
           val name = path.data.getName
 
           val exclude = !shadedDepJars(name)
+
           if (exclude)
             log.debug(s"Skipping JAR: $name")
           else
@@ -137,6 +145,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
   override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = {
 
+    // Settings to configure `publish`, `publishM2`, and `publishSigned`.
     val mavenSettings =
       Seq(
         publishTo := {
@@ -182,11 +191,18 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
     val testSettings =
       Seq(
         scalatestVersion := "3.0.0",
+
+        // Only use ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
+        // test-command-lines/args/classpaths.
         testFrameworks := Seq(ScalaTest),
 
+        // Add a scalatest test-dep by default!
         testDeps := Seq(libraries.value('scalatest)),
+
+        // Add any other `testDeps` as test-scoped dependencies.
         libraryDependencies ++= testDeps.value.map(_ % "test"),
 
+        // SparkContexts play poorly with parallel test-execution.
         parallelExecution in Test := false
       )
 
@@ -218,7 +234,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.0",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.1",
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> "org.apache.spark" %% "spark-core" % sv,
@@ -233,27 +249,39 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         }
       )
 
+    // Settings related to the sbt-assembly plugin.
     val assemblySettings =
       Seq(
         shadeRenames := Nil,
         shadedDeps := Nil,
 
+        // If any shadeRenames are specified, apply them.
         assemblyShadeRules in assembly ++= Seq(
           ShadeRule.rename(
             shadeRenames.value: _*
           ).inAll
         ),
 
+        // Don't run tests when building assembly JAR, by default.
         test in assembly := {},
 
+        // Don't include scala in the assembly JAR, by default; if it is used with Spark downstream, the runtime will
+        // include the Scala libraries.
         assemblyIncludeScala := false,
 
+        // If the user overrides the above by setting assemblyIncludeScala to true, pick that up here.
         assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = assemblyIncludeScala.value)
       )
 
+    // Settings related to running in Travis CI.
     val travisSettings =
       Seq(
         travisCoverageScalaVersion := scalaVersion.value,
+
+        // Register `travis-report` from above.
+        commands += travisReportCmd,
+
+        // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
         coverageEnabled := (
           if (System.getenv("TRAVIS_SCALA_VERSION") == travisCoverageScalaVersion.value)
             true
@@ -270,6 +298,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         libraryDependencies ++= providedDeps.value.map(_ % "provided"),
         libraryDependencies ++= shadedDeps.value,
 
+        // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
         excludeDependencies += SbtExclusionRule("javax.servlet", "servlet-api")
       )
 
@@ -278,7 +307,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       githubUser := "hammerlab",
       scalaVersion := "2.11.8",
       crossScalaVersions := Seq("2.10.6", "2.11.8"),
-      commands += travisReportCmd,
+
+      // All org.hammerlab* repos are published with this Sonatype profile.
       sonatypeProfileName := (
         if (organization.value.startsWith("org.hammerlab"))
           "org.hammerlab"
