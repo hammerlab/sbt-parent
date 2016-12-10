@@ -1,13 +1,15 @@
 package org.hammerlab.sbt
 
-import sbt.Keys.{ testFrameworks, _ }
+import org.scoverage.coveralls.CommandSupport
+import sbt.Keys.{ commands, testFrameworks, _ }
 import sbt.TestFrameworks.ScalaTest
 import sbt._
+import sbtassembly.AssemblyKeys.assemblyOption
 import sbtassembly.AssemblyPlugin
 import sbtassembly.AssemblyPlugin.autoImport.{ ShadeRule, assembly, assemblyExcludedJars, assemblyJarName, assemblyShadeRules }
-import sbtassembly.AssemblyKeys.assemblyOption
+import scoverage.ScoverageKeys.{ coverageEnabled, coverageReport }
 
-object ParentPlugin extends AutoPlugin {
+object ParentPlugin extends AutoPlugin with CommandSupport {
 
   object autoImport {
     val libraries = settingKey[Map[Symbol, ModuleID]]("Some common dependencies/versions")
@@ -15,7 +17,7 @@ object ParentPlugin extends AutoPlugin {
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
 
     val sparkVersion = settingKey[String]("Spark version to use")
-    val spark2Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark2 is set.")
+    val spark1Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark1 is set.")
 
     val hadoopVersion = settingKey[String]("Hadoop version to use")
 
@@ -28,14 +30,37 @@ object ParentPlugin extends AutoPlugin {
     val shadeRenames = settingKey[Seq[(String, String)]]("Shading renames to perform")
 
     val assemblyIncludeScala = settingKey[Boolean]("When set, include Scala libraries in the assembled JAR")
-  }
 
+    val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
+  }
   import autoImport._
 
-  // Helper for appending "_spark2" to a project's name iff the "spark2" env var is set.
+  val travisReportCmd =
+    Command.command("travis-report")(
+      state ⇒ {
+        implicit val iState = state
+        val extracted = Project.extract(state)
+        implicit val pr = extracted.currentRef
+        implicit val bs = extracted.structure
+
+        val actualTravisScalaVersion = System.getenv("TRAVIS_SCALA_VERSION")
+        val tcsv = travisCoverageScalaVersion.gimme
+
+        if (actualTravisScalaVersion == tcsv) {
+          val nextState = Project.runTask(coverageReport, state).map(_._1).getOrElse(state)
+          Command.process("coveralls", nextState)
+        } else {
+
+          log.info(s"Skipping coverage reporting for scala version $actualTravisScalaVersion (reporting enabled for $tcsv)")
+          state
+        }
+      }
+    )
+
+  // Helper for appending "_spark1" to a project's name iff the "spark1" env var is set.
   def sparkName(name: String): String =
-    if (System.getProperty("spark2") != null)
-      s"${name}_spark2"
+    if (System.getProperty("spark1") != null)
+      s"${name}_spark1"
     else
       name
 
@@ -165,15 +190,15 @@ object ParentPlugin extends AutoPlugin {
 
     val versionSettings =
       Seq(
-        sparkVersion := "1.6.3",
-        spark2Version := "2.0.2",
+        sparkVersion := "2.0.2",
+        spark1Version := "1.6.3",
 
         hadoopVersion := "2.6.0",
 
         libraries := {
           val sv =
-            if (System.getProperty("spark2") != null)
-              spark2Version.value
+            if (System.getProperty("spark1") != null)
+              spark1Version.value
             else
               sparkVersion.value
 
@@ -220,6 +245,17 @@ object ParentPlugin extends AutoPlugin {
         assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = assemblyIncludeScala.value)
       )
 
+    val travisSettings =
+      Seq(
+        travisCoverageScalaVersion := "2.11.8",
+        coverageEnabled := (
+          if (System.getenv("TRAVIS_SCALA_VERSION") == travisCoverageScalaVersion.value)
+            true
+          else
+            coverageEnabled.value
+        )
+      )
+
     val depsSettings =
       Seq(
         providedDeps := Nil,
@@ -235,10 +271,12 @@ object ParentPlugin extends AutoPlugin {
       organization := "org.hammerlab",
       githubUser := "hammerlab",
       scalaVersion := "2.11.8",
-      crossScalaVersions := Seq("2.10.6", "2.11.8")
+      crossScalaVersions := Seq("2.10.6", "2.11.8"),
+      commands += travisReportCmd
     ) ++
       depsSettings ++
       testSettings ++
+      travisSettings ++
       versionSettings ++
       mavenSettings ++
       assemblySettings
