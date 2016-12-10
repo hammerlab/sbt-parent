@@ -247,7 +247,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
     val travisSettings =
       Seq(
-        travisCoverageScalaVersion := "2.11.8",
+        travisCoverageScalaVersion := scalaVersion.value,
         coverageEnabled := (
           if (System.getenv("TRAVIS_SCALA_VERSION") == travisCoverageScalaVersion.value)
             true

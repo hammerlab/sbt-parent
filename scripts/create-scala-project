@@ -52,7 +52,7 @@ EOF
 GITHUB_USER="${GITHUB_USER:-hammerlab}"
 
 mkdir project
-echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.2.7")' >> project/plugins.sbt
+echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "1.3.1")' >> project/plugins.sbt
 
 echo target > .gitignore
 
@@ -82,7 +82,7 @@ scala:
   - 2.10.6
   - 2.11.8
 
-script: sbt ++\$TRAVIS_SCALA_VERSION clean coverage test
+script: sbt ++\$TRAVIS_SCALA_VERSION clean test
 
 cache:
   directories:
@@ -90,7 +90,7 @@ cache:
   - \$HOME/.sbt/boot/
   - \$HOME/.zinc
 
-after_success: sbt ++\$TRAVIS_SCALA_VERSION coverageReport coveralls
+after_success: sbt ++\$TRAVIS_SCALA_VERSION travis-report
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
