@@ -203,12 +203,14 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
               sparkVersion.value
 
           Map(
+            'adam_core -> "org.hammerlab.adam" %% "adam-core" % "0.20.3",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" %% "args4s" % "1.0.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
             'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % "0.2.10",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
+            'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
             'iterators -> "org.hammerlab" %% "iterator" % "1.1.0",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
