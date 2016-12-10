@@ -8,6 +8,8 @@ import sbtassembly.AssemblyKeys.assemblyOption
 import sbtassembly.AssemblyPlugin
 import sbtassembly.AssemblyPlugin.autoImport.{ ShadeRule, assembly, assemblyExcludedJars, assemblyJarName, assemblyShadeRules }
 import scoverage.ScoverageKeys.{ coverageEnabled, coverageReport }
+import xerial.sbt.Sonatype
+import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
 object ParentPlugin extends AutoPlugin with CommandSupport {
 
@@ -66,7 +68,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
   override def trigger: PluginTrigger = allRequirements
 
-  override def requires: Plugins = super.requires && AssemblyPlugin
+  override def requires: Plugins = super.requires && AssemblyPlugin && Sonatype
 
   // Evaluate these settings to publish a "thin" assembly JAR instead of the default, unshaded JAR.
   val publishThinShadedJar: SettingsDefinition =
@@ -208,6 +210,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'args4s -> "org.hammerlab" %% "args4s" % "1.0.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
             'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % "0.2.10",
+            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.0.0",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
@@ -215,6 +218,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.0",
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> "org.apache.spark" %% "spark-core" % sv,
@@ -274,7 +278,13 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       githubUser := "hammerlab",
       scalaVersion := "2.11.8",
       crossScalaVersions := Seq("2.10.6", "2.11.8"),
-      commands += travisReportCmd
+      commands += travisReportCmd,
+      sonatypeProfileName := (
+        if (organization.value.startsWith("org.hammerlab"))
+          "org.hammerlab"
+        else
+          sonatypeProfileName.value
+      )
     ) ++
       depsSettings ++
       testSettings ++
