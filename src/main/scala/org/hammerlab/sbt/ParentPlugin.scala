@@ -1,7 +1,8 @@
 package org.hammerlab.sbt
 
+import com.typesafe.sbt.SbtScalariform
 import org.scoverage.coveralls.CommandSupport
-import sbt.Keys.{ commands, testFrameworks, _ }
+import sbt.Keys._
 import sbt.TestFrameworks.ScalaTest
 import sbt._
 import sbtassembly.AssemblyKeys.assemblyOption
@@ -13,28 +14,150 @@ import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
 object ParentPlugin extends AutoPlugin with CommandSupport {
 
+  import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+
+  import scalariform.formatter.preferences._
+
   object autoImport {
     val libraries = settingKey[Map[Symbol, ModuleID]]("Some common dependencies/versions")
 
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
+
+    val sparkTestingBaseVersion = settingKey[String]("Version of holdenk/spark-testing-base to use")
 
     val sparkVersion = settingKey[String]("Spark version to use")
     val spark1Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark1 is set.")
 
     val hadoopVersion = settingKey[String]("Hadoop version to use")
 
+    val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
+
     val githubUser = settingKey[String]("Github user/org to point to")
 
     val providedDeps = settingKey[Seq[ModuleID]]("Dependencies to be scoped 'provided'")
+
     val testDeps = settingKey[Seq[ModuleID]]("Dependencies to be scoped 'test'")
+    val testJarTestDeps = settingKey[Seq[ModuleID]]("Modules whose \"tests\"-qualified artifacts should be test-dependencies")
 
     val shadedDeps = settingKey[Seq[ModuleID]]("When set, the main JAR produced will include these libraries shaded")
     val shadeRenames = settingKey[Seq[(String, String)]]("Shading renames to perform")
 
+    val crossSpark1Deps = settingKey[Seq[ModuleID]]("Deps whose artifact-names should have a \"-spark1\" appended to them when building against the Spark 1.x line")
+    val crossSpark2Deps = settingKey[Seq[ModuleID]]("Deps whose artifact-names should have a \"-spark2\" appended to them when building against the Spark 2.x line")
+
+    val isSpark1 = settingKey[Boolean]("True when sparkVersion starts with '1'")
+    val isSpark2 = settingKey[Boolean]("True when sparkVersion starts with '2'")
+
     val assemblyIncludeScala = settingKey[Boolean]("When set, include Scala libraries in the assembled JAR")
 
+    val enableScalariform = (
+      SbtScalariform.defaultScalariformSettings ++
+        Seq(
+          ScalariformKeys.preferences := ScalariformKeys.preferences.value
+                                         .setPreference(AlignParameters, true)
+                                         .setPreference(CompactStringConcatenation, false)
+                                         .setPreference(AlignSingleLineCaseStatements, true)
+                                         .setPreference(DoubleIndentClassDeclaration, true)
+                                         .setPreference(PreserveDanglingCloseParenthesis, true)
+        )
+      )
+
+    // Helper for appending "_spark1" to a project's name iff the "spark1" env var is set.
+    def sparkName(name: String): String =
+      if (System.getProperty("spark1") != null)
+        s"${name}_spark1"
+      else
+        name
+
     val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
+
+    // Evaluate these settings to build a "thin" assembly JAR instead of the default and publish it in place of the
+    // usual (unshaded) JAR.
+    val publishThinShadedJar: SettingsDefinition =
+      Seq(
+        assemblyExcludedJars in assembly := {
+          val log = streams.value.log
+
+          val cp = (fullClasspath in assembly).value
+
+          // Build best-guesses of basenames of JARs corresponding to the deps we want to shade: s"$name-$version.jar".
+          val shadedDepJars =
+            shadedDeps
+            .value
+            .map(
+              dep => {
+                val crossFn =
+                  CrossVersion(
+                    dep.crossVersion,
+                    scalaVersion.value,
+                    scalaBinaryVersion.value
+                  )
+                  .getOrElse((x: String) => x)
+
+                val name = crossFn(dep.name)
+                s"$name-${dep.revision}.jar"
+              }
+            )
+            .toSet
+
+          log.debug(s"Looking for jars to shade:\n${shadedDepJars.mkString("\t", "\n\t", "")}")
+
+          // Scan the classpath flagging JARs *to exclude*: all JARs whose basenames don't match our JARs-to-shade list
+          // from above.
+          cp filter { path => {
+            val name = path.data.getName
+
+            val exclude = !shadedDepJars(name)
+
+            if (exclude)
+              log.debug(s"Skipping JAR: $name")
+            else
+              log.debug(s"Shading classes jar: $name")
+
+            exclude
+          }}
+        },
+
+        assemblyJarName in assembly := {
+          val newName = s"${name.value}_${scalaBinaryVersion.value}-${version.value}.jar"
+          streams.value.log.debug(s"overwriting assemblyJarName: ${assemblyJarName in assembly value} -> $newName")
+          newName
+        },
+
+        // Add a classifier to the default (unshaded) JAR.
+        artifactClassifier in packageBin := Some("unshaded"),
+
+        artifact in (Compile, assembly) := {
+          // Make the assembly JAR the unclassified artifact.
+          (artifact in (Compile, assembly)).value.copy(classifier = None)
+        },
+
+        packagedArtifacts := {
+          // Don't publish the unshaded JAR.
+          val newArtifacts = packagedArtifacts.value.filterKeys(_.classifier != Some("unshaded"))
+          streams.value.log.debug(
+            s"packagedArtifacts, after removing unshaded JAR:\n${newArtifacts.mkString("\t", "\n\t", "")}"
+          )
+          newArtifacts
+        }
+      ) ++
+        addArtifact(artifact in (Compile, assembly), assembly)  // Publish the assembly JAR.
+
+
+    val addSparkDeps: SettingsDefinition =
+      Seq(
+        providedDeps ++=
+          Seq(
+            libraries.value('spark),
+            libraries.value('hadoop)
+          ),
+        testDeps += libraries.value('spark_tests),
+        libraryDependencies += libraries.value('kryo)
+      )
+
+    val publishTestJar = (publishArtifact in Test := true)
   }
+
   import autoImport._
 
   // Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
@@ -61,87 +184,9 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       }
     )
 
-  // Helper for appending "_spark1" to a project's name iff the "spark1" env var is set.
-  def sparkName(name: String): String =
-    if (System.getProperty("spark1") != null)
-      s"${name}_spark1"
-    else
-      name
-
   override def trigger: PluginTrigger = allRequirements
 
   override def requires: Plugins = super.requires && AssemblyPlugin && Sonatype
-
-  // Evaluate these settings to build a "thin" assembly JAR instead of the default and publish it in place of the usual
-  // (unshaded) JAR.
-  val publishThinShadedJar: SettingsDefinition =
-    Seq(
-      assemblyExcludedJars in assembly := {
-        val log = streams.value.log
-
-        val cp = (fullClasspath in assembly).value
-
-        // Build best-guesses of basenames of JARs corresponding to the deps we want to shade: s"$name-$version.jar".
-        val shadedDepJars =
-          shadedDeps
-            .value
-            .map(
-              dep => {
-                val crossFn =
-                  CrossVersion(
-                    dep.crossVersion,
-                    scalaVersion.value,
-                    scalaBinaryVersion.value
-                  )
-                  .getOrElse((x: String) => x)
-
-                val name = crossFn(dep.name)
-                s"$name-${dep.revision}.jar"
-              }
-            )
-            .toSet
-
-        log.debug(s"Looking for jars to shade:\n${shadedDepJars.mkString("\t", "\n\t", "")}")
-
-        // Scan the classpath flagging JARs *to exclude*: all JARs whose basenames don't match our JARs-to-shade list
-        // from above.
-        cp filter { path => {
-          val name = path.data.getName
-
-          val exclude = !shadedDepJars(name)
-
-          if (exclude)
-            log.debug(s"Skipping JAR: $name")
-          else
-            log.debug(s"Shading classes jar: $name")
-
-          exclude
-        }}
-      },
-
-      assemblyJarName in assembly := {
-        val newName = s"${name.value}_${scalaBinaryVersion.value}-${version.value}.jar"
-        streams.value.log.debug(s"overwriting assemblyJarName: ${assemblyJarName in assembly value} -> $newName")
-        newName
-      },
-
-      // Add a classifier to the default (unshaded) JAR.
-      artifactClassifier in packageBin := Some("unshaded"),
-
-      artifact in (Compile, assembly) := {
-        // Make the assembly JAR the unclassified artifact.
-        (artifact in (Compile, assembly)).value.copy(classifier = None)
-      },
-
-      packagedArtifacts := {
-        // Don't publish the unshaded JAR.
-        val newArtifacts = packagedArtifacts.value.filterKeys(_.classifier != Some("unshaded"))
-        streams.value.log.debug(
-          s"packagedArtifacts, after removing unshaded JAR:\n${newArtifacts.mkString("\t", "\n\t", "")}"
-        )
-        newArtifacts
-      }
-    ) ++ addArtifact(artifact in (Compile, assembly), assembly)  // Publish the assembly JAR.
 
   override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = {
 
@@ -188,19 +233,59 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         }
       )
 
+    val sparkSettings =
+      Seq(
+        isSpark1 := sparkVersion.value(0) == '1',
+        isSpark2 := sparkVersion.value(0) == '2',
+        crossSpark1Deps := Seq(),
+        crossSpark2Deps := Seq(),
+        libraryDependencies ++= crossSpark1Deps.value.map(
+          dep ⇒
+            if (isSpark1.value)
+              dep.copy(name = dep.name + "_spark1")
+            else
+              dep
+        ),
+        libraryDependencies ++= crossSpark2Deps.value.map(
+          dep ⇒
+            if (isSpark2.value)
+              dep.copy(name = dep.name + "_spark2")
+            else
+              dep
+        )
+      )
+
     val testSettings =
       Seq(
         scalatestVersion := "3.0.0",
+
+        sparkTestingBaseVersion := {
+          val isSp1 = isSpark1.value
+          val sv =
+            if (isSp1)
+              spark1Version.value
+            else
+              sparkVersion.value
+
+          if (scalaBinaryVersion.value == "2.10" && (!isSp1 || sv(0) == '2'))
+            // spark-testing-base topped out at Spark 2.0.0 for Scala 2.10.
+            "2.0.0_0.4.7"
+          else
+            s"${sv}_0.4.7"
+        },
 
         // Only use ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
         // test-command-lines/args/classpaths.
         testFrameworks := Seq(ScalaTest),
 
-        // Add a scalatest test-dep by default!
-        testDeps := Seq(libraries.value('scalatest)),
+        // Add a hammerlab:test-utils as a test-dep by default.
+        testDeps := Seq(libraries.value('test_utils)),
+
+        testJarTestDeps := Seq(),
 
         // Add any other `testDeps` as test-scoped dependencies.
         libraryDependencies ++= testDeps.value.map(_ % "test"),
+        libraryDependencies ++= testJarTestDeps.value.map(_ % "test" classifier("tests")),
 
         // SparkContexts play poorly with parallel test-execution.
         parallelExecution in Test := false
@@ -212,6 +297,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         spark1Version := "1.6.3",
 
         hadoopVersion := "2.6.0",
+
+        bdgUtilsVersion := "0.2.10",
 
         libraries := {
           val sv =
@@ -225,13 +312,21 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" %% "args4s" % "1.0.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
-            'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % "0.2.10",
+            'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % bdgUtilsVersion.value,
+            'bdg_utils_intervalrdd -> "org.bdgenomics.utils" %% "utils-intervalrdd" % bdgUtilsVersion.value,
+            'bdg_utils_io -> "org.bdgenomics.utils" %% "utils-io" % bdgUtilsVersion.value,
+            'bdg_utils_metrics -> "org.bdgenomics.utils" %% "utils-metrics" % bdgUtilsVersion.value,
+            'bdg_utils_misc -> "org.bdgenomics.utils" %% "utils-misc" % bdgUtilsVersion.value,
+            'commons_io -> "commons-io" % "commons-io" % "2.4",
+            'commons_math -> "org.apache.commons" % "commons-math3" % "3.0",
             'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.0.0",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
             'iterators -> "org.hammerlab" %% "iterator" % "1.1.0",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
+            'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
+            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.2",
             'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.1",
@@ -240,7 +335,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'spark -> "org.apache.spark" %% "spark-core" % sv,
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
             'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.2.1",
-            'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % s"${sv}_0.4.7" exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
+            'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.1.1",
@@ -317,6 +412,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       )
     ) ++
       depsSettings ++
+      sparkSettings ++
       testSettings ++
       travisSettings ++
       versionSettings ++
