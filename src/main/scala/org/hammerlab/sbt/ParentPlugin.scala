@@ -383,7 +383,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "adam-core" % "0.20.3",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.20.4-SNAPSHOT",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.1.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
@@ -395,17 +395,20 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'breeze -> "org.scalanlp" %% "breeze" % "0.12",
             'commons_io -> "commons-io" % "commons-io" % "2.4",
             'commons_math -> "org.apache.commons" % "commons-math3" % "3.6.1",
-            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.0.0",
+            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.1.0-SNAPSHOT",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
             'iterators -> "org.hammerlab" %% "iterator" % "1.1.1",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
+            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.0-SNAPSHOT",
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
-            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.2",
+            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.3-SNAPSHOT",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.1",
+            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.0-SNAPSHOT",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.0-SNAPSHOT",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.2-SNAPSHOT",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
