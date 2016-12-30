@@ -4,7 +4,7 @@ name := "sbt-parent"
 
 organization := "org.hammerlab"
 
-version := "1.5.0"
+version := "1.5.1"
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
