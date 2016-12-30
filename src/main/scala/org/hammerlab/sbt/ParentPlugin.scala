@@ -6,8 +6,8 @@ import sbt.Keys._
 import sbt.TestFrameworks.ScalaTest
 import sbt._
 import sbtassembly.AssemblyKeys.assemblyOption
-import sbtassembly.AssemblyPlugin
-import sbtassembly.AssemblyPlugin.autoImport.{ ShadeRule, assembly, assemblyExcludedJars, assemblyJarName, assemblyShadeRules }
+import sbtassembly.{ AssemblyPlugin, PathList }
+import sbtassembly.AssemblyPlugin.autoImport.{ MergeStrategy, ShadeRule, assembly, assemblyExcludedJars, assemblyJarName, assemblyMergeStrategy, assemblyShadeRules }
 import scoverage.ScoverageKeys.{ coverageEnabled, coverageReport }
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
@@ -19,7 +19,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
   import scalariform.formatter.preferences._
 
   object autoImport {
-    val libraries = settingKey[Map[Symbol, ModuleID]]("Some common dependencies/versions")
+    val libs = settingKey[Map[Symbol, ModuleID]]("Some common dependencies/versions")
 
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
 
@@ -27,8 +27,10 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
     val sparkVersion = settingKey[String]("Spark version to use")
     val spark1Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark1 is set.")
+    val computedSparkVersion = settingKey[String]("Spark version to use, taking in to account 'spark.version' and 'spark1' env vars")
 
     val hadoopVersion = settingKey[String]("Hadoop version to use")
+    val computedHadoopVersion = settingKey[String]("Hadoop version to use, taking in to account the 'hadoop.version' env var")
 
     val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
 
@@ -36,8 +38,11 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
     val providedDeps = settingKey[Seq[ModuleID]]("Dependencies to be scoped 'provided'")
 
+    val deps = settingKey[Seq[ModuleID]]("Short-hand for libraryDependencies")
     val testDeps = settingKey[Seq[ModuleID]]("Dependencies to be scoped 'test'")
     val testJarTestDeps = settingKey[Seq[ModuleID]]("Modules whose \"tests\"-qualified artifacts should be test-dependencies")
+
+    val compileAndTestDeps = settingKey[Seq[ModuleID]]("Dependencies to be added as compile-scoped-compile-deps as well as test-scoped-test-deps")
 
     val shadedDeps = settingKey[Seq[ModuleID]]("When set, the main JAR produced will include these libraries shaded")
     val shadeRenames = settingKey[Seq[(String, String)]]("Shading renames to perform")
@@ -48,7 +53,17 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
     val isSpark1 = settingKey[Boolean]("True when sparkVersion starts with '1'")
     val isSpark2 = settingKey[Boolean]("True when sparkVersion starts with '2'")
 
+    val isScala210 = settingKey[Boolean]("True iff the Scala binary version is 2.10")
+    val isScala211 = settingKey[Boolean]("True iff the Scala binary version is 2.11")
+    val isScala212 = settingKey[Boolean]("True iff the Scala binary version is 2.12")
+
     val assemblyIncludeScala = settingKey[Boolean]("When set, include Scala libraries in the assembled JAR")
+
+    val noCrossPublishing =
+      Seq(
+        crossScalaVersions := Nil,
+        crossPaths := false
+      )
 
     val enableScalariform = (
       SbtScalariform.defaultScalariformSettings ++
@@ -62,12 +77,20 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         )
       )
 
+    def propOrElse(keys: String*)(default: String): String =
+      prop(keys: _*).getOrElse(default)
+
+    def prop(keys: String*): Option[String] =
+      keys
+        .flatMap(key ⇒ Option(System.getProperty(key)).toSeq)
+        .headOption
+
     // Helper for appending "_spark1" to a project's name iff the "spark1" env var is set.
     def sparkName(name: String): String =
-      if (System.getProperty("spark1") != null)
-        s"${name}_spark1"
-      else
-        name
+      prop("spark1") match {
+        case Some(_) ⇒ s"${name}_spark1"
+        case None ⇒ name
+      }
 
     val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
 
@@ -148,14 +171,46 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       Seq(
         providedDeps ++=
           Seq(
-            libraries.value('spark),
-            libraries.value('hadoop)
+            libs.value('spark),
+            libs.value('hadoop)
           ),
-        testDeps += libraries.value('spark_tests),
-        libraryDependencies += libraries.value('kryo)
+        testDeps += libs.value('spark_tests) exclude("org.apache.hadoop", "hadoop-client"),
+        libraryDependencies += libs.value('kryo)
       )
 
     val publishTestJar = (publishArtifact in Test := true)
+
+    val scala210Version = settingKey[String]("Patch version of Scala 2.10.x line to use")
+    val scala211Version = settingKey[String]("Patch version of Scala 2.11.x line to use")
+    val scala212Version = settingKey[String]("Patch version of Scala 2.12.x line to use")
+
+    val addScala212 = (crossScalaVersions += scala212Version.value)
+    val omitScala210 = (crossScalaVersions -= scala210Version.value)
+
+    val scala210Only =
+      Seq(
+        scalaVersion := scala210Version.value,
+        crossScalaVersions := Seq(scala210Version.value)
+      )
+
+    val scala211Only =
+      Seq(
+        scalaVersion := scala211Version.value,
+        crossScalaVersions := Seq(scala211Version.value)
+      )
+
+    val scala212Only =
+      Seq(
+        scalaVersion := scala212Version.value,
+        crossScalaVersions := Seq(scala212Version.value)
+      )
+
+    val takeFirstLog4JProperties =
+      assemblyMergeStrategy in assembly := {
+        // Two org.bdgenomics deps include the same log4j.properties.
+        case PathList("log4j.properties") => MergeStrategy.first
+        case x => (assemblyMergeStrategy in assembly).value(x)
+      }
   }
 
   import autoImport._
@@ -235,8 +290,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
     val sparkSettings =
       Seq(
-        isSpark1 := sparkVersion.value(0) == '1',
-        isSpark2 := sparkVersion.value(0) == '2',
+        isSpark1 := computedSparkVersion.value(0) == '1',
+        isSpark2 := computedSparkVersion.value(0) == '2',
         crossSpark1Deps := Seq(),
         crossSpark2Deps := Seq(),
         libraryDependencies ++= crossSpark1Deps.value.map(
@@ -260,32 +315,39 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         scalatestVersion := "3.0.0",
 
         sparkTestingBaseVersion := {
-          val isSp1 = isSpark1.value
-          val sv =
-            if (isSp1)
-              spark1Version.value
-            else
-              sparkVersion.value
-
-          if (scalaBinaryVersion.value == "2.10" && (!isSp1 || sv(0) == '2'))
+          if (scalaBinaryVersion.value == "2.10" && isSpark2.value)
             // spark-testing-base topped out at Spark 2.0.0 for Scala 2.10.
             "2.0.0_0.4.7"
           else
-            s"${sv}_0.4.7"
+            s"${computedSparkVersion.value}_0.4.7"
         },
+
+        testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
 
         // Only use ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
         // test-command-lines/args/classpaths.
         testFrameworks := Seq(ScalaTest),
 
-        // Add a hammerlab:test-utils as a test-dep by default.
-        testDeps := Seq(libraries.value('test_utils)),
+        // Implement "deps" as a short-hand for libraryDependencies to add
+        deps := Nil,
+        libraryDependencies ++= deps.value,
+
+        // Add hammerlab:test-utils and scalatest as test-deps by default.
+        testDeps := Seq(
+          libs.value('test_utils),
+          libs.value('scalatest)
+        ),
 
         testJarTestDeps := Seq(),
+
+        compileAndTestDeps := Seq(),
 
         // Add any other `testDeps` as test-scoped dependencies.
         libraryDependencies ++= testDeps.value.map(_ % "test"),
         libraryDependencies ++= testJarTestDeps.value.map(_ % "test" classifier("tests")),
+
+        libraryDependencies ++= compileAndTestDeps.value,
+        testJarTestDeps ++= compileAndTestDeps.value,
 
         // SparkContexts play poorly with parallel test-execution.
         parallelExecution in Test := false
@@ -293,20 +355,33 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
     val versionSettings =
       Seq(
+        scala210Version := "2.10.6",
+        scala211Version := "2.11.8",
+        scala212Version := "2.12.1",
+
+        isScala210 := (scalaBinaryVersion.value == "2.10"),
+        isScala211 := (scalaBinaryVersion.value == "2.11"),
+        isScala212 := (scalaBinaryVersion.value == "2.12"),
+
         sparkVersion := "2.0.2",
         spark1Version := "1.6.3",
 
+        computedSparkVersion := (
+          prop("spark.version")
+            .orElse(
+              prop("spark1").map(_ ⇒ spark1Version.value)
+            )
+            .getOrElse(
+              sparkVersion.value
+            )
+        ),
+
         hadoopVersion := "2.6.0",
+        computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
 
         bdgUtilsVersion := "0.2.10",
 
-        libraries := {
-          val sv =
-            if (System.getProperty("spark1") != null)
-              spark1Version.value
-            else
-              sparkVersion.value
-
+        libs := {
           Map(
             'adam_core -> "org.hammerlab.adam" %% "adam-core" % "0.20.3",
             'args4j -> "args4j" % "args4j" % "2.33",
@@ -317,22 +392,25 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'bdg_utils_io -> "org.bdgenomics.utils" %% "utils-io" % bdgUtilsVersion.value,
             'bdg_utils_metrics -> "org.bdgenomics.utils" %% "utils-metrics" % bdgUtilsVersion.value,
             'bdg_utils_misc -> "org.bdgenomics.utils" %% "utils-misc" % bdgUtilsVersion.value,
+            'breeze -> "org.scalanlp" %% "breeze" % "0.12",
             'commons_io -> "commons-io" % "commons-io" % "2.4",
-            'commons_math -> "org.apache.commons" % "commons-math3" % "3.0",
+            'commons_math -> "org.apache.commons" % "commons-math3" % "3.6.1",
             'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.0.0",
-            'hadoop -> "org.apache.hadoop" % "hadoop-client" % hadoopVersion.value,
+            'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
             'iterators -> "org.hammerlab" %% "iterator" % "1.1.0",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.2",
-            'mllib -> "org.apache.spark" %% "spark-mllib" % sv,
+            'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.1",
+            'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
+            'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
-            'spark -> "org.apache.spark" %% "spark-core" % sv,
+            'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
             'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.2.1",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
@@ -400,8 +478,12 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
     Seq(
       organization := "org.hammerlab",
       githubUser := "hammerlab",
-      scalaVersion := "2.11.8",
-      crossScalaVersions := Seq("2.10.6", "2.11.8"),
+
+      // Build for Scala 2.11 by default
+      scalaVersion := scala211Version.value,
+
+      // Cross-build for Scala 2.10 and 2.11 by default
+      crossScalaVersions := Seq(scala210Version.value, scala211Version.value),
 
       // All org.hammerlab* repos are published with this Sonatype profile.
       sonatypeProfileName := (
