@@ -417,7 +417,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.1.1",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.2"
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.3"
           )
         }
       )
