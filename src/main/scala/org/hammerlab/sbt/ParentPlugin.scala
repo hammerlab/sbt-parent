@@ -449,7 +449,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
     // Settings related to running in Travis CI.
     val travisSettings =
       Seq(
-        travisCoverageScalaVersion := scalaVersion.value,
+        travisCoverageScalaVersion := scala211Version.value,
 
         // Register `travis-report` from above.
         commands += travisReportCmd,
