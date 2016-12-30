@@ -385,7 +385,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
           Map(
             'adam_core -> "org.hammerlab.adam" %% "adam-core" % "0.20.3",
             'args4j -> "args4j" % "args4j" % "2.33",
-            'args4s -> "org.hammerlab" %% "args4s" % "1.0.0",
+            'args4s -> "org.hammerlab" % "args4s" % "1.1.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
             'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % bdgUtilsVersion.value,
             'bdg_utils_intervalrdd -> "org.bdgenomics.utils" %% "utils-intervalrdd" % bdgUtilsVersion.value,
@@ -399,7 +399,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
-            'iterators -> "org.hammerlab" %% "iterator" % "1.1.0",
+            'iterators -> "org.hammerlab" %% "iterator" % "1.1.1",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.2",
@@ -412,12 +412,12 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.2.1",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.0",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.1.1",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.1"
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.2"
           )
         }
       )
