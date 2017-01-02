@@ -402,7 +402,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'iterators -> "org.hammerlab" %% "iterator" % "1.1.1",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
-            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.2",
+            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.3",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reference -> "org.hammerlab.genomics" %% "reference" % "1.0.1",
@@ -412,7 +412,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.0",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.1",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
