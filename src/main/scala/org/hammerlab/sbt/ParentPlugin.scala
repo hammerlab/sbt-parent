@@ -398,7 +398,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'breeze -> "org.scalanlp" %% "breeze" % "0.12",
             'commons_io -> "commons-io" % "commons-io" % "2.4",
             'commons_math -> "org.apache.commons" % "commons-math3" % "3.6.1",
-            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.1.0",
+            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.1.1",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
