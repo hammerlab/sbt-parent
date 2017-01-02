@@ -416,8 +416,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
-            'string_utils -> "org.hammerlab" %% "string-utils" % "1.1.1",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.3"
+            'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.4"
           )
         }
       )
