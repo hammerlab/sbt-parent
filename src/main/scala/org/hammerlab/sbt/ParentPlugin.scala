@@ -148,7 +148,10 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         },
 
         // Add a classifier to the default (unshaded) JAR.
-        artifactClassifier in packageBin := Some("unshaded"),
+        artifactClassifier in (Compile, packageBin) := Some("unshaded"),
+
+        // Don't add "unshaded" classifier to -tests JAR.
+        artifactClassifier in (Test, packageBin) := None,
 
         artifact in (Compile, assembly) := {
           // Make the assembly JAR the unclassified artifact.
