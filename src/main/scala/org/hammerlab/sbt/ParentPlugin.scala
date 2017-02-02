@@ -106,22 +106,22 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
           // Build best-guesses of basenames of JARs corresponding to the deps we want to shade: s"$name-$version.jar".
           val shadedDepJars =
             shadedDeps
-            .value
-            .map(
-              dep => {
-                val crossFn =
-                  CrossVersion(
-                    dep.crossVersion,
-                    scalaVersion.value,
-                    scalaBinaryVersion.value
-                  )
-                  .getOrElse((x: String) => x)
+              .value
+              .map(
+                dep => {
+                  val crossFn =
+                    CrossVersion(
+                      dep.crossVersion,
+                      scalaVersion.value,
+                      scalaBinaryVersion.value
+                    )
+                    .getOrElse((x: String) => x)
 
-                val name = crossFn(dep.name)
-                s"$name-${dep.revision}.jar"
-              }
-            )
-            .toSet
+                  val name = crossFn(dep.name)
+                  s"$name-${dep.revision}.jar"
+                }
+              )
+              .toSet
 
           log.debug(s"Looking for jars to shade:\n${shadedDepJars.mkString("\t", "\n\t", "")}")
 
@@ -320,9 +320,9 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         sparkTestingBaseVersion := {
           if (scalaBinaryVersion.value == "2.10" && isSpark2.value)
             // spark-testing-base topped out at Spark 2.0.0 for Scala 2.10.
-            "2.0.0_0.4.7"
+            "2.0.0_0.5.0"
           else
-            s"${computedSparkVersion.value}_0.4.7"
+            s"${computedSparkVersion.value}_0.5.0"
         },
 
         testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
@@ -366,7 +366,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         isScala211 := (scalaBinaryVersion.value == "2.11"),
         isScala212 := (scalaBinaryVersion.value == "2.12"),
 
-        sparkVersion := "2.0.2",
+        sparkVersion := "2.1.0",
         spark1Version := "1.6.3",
 
         computedSparkVersion := (
@@ -386,7 +386,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "core" % "0.20.4",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.20.5-SNAPSHOT",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.1.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
@@ -398,32 +398,32 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'breeze -> "org.scalanlp" %% "breeze" % "0.12",
             'commons_io -> "commons-io" % "commons-io" % "2.4",
             'commons_math -> "org.apache.commons" % "commons-math3" % "3.6.1",
-            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.1.1",
+            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.2.0-SNAPSHOT",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
-            'iterators -> "org.hammerlab" %% "iterator" % "1.1.1",
+            'iterators -> "org.hammerlab" %% "iterator" % "1.1.2-SNAPSHOT",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
-            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.0",
+            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.1-SNAPSHOT",
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.3",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.0",
-            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.0",
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.1.0",
+            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.1-SNAPSHOT",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.1-SNAPSHOT",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.1.1-SNAPSHOT",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.1",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.2-SNAPSHOT",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.4"
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.5-SNAPSHOT"
           )
         }
       )
