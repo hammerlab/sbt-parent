@@ -412,14 +412,14 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         hadoopVersion := "2.6.0",
         computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
 
-        bdgUtilsVersion := "0.2.10",
+        bdgUtilsVersion := "0.2.11",
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "core" % "0.20.5-SNAPSHOT",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.21.0-SNAPSHOT",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.1.0",
-            'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.0",
+            'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.1",
             'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % bdgUtilsVersion.value,
             'bdg_utils_intervalrdd -> "org.bdgenomics.utils" %% "utils-intervalrdd" % bdgUtilsVersion.value,
             'bdg_utils_io -> "org.bdgenomics.utils" %% "utils-io" % bdgUtilsVersion.value,
