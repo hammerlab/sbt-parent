@@ -12,6 +12,8 @@ import scoverage.ScoverageKeys.{ coverageEnabled, coverageReport }
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
+import scala.collection.mutable.ArrayBuffer
+
 object ParentPlugin extends AutoPlugin with CommandSupport {
 
   import com.typesafe.sbt.SbtScalariform.ScalariformKeys
@@ -246,31 +248,39 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
           val nextState = runTask(coverageReport, state)
           Command.process("coveralls", nextState)
         } else {
-
           log.info(s"Skipping coverage reporting for scala version $actualTravisScalaVersion (reporting enabled for $tcsv)")
           state
         }
       }
     )
 
-  /**
-   * Command for running [[publishM2]] on a given project as well as all its dependencies (as declared by
-   * [[Project.dependsOn]]), in a multi-project repo setting.
-   */
-  val publishM2Transitive =
-    Command.command("publishM2Transitive") {
-      state ⇒
-        val nextState =
-          Project
-            .extract(state)
-            .currentProject
-            .dependencies
-            .foldLeft(state)((curState, dep) ⇒
-              runTask(publishM2 in dep.project, curState)
-            )
+  private val commandsToRegister = ArrayBuffer[Command]()
 
-        runTask(publishM2, nextState)
-    }
+  /**
+   * Helper for creating a [[Command]] that runs a given task on a given project as well as all its dependencies (as
+   * declared by [[Project.dependsOn]]), in a multi-project setting.
+   */
+  def makeTransitiveCommand(name: String, task: TaskKey[_]): Unit =
+    commandsToRegister +=
+      Command.command(name) {
+        state ⇒
+          val nextState =
+            Project
+              .extract(state)
+              .currentProject
+              .dependencies
+              .foldLeft(state) {
+                (curState, dep) ⇒
+                  state.log.info(s"Running task ${task.key.label} in dependency ${dep.project.project}")
+                  runTask(task in dep.project, curState)
+              }
+
+          runTask(task, nextState)
+      }
+
+  makeTransitiveCommand("publishM2Transitive", publishM2)
+  makeTransitiveCommand("testTransitive", test in Test)
+  makeTransitiveCommand("cleanTransitive", clean)
 
   override def trigger: PluginTrigger = allRequirements
 
@@ -436,12 +446,12 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.1",
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
-            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.3",
+            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.4",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.1",
             'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.1",
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.1.1",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.0",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
@@ -453,7 +463,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.5"
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.6"
           )
         }
       )
@@ -488,7 +498,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         travisCoverageScalaVersion := scala211Version.value,
 
         // Register `travis-report` from above.
-        commands ++= Seq(travisReportCmd, publishM2Transitive),
+        commands += travisReportCmd,
 
         // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
         coverageEnabled := (
@@ -527,7 +537,9 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
           "org.hammerlab"
         else
           sonatypeProfileName.value
-      )
+      ),
+
+      commands ++= commandsToRegister
     ) ++
       depsSettings ++
       sparkSettings ++
