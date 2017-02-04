@@ -416,7 +416,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "core" % "0.21.0-SNAPSHOT",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.21.0",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.1.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.1",
@@ -428,32 +428,32 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'breeze -> "org.scalanlp" %% "breeze" % "0.12",
             'commons_io -> "commons-io" % "commons-io" % "2.4",
             'commons_math -> "org.apache.commons" % "commons-math3" % "3.6.1",
-            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.2.0-SNAPSHOT",
+            'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.2.0",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
-            'iterators -> "org.hammerlab" %% "iterator" % "1.1.2-SNAPSHOT",
+            'iterators -> "org.hammerlab" %% "iterator" % "1.1.2",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
-            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.1-SNAPSHOT",
+            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.1",
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.3",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.1-SNAPSHOT",
-            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.1-SNAPSHOT",
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.1.1-SNAPSHOT",
+            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.1",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.1",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.1.1",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.2-SNAPSHOT",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.2",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.11.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.5-SNAPSHOT"
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.5"
           )
         }
       )
