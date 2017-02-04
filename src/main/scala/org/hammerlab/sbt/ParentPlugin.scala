@@ -218,8 +218,19 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
   import autoImport._
 
-  // Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
-  // Scala version (indicated by travisCoverageScalaVersion).
+  /**
+   * Helper for running [[Task]]s from within [[Command]]s.
+   */
+  def runTask[T](taskKey: ScopedKey[Task[T]], state: State): State =
+    Project
+      .runTask(taskKey, state)
+      .map(_._1)
+      .getOrElse(state)
+
+  /**
+   * Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
+   * Scala version (indicated by travisCoverageScalaVersion).
+   */
   val travisReportCmd =
     Command.command("travis-report")(
       state ⇒ {
@@ -232,7 +243,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         val tcsv = travisCoverageScalaVersion.gimme
 
         if (actualTravisScalaVersion == tcsv) {
-          val nextState = Project.runTask(coverageReport, state).map(_._1).getOrElse(state)
+          val nextState = runTask(coverageReport, state)
           Command.process("coveralls", nextState)
         } else {
 
@@ -241,6 +252,25 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         }
       }
     )
+
+  /**
+   * Command for running [[publishM2]] on a given project as well as all its dependencies (as declared by
+   * [[Project.dependsOn]]), in a multi-project repo setting.
+   */
+  val publishM2Transitive =
+    Command.command("publishM2Transitive") {
+      state ⇒
+        val nextState =
+          Project
+            .extract(state)
+            .currentProject
+            .dependencies
+            .foldLeft(state)((curState, dep) ⇒
+              runTask(publishM2 in dep.project, curState)
+            )
+
+        runTask(publishM2, nextState)
+    }
 
   override def trigger: PluginTrigger = allRequirements
 
@@ -458,7 +488,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         travisCoverageScalaVersion := scala211Version.value,
 
         // Register `travis-report` from above.
-        commands += travisReportCmd,
+        commands ++= Seq(travisReportCmd, publishM2Transitive),
 
         // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
         coverageEnabled := (
