@@ -428,7 +428,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "core" % "0.21.0",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.21.1",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.1.0",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.1",
@@ -446,14 +446,14 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
             'iterators -> "org.hammerlab" %% "iterator" % "1.1.2",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
-            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.1",
+            'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.2",
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.4",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.1",
-            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.1",
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.0",
+            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.2",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.2",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.1",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
