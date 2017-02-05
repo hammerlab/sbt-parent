@@ -45,7 +45,7 @@ fi
 echo "name := \"$name\"" >> build.sbt
 cat >>build.sbt <<EOF
 version := "1.0.0"
-libraryDependencies ++= Seq(
+deps ++= Seq(
 )
 EOF
 
