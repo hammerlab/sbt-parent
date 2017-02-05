@@ -49,6 +49,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
     val shadedDeps = settingKey[Seq[ModuleID]]("When set, the main JAR produced will include these libraries shaded")
     val shadeRenames = settingKey[Seq[(String, String)]]("Shading renames to perform")
 
+    val main = settingKey[String]("Main class; non-Option wrapper for `mainClass`")
+
     val crossSpark1Deps = settingKey[Seq[ModuleID]]("Deps whose artifact-names should have a \"-spark1\" appended to them when building against the Spark 1.x line")
     val crossSpark2Deps = settingKey[Seq[ModuleID]]("Deps whose artifact-names should have a \"-spark2\" appended to them when building against the Spark 2.x line")
 
@@ -542,7 +544,15 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       commands ++= commandsToRegister,
 
       resolvers += Resolver.sonatypeRepo("releases"),
-      resolvers += Resolver.sonatypeRepo("snapshots")
+      resolvers += Resolver.sonatypeRepo("snapshots"),
+
+      main := "",
+      mainClass := (
+        if (main.value.isEmpty)
+          None
+        else
+          Some(main.value)
+      )
     ) ++
       depsSettings ++
       sparkSettings ++
