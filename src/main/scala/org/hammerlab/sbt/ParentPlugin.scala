@@ -539,7 +539,10 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
           sonatypeProfileName.value
       ),
 
-      commands ++= commandsToRegister
+      commands ++= commandsToRegister,
+
+      resolvers += Resolver.sonatypeRepo("releases"),
+      resolvers += Resolver.sonatypeRepo("snapshots")
     ) ++
       depsSettings ++
       sparkSettings ++
