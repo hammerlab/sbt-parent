@@ -173,6 +173,14 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       ) ++
         addArtifact(artifact in (Compile, assembly), assembly)  // Publish the assembly JAR.
 
+    val publishAssemblyJar =
+      Seq(
+        artifact in (Compile, assembly) := {
+          val art = (artifact in (Compile, assembly)).value
+          art.copy(`classifier` = Some("assembly"))
+        }
+      ) ++
+        addArtifact(artifact in (Compile, assembly), assembly)
 
     val addSparkDeps: SettingsDefinition =
       Seq(
