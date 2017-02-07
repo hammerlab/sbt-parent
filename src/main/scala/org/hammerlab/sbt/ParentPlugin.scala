@@ -460,7 +460,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.2",
-            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.2",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.3",
             'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.1",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
