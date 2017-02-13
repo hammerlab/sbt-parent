@@ -452,11 +452,11 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
             'hadoop_bam -> ("org.seqdoop" % "hadoop-bam" % "7.7.1" exclude("org.apache.hadoop", "hadoop-client")),
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.6.1" exclude("org.xerial.snappy", "snappy-java")),
-            'iterators -> "org.hammerlab" %% "iterator" % "1.1.2",
+            'iterators -> "org.hammerlab" %% "iterator" % "1.2.0",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
             'loci -> "org.hammerlab.genomics" %% "loci" % "1.5.2",
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
-            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.3.4",
+            'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.4.0",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.2",
@@ -471,7 +471,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.2",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
-            'spire -> "org.spire-math" %% "spire" % "0.11.0",
+            'spire -> "org.spire-math" %% "spire" % "0.13.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
             'test_utils -> "org.hammerlab" %% "test-utils" % "1.1.6"
           )
@@ -538,8 +538,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
       // Build for Scala 2.11 by default
       scalaVersion := scala211Version.value,
 
-      // Cross-build for Scala 2.10 and 2.11 by default
-      crossScalaVersions := Seq(scala210Version.value, scala211Version.value),
+      // Only build for Scala 2.11, by default
+      crossScalaVersions := Seq(scala211Version.value),
 
       // All org.hammerlab* repos are published with this Sonatype profile.
       sonatypeProfileName := (
