@@ -226,6 +226,9 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         case PathList("log4j.properties") => MergeStrategy.first
         case x => (assemblyMergeStrategy in assembly).value(x)
       }
+
+    val enableMacroParadise =
+      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
   }
 
   import autoImport._
