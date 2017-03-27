@@ -111,8 +111,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
           val shadedDepJars =
             shadedDeps
               .value
-              .map(
-                dep => {
+              .map {
+                dep ⇒
                   val crossFn =
                     CrossVersion(
                       dep.crossVersion,
@@ -123,26 +123,26 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
                   val name = crossFn(dep.name)
                   s"$name-${dep.revision}.jar"
-                }
-              )
+              }
               .toSet
 
           log.debug(s"Looking for jars to shade:\n${shadedDepJars.mkString("\t", "\n\t", "")}")
 
           // Scan the classpath flagging JARs *to exclude*: all JARs whose basenames don't match our JARs-to-shade list
           // from above.
-          cp filter { path => {
-            val name = path.data.getName
+          cp filter {
+            path =>
+              val name = path.data.getName
 
-            val exclude = !shadedDepJars(name)
+              val exclude = !shadedDepJars(name)
 
-            if (exclude)
-              log.debug(s"Skipping JAR: $name")
-            else
-              log.debug(s"Shading classes jar: $name")
+              if (exclude)
+                log.debug(s"Skipping JAR: $name")
+              else
+                log.debug(s"Shading classes jar: $name")
 
-            exclude
-          }}
+              exclude
+          }
         },
 
         assemblyJarName in assembly := {
@@ -476,7 +476,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
             'spire -> "org.spire-math" %% "spire" % "0.13.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
-            'test_utils -> "org.hammerlab" %% "test-utils" % "1.2.0"
+            'test_utils -> "org.hammerlab" %% "test-utils" % "1.2.1-SNAPSHOT"
           )
         }
       )
@@ -525,7 +525,6 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
     val depsSettings =
       Seq(
         providedDeps := Nil,
-        shadedDeps := Nil,
 
         libraryDependencies ++= providedDeps.value.map(_ % "provided"),
         libraryDependencies ++= shadedDeps.value,
