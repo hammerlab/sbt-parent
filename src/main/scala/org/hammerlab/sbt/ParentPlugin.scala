@@ -435,7 +435,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
         hadoopVersion := "2.6.0",
         computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
 
-        bdgUtilsVersion := "0.2.11",
+        bdgUtilsVersion := "0.2.13",
 
         libs := {
           Map(
@@ -443,7 +443,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.2.0-SNAPSHOT",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.1",
-            'bdg_utils_cli -> "org.bdgenomics.utils" %% "utils-cli" % bdgUtilsVersion.value,
+            'bdg_utils_cli -> "org.hammerlab.bdg-utils" %% "cli" % "0.2.14-SNAPSHOT",
             'bdg_utils_intervalrdd -> "org.bdgenomics.utils" %% "utils-intervalrdd" % bdgUtilsVersion.value,
             'bdg_utils_io -> "org.bdgenomics.utils" %% "utils-io" % bdgUtilsVersion.value,
             'bdg_utils_metrics -> "org.bdgenomics.utils" %% "utils-metrics" % bdgUtilsVersion.value,
@@ -461,6 +461,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.4.0",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
+            'paths -> "org.hammerlab" %% "paths" % "1.0.0-SNAPSHOT",
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.4-SNAPSHOT",
             'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.5-SNAPSHOT",
@@ -470,10 +471,10 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
-            'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.1",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.3",
+            'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.2-SNAPSHOT",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.4-SNAPSHOT",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
-            'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.1",
+            'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.2-SNAPSHOT",
             'spire -> "org.spire-math" %% "spire" % "0.13.0",
             'string_utils -> "org.hammerlab" %% "string-utils" % "1.2.0",
             'test_utils -> "org.hammerlab" %% "test-utils" % "1.2.1-SNAPSHOT"
