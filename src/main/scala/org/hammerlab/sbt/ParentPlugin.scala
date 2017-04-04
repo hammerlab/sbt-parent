@@ -461,7 +461,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'htsjdk -> ("com.github.samtools" % "htsjdk" % "2.9.1" exclude("org.xerial.snappy", "snappy-java")),
             'iterators -> "org.hammerlab" %% "iterator" % "1.2.1",
             'kryo -> "com.esotericsoftware.kryo" % "kryo" % "2.24.0",  // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
-            'loci -> ("org.hammerlab.genomics" %% "loci" % "1.5.4" exclude("com.google.guava", "guava")),
+            'loci -> ("org.hammerlab.genomics" %% "loci" % "1.5.5-SNAPSHOT" exclude("com.google.guava", "guava")),
             'log4j -> "org.slf4j" % "slf4j-log4j12" % "1.7.21",
             'magic_rdds -> "org.hammerlab" %% "magic-rdds" % "1.4.0",
             'mllib -> ("org.apache.spark" %% "spark-mllib" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
