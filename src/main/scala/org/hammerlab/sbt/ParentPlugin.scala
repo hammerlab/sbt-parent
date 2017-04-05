@@ -436,7 +436,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             )
         ),
 
-        hadoopVersion := "2.6.0",
+        hadoopVersion := "2.7.3",
         computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
 
         bdgUtilsVersion := "0.2.13",
@@ -470,7 +470,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
             'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.4",
             'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.5",
-            'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.3",
+            'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.4",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
             'scalautils -> "org.scalautils" %% "scalautils" % "2.1.5",
