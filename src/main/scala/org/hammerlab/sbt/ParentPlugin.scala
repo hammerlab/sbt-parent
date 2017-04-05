@@ -443,7 +443,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "core" % "0.23.0-SNAPSHOT",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.23.0",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.2.2",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.1",
@@ -468,8 +468,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'paths -> "org.hammerlab" %% "paths" % "1.0.2",
             'parquet_avro -> "org.apache.parquet" % "parquet-avro" % "1.8.1",
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.4-SNAPSHOT",
-            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.5-SNAPSHOT",
+            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.4",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.5",
             'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.3",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
