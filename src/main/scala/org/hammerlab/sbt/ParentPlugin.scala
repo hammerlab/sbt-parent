@@ -443,7 +443,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
 
         libs := {
           Map(
-            'adam_core -> "org.hammerlab.adam" %% "core" % "0.23.0",
+            'adam_core -> "org.hammerlab.adam" %% "core" % "0.23.0-SNAPSHOT",
             'args4j -> "args4j" % "args4j" % "2.33",
             'args4s -> "org.hammerlab" % "args4s" % "1.2.2",
             'bdg_formats -> "org.bdgenomics.bdg-formats" % "bdg-formats" % "0.10.1",
@@ -453,7 +453,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'bdg_utils_metrics -> "org.bdgenomics.utils" %% "utils-metrics" % bdgUtilsVersion.value,
             'bdg_utils_misc -> "org.bdgenomics.utils" %% "utils-misc" % bdgUtilsVersion.value,
             'breeze -> "org.scalanlp" %% "breeze" % "0.12",
-            'commons_io -> "commons-io" % "commons-io" % "2.4",
+            'commons_io -> "commons-io" % "commons-io" % "2.5",
             'commons_math -> "org.apache.commons" % "commons-math3" % "3.6.1",
             'genomic_utils -> "org.hammerlab.genomics" %% "utils" % "1.2.2",
             'hadoop -> "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
@@ -468,8 +468,8 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'paths -> "org.hammerlab" %% "paths" % "1.0.2",
             'parquet_avro -> "org.apache.parquet" % "parquet-avro" % "1.8.1",
             'quinine_core -> ("org.bdgenomics.quinine" %% "quinine-core" % "0.0.2" exclude("org.bdgenomics.adam", "adam-core")),
-            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.4",
-            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.5",
+            'reads -> "org.hammerlab.genomics" %% "reads" % "1.0.4-SNAPSHOT",
+            'readsets -> "org.hammerlab.genomics" %% "readsets" % "1.0.5-SNAPSHOT",
             'reference -> "org.hammerlab.genomics" %% "reference" % "1.2.4",
             'scala_reflect -> "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             'scalatest -> "org.scalatest" %% "scalatest" % scalatestVersion.value,
@@ -477,7 +477,7 @@ object ParentPlugin extends AutoPlugin with CommandSupport {
             'slf4j -> "org.clapper" %% "grizzled-slf4j" % "1.0.3",
             'spark -> ("org.apache.spark" %% "spark-core" % computedSparkVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_commands -> "org.hammerlab" %% "spark-commands" % "1.0.3",
-            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.4",
+            'spark_tests -> "org.hammerlab" %% "spark-tests" % "1.3.5-SNAPSHOT",
             'spark_testing_base -> ("com.holdenkarau" %% "spark-testing-base" % sparkTestingBaseVersion.value exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}")),
             'spark_util -> "org.hammerlab" %% "spark-util" % "1.1.2",
             'spire -> "org.spire-math" %% "spire" % "0.13.0",
