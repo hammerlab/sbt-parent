@@ -70,7 +70,7 @@ object Spark
           sparkTestsVersion.value
           exclude("org.apache.hadoop", "hadoop-client"),
 
-      sparkTestsVersion := "1.3.6-SNAPSHOT",
+      sparkTestsVersion := "1.3.6",
 
       sparkTestingBase :=
         "com.holdenkarau" %%
@@ -106,9 +106,9 @@ object Spark
       sparkTestingBaseVersion := {
         if (scalaBinaryVersion.value == "2.10" && isSpark2.value)
         // spark-testing-base topped out at Spark 2.0.0 for Scala 2.10.
-          "2.0.0_0.5.0"
+          "2.0.0_0.6.0"
         else
-          s"${computedSparkVersion.value}_0.5.0"
+          s"${computedSparkVersion.value}_0.6.0"
       },
 
       sparkVersion := "2.1.0",
