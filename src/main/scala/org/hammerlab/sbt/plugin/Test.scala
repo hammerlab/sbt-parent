@@ -9,6 +9,8 @@ object Test
   extends Plugin(Deps) {
 
   object autoImport {
+    val scalatest = settingKey[ModuleID]("Scalatest dependency")
+    val testUtils = settingKey[ModuleID]("org.hammerlab:test-utils dependency")
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
     val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
 
@@ -22,6 +24,9 @@ object Test
       scalatestVersion := "3.0.0",
       testUtilsVersion := "1.2.3-SNAPSHOT",
 
+      scalatest := "org.scalatest" %% "scalatest" % scalatestVersion.value,
+      testUtils := "org.hammerlab" %% "test-utils" % testUtilsVersion.value,
+
       testOptions in sbt.Test += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
 
       // Only use ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
@@ -30,8 +35,8 @@ object Test
 
       // Add hammerlab:test-utils and scalatest as test-deps by default.
       testDeps := Seq(
-        "org.hammerlab" %% "test-utils" % testUtilsVersion.value,
-        "org.scalatest" %% "scalatest" % scalatestVersion.value
+        testUtils.value,
+        scalatest.value
       )
     )
 }
