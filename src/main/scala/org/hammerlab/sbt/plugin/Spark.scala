@@ -9,8 +9,6 @@ object Spark
   extends Plugin(Deps) {
 
   object autoImport {
-    val sparkTestingBaseVersion = settingKey[String]("Version of holdenk/spark-testing-base to use")
-
     val sparkVersion = settingKey[String]("Spark version to use")
     val spark1Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark1 is set.")
     val computedSparkVersion = settingKey[String]("Spark version to use, taking in to account 'spark.version' and 'spark1' env vars")
@@ -26,7 +24,6 @@ object Spark
 
     val spark = settingKey[ModuleID]("Spark dependency")
     val hadoop = settingKey[ModuleID]("Hadoop dependency")
-    val sparkTestingBase = settingKey[ModuleID]("com.holdenkarau:spark-testing-base dependency")
     val sparkTests = settingKey[ModuleID]("org.hammerlab:spark-tests dependency")
     val sparkTestsVersion = settingKey[String]("org.hammerlab:spark-tests version")
     val kryo = settingKey[ModuleID]("Kryo dependency")
@@ -70,13 +67,7 @@ object Spark
           sparkTestsVersion.value
           exclude("org.apache.hadoop", "hadoop-client"),
 
-      sparkTestsVersion := "1.3.6",
-
-      sparkTestingBase :=
-        "com.holdenkarau" %%
-          "spark-testing-base" %
-          sparkTestingBaseVersion.value
-          exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}"),
+      sparkTestsVersion := "2.0.0",
 
       // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
       kryo := "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
@@ -102,14 +93,6 @@ object Spark
           else
             dep
       ),
-
-      sparkTestingBaseVersion := {
-        if (scalaBinaryVersion.value == "2.10" && isSpark2.value)
-        // spark-testing-base topped out at Spark 2.0.0 for Scala 2.10.
-          "2.0.0_0.6.0"
-        else
-          s"${computedSparkVersion.value}_0.6.0"
-      },
 
       sparkVersion := "2.1.0",
       spark1Version := "1.6.3",
