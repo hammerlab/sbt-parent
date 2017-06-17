@@ -4,7 +4,9 @@ name := "sbt-parent"
 
 organization := "org.hammerlab"
 
-version := "2.0.0"
+enablePlugins(GitVersioning)
+
+git.formattedShaVersion := git.gitHeadCommit.value map { sha => s"${sha.substring(0, 8)}" }
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
