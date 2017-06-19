@@ -67,7 +67,7 @@ object Spark
           sparkTestsVersion.value
           exclude("org.apache.hadoop", "hadoop-client"),
 
-      sparkTestsVersion := "2.0.0-SNAPSHOT",
+      sparkTestsVersion := "2.0.0",
 
       // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
       kryo := "com.esotericsoftware.kryo" % "kryo" % "2.24.0",

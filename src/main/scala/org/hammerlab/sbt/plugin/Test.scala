@@ -22,7 +22,7 @@ object Test
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       scalatestVersion := "3.0.0",
-      testUtilsVersion := "1.2.3-SNAPSHOT",
+      testUtilsVersion := "1.2.3",
 
       scalatest := "org.scalatest" %% "scalatest" % scalatestVersion.value,
       testUtils := "org.hammerlab" %% "test-utils" % testUtilsVersion.value,
