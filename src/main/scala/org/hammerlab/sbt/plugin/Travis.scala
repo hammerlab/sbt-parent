@@ -4,7 +4,7 @@ import org.hammerlab.sbt.Util.runTask
 import org.hammerlab.sbt.plugin.Scala.autoImport.scala211Version
 import org.scoverage.coveralls.CommandSupport
 import sbt.Keys.commands
-import sbt.{ Command, Project, settingKey }
+import sbt.{ Command, Def, Project, settingKey }
 import scoverage.ScoverageKeys.{ coverageEnabled, coverageReport }
 
 object Travis
@@ -40,13 +40,16 @@ object Travis
           val nextState = runTask(coverageReport, state)
           Command.process("coveralls", nextState)
         } else {
-          log.info(s"Skipping coverage reporting for scala version $actualTravisScalaVersion (reporting enabled for $tcsv)")
+          log.info(
+            s"Skipping coverage reporting for scala version '${Option(actualTravisScalaVersion).getOrElse("")}' (env var: TRAVIS_SCALA_VERSION); reporting enabled for $tcsv (sbt key: travisCoverageScalaVersion)"
+          )
           state
         }
     }
 
   // Settings related to running in Travis CI.
-  val travisSettings =
+
+  override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       travisCoverageScalaVersion := scala211Version.value,
 
