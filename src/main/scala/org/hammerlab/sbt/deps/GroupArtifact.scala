@@ -1,7 +1,5 @@
 package org.hammerlab.sbt.deps
 
-import sbt.CrossVersion
-
 case class GroupArtifact(group: Group,
                          artifact: Artifact,
                          crossVersion: CrossVersion) {

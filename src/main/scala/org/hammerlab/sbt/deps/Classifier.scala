@@ -4,7 +4,12 @@ trait SimpleToString {
   override def toString: String =
     getClass
       .getSimpleName
-      .toLowerCase
+      .toLowerCase match {
+      case x
+        if x.endsWith("$") ⇒
+          x.dropRight(1)
+      case x ⇒ x
+    }
 }
 
 sealed trait Classifier

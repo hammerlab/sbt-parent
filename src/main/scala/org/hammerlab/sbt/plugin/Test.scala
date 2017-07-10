@@ -9,7 +9,7 @@ import sbt.TestFrameworks.ScalaTest
 import sbt.{ Def, Tests, settingKey }
 
 object Test
-  extends Plugin {
+  extends Plugin(Versions) {
 
   object autoImport {
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
@@ -18,19 +18,19 @@ object Test
     val publishTestJar = (publishArtifact in sbt.Test := true)
 
     val testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies; default: scalatest, test-utils")
+
+    val scalatest = "org.scalatest" ^^ "scalatest"
+    val testUtils = "org.hammerlab" ^^ "test-utils"
   }
 
   import autoImport._
-
-  val scalatest = "org.scalatest" ^^ "scalatest"
-  val testUtils = "org.hammerlab" ^^ "test-utils"
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       versions ++=
         Seq(
-          scalatest → scalatestVersion.value,
-          testUtils → testUtilsVersion.value
+          scalatest.groupArtifact → scalatestVersion.value,
+          testUtils.groupArtifact → testUtilsVersion.value
         ),
 
       scalatestVersion := "3.0.0",

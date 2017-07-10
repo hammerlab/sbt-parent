@@ -4,7 +4,7 @@ sealed trait Configuration {
   def scope: Scope
   def classifier: Classifier
   override def toString: String =
-    s"$classifier->$scope"
+    s"$scope->$classifier"
 }
 
 object Configuration {

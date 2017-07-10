@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.deps
 
-import sbt.{ CrossVersion, ModuleID }
+import sbt.ModuleID
 
 case class Dep(group: Group,
                artifact: Artifact,
@@ -39,23 +39,29 @@ case class Dep(group: Group,
       )
 
   def withVersion(implicit versionsMap: VersionsMap): Dep =
-    versionsMap
-      .get(groupArtifact)
-      .map(
-        version ⇒
-          copy(
-            version =
-              this
-                .version
-                .orElse(
-                  Some(version)
-                )
+    version
+      .map(_ ⇒ this)
+      .orElse(
+        versionsMap
+          .get(groupArtifact)
+          .map(
+            version ⇒
+              copy(
+                version =
+                  this
+                    .version
+                    .orElse(
+                      Some(version)
+                    )
+              )
           )
       )
       .getOrElse {
         throw GroupArtifactNotFound(
           group,
-          artifact
+          artifact,
+          crossVersion,
+          versionsMap
         )
       }
 
@@ -88,9 +94,11 @@ object Dep {
 }
 
 case class GroupArtifactNotFound(group: Group,
-                                 artifact: Artifact)
+                                 artifact: Artifact,
+                                 crossVersion: CrossVersion,
+                                 versionsMap: VersionsMap)
   extends IllegalArgumentException(
-    s"$group:$artifact"
+    s"$group:$artifact:$crossVersion\n$versionsMap"
   )
 
 case class VersionNotSetException(dep: Dep)

@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Dep, VersionsMap }
+import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, VersionsMap }
 import sbt.Keys.libraryDependencies
 import sbt.{ Def, settingKey }
 
@@ -13,7 +13,7 @@ object Versions
 
   implicit val versionsMap = settingKey[VersionsMap]("Map from 'group:artifact' aliases/literals to versions numbers")
 
-  val versions = settingKey[Seq[(Dep, String)]]("")
+  val versions = settingKey[Seq[(GroupArtifact, String)]]("")
 
   import autoImport._
 

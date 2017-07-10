@@ -10,7 +10,7 @@ import sbt.Keys.{ excludeDependencies, parallelExecution }
 import sbt.{ Def, SbtExclusionRule, SettingsDefinition, settingKey }
 
 object Spark
-  extends Plugin {
+  extends Plugin(Versions) {
 
   import Deps._
 
@@ -48,10 +48,10 @@ object Spark
 
       versions ++=
         Seq(
-          hadoop → computedHadoopVersion.value,
-          spark → computedSparkVersion.value,
-          kryo → "2.24.0",
-          sparkTests → "2.0.1"
+          hadoop.groupArtifact → computedHadoopVersion.value,
+          spark.groupArtifact → computedSparkVersion.value,
+          kryo.groupArtifact → "2.24.0",
+          sparkTests.groupArtifact → "2.0.1"
         ),
 
       hadoopVersion := "2.7.3",

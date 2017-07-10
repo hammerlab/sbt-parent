@@ -1,7 +1,5 @@
 package org.hammerlab.sbt.deps
 
-import sbt.CrossVersion
-
 case class Group(value: String) {
   def ^(artifact: Artifact): Dep =
     GroupArtifact(
@@ -14,14 +12,14 @@ case class Group(value: String) {
     GroupArtifact(
       this,
       artifact,
-      CrossVersion.binary
+      CrossVersion.Binary
     )
 
   def ^^^(artifact: Artifact): Dep =
     GroupArtifact(
       this,
       artifact,
-      CrossVersion.full
+      CrossVersion.Full
     )
 }
 

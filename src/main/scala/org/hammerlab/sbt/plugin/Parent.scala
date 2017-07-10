@@ -26,6 +26,7 @@ object Parent
     val bdg_utils_metrics = "org.bdgenomics.utils" ^^ "utils-metrics"
     val bdg_utils_misc = "org.bdgenomics.utils" ^^ "utils-misc"
     val breeze = "org.scalanlp" ^^ "breeze"
+    val case_app = "com.github.alexarchambault" ^^ "case-app"
     val commons_io = "commons-io" ^ "commons-io"
     val commons_math = "org.apache.commons" ^ "commons-math3"
     val genomic_utils = "org.hammerlab.genomics" ^^ "utils"
@@ -51,9 +52,5 @@ object Parent
     val string_utils = "org.hammerlab" ^^ "string-utils"
   }
 
-//  implicit def depifyTuple(t: (String, GroupArtifact)): (String, Dep) = (t._1, t._2)
-
-  override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] =
-    Seq(
-    )
+  override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = Nil
 }
