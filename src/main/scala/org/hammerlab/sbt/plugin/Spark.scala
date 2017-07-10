@@ -1,114 +1,64 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.Util.prop
-import org.hammerlab.sbt.plugin.Deps.autoImport.{ providedDeps, testDeps }
-import sbt.Keys._
-import sbt._
+import org.hammerlab.sbt.deps.Configuration.Provided
+import org.hammerlab.sbt.deps.Configurations._
+import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.deps.{ Configuration ⇒ Conf }
+import org.hammerlab.sbt.plugin.Versions.autoImport.deps
+import org.hammerlab.sbt.plugin.Versions.versions
+import sbt.Keys.{ excludeDependencies, parallelExecution }
+import sbt.{ Def, SbtExclusionRule, SettingsDefinition, settingKey }
 
 object Spark
-  extends Plugin(Deps) {
+  extends Plugin {
+
+  import Deps._
 
   object autoImport {
     val sparkVersion = settingKey[String]("Spark version to use")
-    val spark1Version = settingKey[String]("When cross-building for Spark 1.x and 2.x, this version will be used when -Dspark1 is set.")
-    val computedSparkVersion = settingKey[String]("Spark version to use, taking in to account 'spark.version' and 'spark1' env vars")
 
     val hadoopVersion = settingKey[String]("Hadoop version to use")
-    val computedHadoopVersion = settingKey[String]("Hadoop version to use, taking in to account the 'hadoop.version' env var")
 
-    val crossSpark1Deps = settingKey[Seq[ModuleID]]("Deps whose artifact-names should have a \"-spark1\" appended to them when building against the Spark 1.x line")
-    val crossSpark2Deps = settingKey[Seq[ModuleID]]("Deps whose artifact-names should have a \"-spark2\" appended to them when building against the Spark 2.x line")
-
-    val isSpark1 = settingKey[Boolean]("True when sparkVersion starts with '1'")
-    val isSpark2 = settingKey[Boolean]("True when sparkVersion starts with '2'")
-
-    val spark = settingKey[ModuleID]("Spark dependency")
-    val hadoop = settingKey[ModuleID]("Hadoop dependency")
-    val sparkTests = settingKey[ModuleID]("org.hammerlab:spark-tests dependency")
-    val sparkTestsVersion = settingKey[String]("org.hammerlab:spark-tests version")
-    val kryo = settingKey[ModuleID]("Kryo dependency")
-
-    // Helper for appending "_spark1" to a project's name iff the "spark1" env var is set.
-    def sparkName(name: String): String =
-      prop("spark1") match {
-        case Some(_) ⇒ s"${name}_spark1"
-        case None ⇒ name
-      }
-
-    val addSparkDeps: SettingsDefinition = (
+    val addSparkDeps: SettingsDefinition =
       Seq(
-        providedDeps ++= (
+        deps ++=
           Seq(
-            spark.value,
-            hadoop.value
+            spark ^ Provided,
+            hadoop ^ Provided,
+            kryo,
+            sparkTests ^ Conf.Test
           )
-        ),
-        testDeps += sparkTests.value,
-        libraryDependencies += kryo.value
       )
-    )
+  }
+
+  private val computedSparkVersion = settingKey[String]("Spark version to use, taking in to account 'spark.version' and 'spark1' env vars")
+  private val computedHadoopVersion = settingKey[String]("Hadoop version to use, taking in to account the 'hadoop.version' env var")
+
+  object Deps {
+    val spark = (("org.apache.spark" ^^ "spark-core") - ("org.scalatest" ^^ "scalatest"))
+    val hadoop = "org.apache.hadoop" ^ "hadoop-client"
+    val sparkTests = (("org.hammerlab" ^^ "spark-tests") - ("org.apache.hadoop" ^ "hadoop-client"))
+    val kryo = "com.esotericsoftware.kryo" ^ "kryo"
   }
 
   import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      spark :=
-        "org.apache.spark" %%
-          "spark-core" %
-          computedSparkVersion.value
-          exclude("org.scalatest", s"scalatest_${scalaBinaryVersion.value}"),
 
-      hadoop := "org.apache.hadoop" % "hadoop-client" % computedHadoopVersion.value,
-
-      sparkTests :=
-        "org.hammerlab" %%
-          "spark-tests" %
-          sparkTestsVersion.value
-          exclude("org.apache.hadoop", "hadoop-client"),
-
-      sparkTestsVersion := "2.0.0",
-
-      // Better than Spark's 2.21, which ill-advisedly shades in some minlog classes.
-      kryo := "com.esotericsoftware.kryo" % "kryo" % "2.24.0",
-
-      isSpark1 := computedSparkVersion.value(0) == '1',
-      isSpark2 := computedSparkVersion.value(0) == '2',
-
-      crossSpark1Deps := Seq(),
-      crossSpark2Deps := Seq(),
-
-      libraryDependencies ++= crossSpark1Deps.value.map(
-        dep ⇒
-          if (isSpark1.value)
-            dep.copy(name = dep.name + "_spark1")
-          else
-            dep
-      ),
-
-      libraryDependencies ++= crossSpark2Deps.value.map(
-        dep ⇒
-          if (isSpark2.value)
-            dep.copy(name = dep.name + "_spark2")
-          else
-            dep
-      ),
-
-      sparkVersion := "2.1.0",
-      spark1Version := "1.6.3",
-
-      computedSparkVersion := (
-        prop("spark.version")
-        .orElse(
-          prop("spark1").map(_ ⇒ spark1Version.value)
-        )
-        .getOrElse(
-          sparkVersion.value
-        )
+      versions ++=
+        Seq(
+          hadoop → computedHadoopVersion.value,
+          spark → computedSparkVersion.value,
+          kryo → "2.24.0",
+          sparkTests → "2.0.1"
         ),
 
       hadoopVersion := "2.7.3",
       computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
+
+      sparkVersion := "2.1.0",
+      computedSparkVersion := System.getProperty("spark.version", sparkVersion.value),
 
       // SparkContexts play poorly with parallel test-execution
       parallelExecution in sbt.Test := false,

@@ -1,33 +1,42 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
+import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.deps.{ Configuration, Dep }
+import org.hammerlab.sbt.plugin.Versions.autoImport.deps
+import org.hammerlab.sbt.plugin.Versions.versions
 import sbt.Keys.{ publishArtifact, testFrameworks, testOptions }
 import sbt.TestFrameworks.ScalaTest
-import sbt.{ Def, TestFrameworks, Tests, settingKey, _ }
+import sbt.{ Def, Tests, settingKey }
 
 object Test
-  extends Plugin(Deps) {
+  extends Plugin {
 
   object autoImport {
-    val scalatest = settingKey[ModuleID]("Scalatest dependency")
-    val testUtils = settingKey[ModuleID]("org.hammerlab:test-utils dependency")
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
     val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
 
     val publishTestJar = (publishArtifact in sbt.Test := true)
+
+    val testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies; default: scalatest, test-utils")
   }
 
   import autoImport._
 
+  val scalatest = "org.scalatest" ^^ "scalatest"
+  val testUtils = "org.hammerlab" ^^ "test-utils"
+
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
+      versions ++=
+        Seq(
+          scalatest → scalatestVersion.value,
+          testUtils → testUtilsVersion.value
+        ),
+
       scalatestVersion := "3.0.0",
       testUtilsVersion := "1.2.3",
 
-      scalatest := "org.scalatest" %% "scalatest" % scalatestVersion.value,
-      testUtils := "org.hammerlab" %% "test-utils" % testUtilsVersion.value,
-
-      testOptions in sbt.Test += Tests.Argument(TestFrameworks.ScalaTest, "-oF"),
+      testOptions in sbt.Test += Tests.Argument(ScalaTest, "-oF"),
 
       // Only use ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
       // test-command-lines/args/classpaths.
@@ -35,8 +44,13 @@ object Test
 
       // Add hammerlab:test-utils and scalatest as test-deps by default.
       testDeps := Seq(
-        testUtils.value,
-        scalatest.value
-      )
+        testUtils,
+        scalatest
+      ),
+
+      deps ++=
+        testDeps
+          .value
+          .map(_ ^ Configuration.Test)
     )
 }
