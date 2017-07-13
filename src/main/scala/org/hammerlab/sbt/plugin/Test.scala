@@ -1,23 +1,20 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.deps.{ Configuration, Dep }
-import org.hammerlab.sbt.plugin.Versions.autoImport.deps
-import org.hammerlab.sbt.plugin.Versions.versions
+import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
+import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
 import sbt.Keys.{ publishArtifact, testFrameworks, testOptions }
 import sbt.TestFrameworks.ScalaTest
 import sbt.{ Def, Tests, settingKey }
 
 object Test
-  extends Plugin(Versions) {
+  extends Plugin(Deps) {
 
   object autoImport {
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
     val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
 
     val publishTestJar = (publishArtifact in sbt.Test := true)
-
-    val testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies; default: scalatest, test-utils")
 
     val scalatest = "org.scalatest" ^^ "scalatest"
     val testUtils = "org.hammerlab" ^^ "test-utils"
@@ -29,8 +26,8 @@ object Test
     Seq(
       versions ++=
         Seq(
-          scalatest.groupArtifact → scalatestVersion.value,
-          testUtils.groupArtifact → testUtilsVersion.value
+          scalatest → scalatestVersion.value,
+          testUtils → testUtilsVersion.value
         ),
 
       scalatestVersion := "3.0.0",
@@ -46,11 +43,6 @@ object Test
       testDeps := Seq(
         testUtils,
         scalatest
-      ),
-
-      deps ++=
-        testDeps
-          .value
-          .map(_ ^ Configuration.Test)
+      )
     )
 }

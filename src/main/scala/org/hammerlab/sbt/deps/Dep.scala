@@ -1,11 +1,11 @@
 package org.hammerlab.sbt.deps
 
-import sbt.ModuleID
+import sbt.{ ExclusionRule, ModuleID }
 
 case class Dep(group: Group,
                artifact: Artifact,
                crossVersion: CrossVersion,
-               configurations: Configurations = Seq(Configuration.Default),
+               configuration: Configuration = Configuration.Default,
                excludes: Seq[GroupArtifact] = Nil,
                version: Option[String] = None) {
 
@@ -16,27 +16,44 @@ case class Dep(group: Group,
       crossVersion
     )
 
-  def toModuleID: ModuleID =
-    version
-      .map(
-        version ⇒
+  def toModuleID(crossVersionFn: (CrossVersion, String) ⇒ String): ModuleID =
+    version match {
+      case Some(version) ⇒
+        val Configuration(scope, classifier) = configuration
+        val id =
           ModuleID(
             organization = group.value,
             name = artifact.value,
             revision = version,
             configurations =
-              configurations.configurations match {
-                case Seq(Configuration.Default) ⇒
-                  None
-                case _ ⇒
-                  Some(configurations.toString)
+              scope match {
+                case Scope.Compile ⇒ None
+                case _ ⇒ Some(scope.toString)
               },
-            crossVersion = crossVersion
+            crossVersion = crossVersion,
+            exclusions =
+              this
+                .excludes
+                .map {
+                  case GroupArtifact(
+                    Group(group),
+                    Artifact(artifact),
+                    crossVersion
+                  ) ⇒
+                    ExclusionRule(
+                      group,
+                      crossVersionFn(crossVersion, artifact)
+                    )
+                }
           )
-      )
-      .getOrElse(
+
+        classifier match {
+          case Classifier.Default ⇒ id
+          case _ ⇒ id.classifier(classifier.toString)
+        }
+      case None ⇒
         throw VersionNotSetException(this)
-      )
+    }
 
   def withVersion(implicit versionsMap: VersionsMap): Dep =
     version
@@ -70,10 +87,13 @@ case class Dep(group: Group,
       excludes = this.excludes ++ excludes.map(_.groupArtifact)
     )
 
-  def ^(configurations: Configurations): Dep =
-    copy(configurations = configurations)
+  def ^(configuration: Configuration): Dep =
+    copy(configuration = configuration)
 
   def %(version: String): Dep =
+    this.copy(version = Some(version))
+
+  def ^(version: String): Dep =
     this.copy(version = Some(version))
 }
 
@@ -86,11 +106,8 @@ object Dep {
       group,
       artifact,
       crossVersion,
-      Seq(configuration)
+      configuration
     )
-
-  implicit def depToModuleID(dep: Dep)(implicit versionsMap: VersionsMap): ModuleID =
-    dep.toModuleID
 }
 
 case class GroupArtifactNotFound(group: Group,

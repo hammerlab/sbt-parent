@@ -1,15 +1,20 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.deps.CrossVersion
+import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
 import sbt.Keys._
-import sbt._
+import sbt.{ Def, addCompilerPlugin, settingKey, toGroupID }
 
 object Scala
-  extends Plugin {
+  extends Plugin(Versions) {
 
   object autoImport {
     val isScala210 = settingKey[Boolean]("True iff the Scala binary version is 2.10")
     val isScala211 = settingKey[Boolean]("True iff the Scala binary version is 2.11")
     val isScala212 = settingKey[Boolean]("True iff the Scala binary version is 2.12")
+
+    val appendCrossVersion = settingKey[(CrossVersion, String) ⇒ String]("Helper for appending a cross-version component to artifact names")
 
     val noCrossPublishing =
       Seq(
@@ -43,13 +48,34 @@ object Scala
       )
 
     val enableMacroParadise =
-      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross sbt.CrossVersion.full)
+
+    val scala_lang = "org.scala-lang" ^ "scala-library"
+    val scala_reflect = "org.scala-lang" ^ "scala-reflect"
   }
 
   import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
+
+      appendCrossVersion := (
+        (crossVersion, artifact) ⇒
+          sbt.CrossVersion(
+            crossVersion,
+            scalaVersion.value,
+            scalaBinaryVersion.value
+          )
+          .map(_(artifact))
+          .getOrElse(artifact)
+      ),
+
+      versions ++=
+        Seq(
+          scala_lang → scalaVersion.value,
+          scala_reflect → scalaVersion.value
+        ),
+
       // Build for Scala 2.11 by default
       scalaVersion := scala211Version.value,
 

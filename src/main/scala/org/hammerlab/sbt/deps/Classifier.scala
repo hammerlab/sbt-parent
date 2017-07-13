@@ -16,6 +16,7 @@ sealed trait Classifier
   extends SimpleToString
 
 object Classifier {
+  object Default extends Classifier
   object Compile extends Classifier
   object Tests extends Classifier
 }

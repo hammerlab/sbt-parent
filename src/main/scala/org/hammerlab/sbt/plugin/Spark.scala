@@ -1,23 +1,27 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Configuration.Provided
-import org.hammerlab.sbt.deps.Configurations._
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.deps.{ Configuration ⇒ Conf }
-import org.hammerlab.sbt.plugin.Versions.autoImport.deps
-import org.hammerlab.sbt.plugin.Versions.versions
+import org.hammerlab.sbt.plugin.Deps.autoImport.deps
+import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
+import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
 import sbt.Keys.{ excludeDependencies, parallelExecution }
 import sbt.{ Def, SbtExclusionRule, SettingsDefinition, settingKey }
 
 object Spark
-  extends Plugin(Versions) {
-
-  import Deps._
+  extends Plugin(Deps) {
 
   object autoImport {
     val sparkVersion = settingKey[String]("Spark version to use")
-
     val hadoopVersion = settingKey[String]("Hadoop version to use")
+    val kryoVersion = settingKey[String]("Kryo version to use")
+    val sparkTestsVersion = settingKey[String]("org.hammerlab:spark-tests version to use")
+
+    val spark = ("org.apache.spark" ^^ "spark-core") - scalatest
+    val hadoop = "org.apache.hadoop" ^ "hadoop-client"
+    val sparkTests = ("org.hammerlab" ^^ "spark-tests") - hadoop
+    val kryo = "com.esotericsoftware.kryo" ^ "kryo"
 
     val addSparkDeps: SettingsDefinition =
       Seq(
@@ -34,13 +38,6 @@ object Spark
   private val computedSparkVersion = settingKey[String]("Spark version to use, taking in to account 'spark.version' and 'spark1' env vars")
   private val computedHadoopVersion = settingKey[String]("Hadoop version to use, taking in to account the 'hadoop.version' env var")
 
-  object Deps {
-    val spark = (("org.apache.spark" ^^ "spark-core") - ("org.scalatest" ^^ "scalatest"))
-    val hadoop = "org.apache.hadoop" ^ "hadoop-client"
-    val sparkTests = (("org.hammerlab" ^^ "spark-tests") - ("org.apache.hadoop" ^ "hadoop-client"))
-    val kryo = "com.esotericsoftware.kryo" ^ "kryo"
-  }
-
   import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] =
@@ -48,11 +45,14 @@ object Spark
 
       versions ++=
         Seq(
-          hadoop.groupArtifact → computedHadoopVersion.value,
-          spark.groupArtifact → computedSparkVersion.value,
-          kryo.groupArtifact → "2.24.0",
-          sparkTests.groupArtifact → "2.0.1"
+          hadoop → computedHadoopVersion.value,
+          spark → computedSparkVersion.value,
+          kryo → kryoVersion.value,
+          sparkTests → sparkTestsVersion.value
         ),
+
+      kryoVersion := "2.24.0",
+      sparkTestsVersion := "2.0.1",
 
       hadoopVersion := "2.7.3",
       computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),

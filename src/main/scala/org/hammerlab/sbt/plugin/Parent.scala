@@ -1,10 +1,15 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group
+import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
+import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
+import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
+import sbt.settingKey
 
 object Parent
   extends Plugin(
     Assembly,
+    Deps,
     Maven,
     Scalariform,
     Spark,
@@ -30,27 +35,57 @@ object Parent
     val commons_io = "commons-io" ^ "commons-io"
     val commons_math = "org.apache.commons" ^ "commons-math3"
     val genomic_utils = "org.hammerlab.genomics" ^^ "utils"
-    val hadoop_bam = ("org.seqdoop" ^ "hadoop-bam") - ("org.apache.hadoop" ^ "hadoop-client")
+    val guava = "com.google.guava" ^ "guava"
+    val hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
     val htsjdk = ("com.github.samtools" ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
     val iterators = "org.hammerlab" ^^ "iterator"
-    val loci = ("org.hammerlab.genomics" ^^ "loci") - ("com.google.guava" ^ "guava")
+    val loci = ("org.hammerlab.genomics" ^^ "loci") - guava
     val log4j = "org.slf4j" ^ "slf4j-log4j12"
     val magic_rdds = "org.hammerlab" ^^ "magic-rdds"
-    val mllib = ("org.apache.spark" ^^ "spark-mllib") - ("org.scalatest" ^^ "scalatest")
+    val mllib = ("org.apache.spark" ^^ "spark-mllib") - scalatest
     val paths = "org.hammerlab" ^^ "paths"
     val parquet_avro = "org.apache.parquet" ^ "parquet-avro"
     val quinine_core = ("org.bdgenomics.quinine" ^^ "quinine-core") - ("org.bdgenomics.adam" ^^ "adam-core")
     val reads = "org.hammerlab.genomics" ^^ "reads"
     val readsets = "org.hammerlab.genomics" ^^ "readsets"
     val reference = "org.hammerlab.genomics" ^^ "reference"
-    val scala_reflect = "org.scala-lang" ^ "scala-reflect"
     val scalautils = "org.scalautils" ^^ "scalautils"
+    val shapeless = "com.chuusai" ^^ "shapeless"
     val slf4j = "org.clapper" ^^ "grizzled-slf4j"
+    val spark_bam = "org.hammerlab" ^^ "spark-bam"
     val spark_commands = "org.hammerlab" ^^ "spark-commands"
     val spark_util = "org.hammerlab" ^^ "spark-util"
     val spire = "org.spire-math" ^^ "spire"
     val string_utils = "org.hammerlab" ^^ "string-utils"
+
+    val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
   }
 
-  override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] = Nil
+  import autoImport._
+
+  override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] =
+    Seq(
+      bdgUtilsVersion := "0.2.13",
+
+      versions ++=
+        Seq(
+          args4j → "2.33",
+          bdg_formats → "0.10.1",
+          bdg_utils_intervalrdd → bdgUtilsVersion.value,
+          bdg_utils_io → bdgUtilsVersion.value,
+          bdg_utils_metrics → bdgUtilsVersion.value,
+          bdg_utils_misc → bdgUtilsVersion.value,
+          commons_io → "2.5",
+          commons_math → "3.6.1",
+          case_app → "1.2.0-M3",
+          guava → "19.0",
+          htsjdk → "2.9.1",
+          log4j → "1.7.21",
+          parquet_avro → "1.8.1",
+          scalautils → "2.1.5",
+          shapeless → "2.3.2",
+          slf4j → "1.3.0",
+          spire → "0.13.0"
+        )
+    )
 }

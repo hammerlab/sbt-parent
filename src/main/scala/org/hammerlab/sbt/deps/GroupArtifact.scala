@@ -10,14 +10,6 @@ case class GroupArtifact(group: Group,
       crossVersion,
       configuration
     )
-
-  def ^(configurations: Configurations): Dep =
-    Dep(
-      group,
-      artifact,
-      crossVersion,
-      configurations
-    )
 }
 
 object GroupArtifact {

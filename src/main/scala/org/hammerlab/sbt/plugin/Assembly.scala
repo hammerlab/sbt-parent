@@ -1,5 +1,9 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.deps.Dep
+import org.hammerlab.sbt.plugin.Deps.autoImport.deps
+import org.hammerlab.sbt.plugin.Scala.autoImport.appendCrossVersion
+import org.hammerlab.sbt.plugin.Versions.versionsMap
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys.assemblyOption
@@ -7,10 +11,14 @@ import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{ AssemblyPlugin, PathList }
 
 object Assembly
-  extends Plugin(AssemblyPlugin) {
+  extends Plugin(
+    AssemblyPlugin,
+    Deps,
+    Scala
+  ) {
 
   object autoImport {
-    val shadedDeps = settingKey[Seq[ModuleID]]("When set, the main JAR produced will include these libraries shaded")
+    val shadedDeps = settingKey[Seq[Dep]]("When set, the main JAR produced will include these libraries shaded")
     val shadeRenames = settingKey[Seq[(String, String)]]("Shading renames to perform")
 
     val assemblyIncludeScala = settingKey[Boolean]("When set, include Scala libraries in the assembled JAR")
@@ -18,8 +26,8 @@ object Assembly
     val takeFirstLog4JProperties =
       assemblyMergeStrategy in assembly := {
         // Two org.bdgenomics deps include the same log4j.properties.
-        case PathList("log4j.properties") => MergeStrategy.first
-        case x => (assemblyMergeStrategy in assembly).value(x)
+        case PathList("log4j.properties") ⇒ MergeStrategy.first
+        case x ⇒ (assemblyMergeStrategy in assembly).value(x)
       }
 
     // Evaluate these settings to build a "thin" assembly JAR instead of the default and publish it in place of the
@@ -34,28 +42,33 @@ object Assembly
           // Build best-guesses of basenames of JARs corresponding to the deps we want to shade: s"$name-$version.jar".
           val shadedDepJars =
             shadedDeps
-            .value
-            .map {
-              dep ⇒
-                val crossFn =
-                  CrossVersion(
-                    dep.crossVersion,
-                    scalaVersion.value,
-                    scalaBinaryVersion.value
-                  )
-                  .getOrElse((x: String) => x)
+              .value
+              .map(
+                _
+                  .withVersion(versionsMap.value)
+                  .toModuleID(appendCrossVersion.value)
+              )
+              .map {
+                dep ⇒
+                  val crossFn =
+                    CrossVersion(
+                      dep.crossVersion,
+                      scalaVersion.value,
+                      scalaBinaryVersion.value
+                    )
+                    .getOrElse((x: String) ⇒ x)
 
-                val name = crossFn(dep.name)
-                s"$name-${dep.revision}.jar"
-            }
-            .toSet
+                  val name = crossFn(dep.name)
+                  s"$name-${dep.revision}.jar"
+              }
+              .toSet
 
           log.debug(s"Looking for jars to shade:\n${shadedDepJars.mkString("\t", "\n\t", "")}")
 
           // Scan the classpath flagging JARs *to exclude*: all JARs whose basenames don't match our JARs-to-shade list
           // from above.
           cp filter {
-            path =>
+            path ⇒
               val name = path.data.getName
 
               val exclude = !shadedDepJars(name)
@@ -133,7 +146,7 @@ object Assembly
       // If the user overrides the above by setting assemblyIncludeScala to true, pick that up here.
       assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = assemblyIncludeScala.value),
 
-      libraryDependencies ++= shadedDeps.value,
+      deps ++= shadedDeps.value,
 
       main := "",
       mainClass := (
