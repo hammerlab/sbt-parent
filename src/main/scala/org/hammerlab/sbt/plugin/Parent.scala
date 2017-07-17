@@ -1,9 +1,9 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group
-import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
-import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
+import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, sparkVersion }
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
+import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
 import sbt.settingKey
 
 object Parent
@@ -81,6 +81,7 @@ object Parent
           guava → "19.0",
           htsjdk → "2.9.1",
           log4j → "1.7.21",
+          mllib → sparkVersion.value,
           parquet_avro → "1.8.1",
           scalautils → "2.1.5",
           shapeless → "2.3.2",
