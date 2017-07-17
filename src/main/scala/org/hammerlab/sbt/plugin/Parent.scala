@@ -75,6 +75,7 @@ object Parent
           bdg_utils_io → bdgUtilsVersion.value,
           bdg_utils_metrics → bdgUtilsVersion.value,
           bdg_utils_misc → bdgUtilsVersion.value,
+          breeze → "0.12",
           commons_io → "2.5",
           commons_math → "3.6.1",
           case_app → "1.2.0-M3",
