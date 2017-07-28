@@ -57,7 +57,7 @@ object Spark
       hadoopVersion := "2.7.3",
       computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
 
-      sparkVersion := "2.1.0",
+      sparkVersion := "2.2.0",
       computedSparkVersion := System.getProperty("spark.version", sparkVersion.value),
 
       // SparkContexts play poorly with parallel test-execution
