@@ -32,6 +32,7 @@ object Parent
     val bdg_utils_misc = "org.bdgenomics.utils" ^^ "utils-misc-spark2"
     val breeze = "org.scalanlp" ^^ "breeze"
     val case_app = "com.github.alexarchambault" ^^ "case-app"
+    val cats = "org.typelevel" ^^ "cats"
     val commons_io = "commons-io" ^ "commons-io"
     val commons_math = "org.apache.commons" ^ "commons-math3"
     val genomic_utils = "org.hammerlab.genomics" ^^ "utils"
@@ -76,6 +77,7 @@ object Parent
           bdg_utils_metrics → bdgUtilsVersion.value,
           bdg_utils_misc → bdgUtilsVersion.value,
           breeze → "0.12",
+          cats → "0.9.0",
           commons_io → "2.5",
           commons_math → "3.6.1",
           case_app → "1.2.0-M3",
