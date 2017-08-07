@@ -26,7 +26,7 @@ object Parent
 
     val adam = "org.hammerlab.adam" ^^ "core"
     val args4j = "args4j" ^ "args4j"
-    val args4s = "org.hammerlab" ^ "args4s"
+    val args4s = "org.hammerlab" ^^ "args4s"
     val bdg_formats = "org.bdgenomics.bdg-formats" ^ "bdg-formats"
     val bdg_utils_cli = "org.hammerlab.bdg-utils" ^^ "cli"
     val bdg_utils_intervalrdd = "org.bdgenomics.utils" ^^ "utils-intervalrdd-spark2"
