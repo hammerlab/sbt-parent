@@ -11,6 +11,7 @@ object Parent
     Assembly,
     Deps,
     Maven,
+    Root,
     Scalariform,
     Spark,
     Test,
