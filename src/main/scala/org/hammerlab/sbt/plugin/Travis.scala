@@ -47,8 +47,6 @@ object Travis
         }
     }
 
-  // Settings related to running in Travis CI.
-
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       travisCoverageScalaVersion := scala211Version.value,
