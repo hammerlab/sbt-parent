@@ -29,11 +29,11 @@ object Travis
         implicit val pr = extracted.currentRef
         implicit val bs = extracted.structure
 
-        val disableCoverallsEnv = System.getProperty("coveralls.disable", "")
+        val disableCoverallsEnv = System.getProperty("coveralls.disable") != null
         val actualTravisScalaVersion = System.getenv("TRAVIS_SCALA_VERSION")
         val tcsv = travisCoverageScalaVersion.gimme
 
-        if (Option(disableCoverallsEnv).exists(_.nonEmpty)) {
+        if (disableCoverallsEnv) {
           log.info(s"Coveralls reporting disabled by -Dcoveralls.disable")
           state
         } else if (actualTravisScalaVersion == tcsv) {
