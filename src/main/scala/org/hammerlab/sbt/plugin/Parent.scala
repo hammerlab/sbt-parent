@@ -7,17 +7,7 @@ import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
 import sbt.settingKey
 
 object Parent
-  extends Plugin(
-    Assembly,
-    Deps,
-    Maven,
-    Root,
-    Scalariform,
-    Spark,
-    Test,
-    Travis,
-    Versions
-  ) {
+  extends Plugin(Versions) {
 
   import Group._
 
