@@ -14,7 +14,7 @@ object Travis
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
-    val coverageTest = taskKey[Unit]("Wrapper for test, coverageReport, coverageAggregate")
+    val coverageTest = taskKey[Unit]("Wrapper for test and, if $TRAVIS_SCALA_VERSION matches travisCoverageScalaVersion, coverageReport")
   }
 
   import autoImport._

@@ -87,7 +87,7 @@ object Parent
           parquet_avro → "1.8.1",
           scalautils → "2.1.5",
           shapeless → "2.3.2",
-          slf4j → "1.3.0",
+          slf4j → "1.3.1",
           spire → "0.13.0"
         )
     )
