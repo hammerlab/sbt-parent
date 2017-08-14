@@ -31,7 +31,7 @@ This will set create stubs for the following files:
 To use `sbt-parent` in an existing project, add this to its `project/plugins.sbt`:
 
 ```
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.1.0")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.1.1")
 ```
 
 Then you can specify minimal configuration in your `build.sbt`:
