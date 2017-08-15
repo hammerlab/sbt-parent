@@ -30,6 +30,13 @@ object Assembly
         case x ⇒ (assemblyMergeStrategy in assembly).value(x)
       }
 
+    val assemblyExcludeLib =
+      assemblyExcludedJars in assembly ++= {
+        (fullClasspath in assembly).value.filter {
+          _.data.getParent.endsWith("/lib")
+        }
+      }
+
     // Evaluate these settings to build a "thin" assembly JAR instead of the default and publish it in place of the
     // usual (unshaded) JAR.
     val publishThinShadedJar: SettingsDefinition =
