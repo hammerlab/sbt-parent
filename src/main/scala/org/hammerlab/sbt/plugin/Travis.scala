@@ -19,6 +19,8 @@ object Travis
 
   import autoImport._
 
+  def disableCoverallsEnv = System.getProperty("coveralls.disable") != null
+
   /**
    * Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
    * Scala version (indicated by travisCoverageScalaVersion).
@@ -31,7 +33,6 @@ object Travis
         implicit val pr = extracted.currentRef
         implicit val bs = extracted.structure
 
-        val disableCoverallsEnv = System.getProperty("coveralls.disable") != null
         val actualTravisScalaVersion = System.getenv("TRAVIS_SCALA_VERSION")
         val tcsv = travisCoverageScalaVersion.gimme
 
@@ -79,7 +80,7 @@ object Travis
 
       // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
       coverageEnabled := (
-        if (System.getenv("TRAVIS_SCALA_VERSION") == travisCoverageScalaVersion.value)
+        if (System.getenv("TRAVIS_SCALA_VERSION") == travisCoverageScalaVersion.value && !disableCoverallsEnv)
           true
         else
           coverageEnabled.value

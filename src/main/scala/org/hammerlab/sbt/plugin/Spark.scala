@@ -31,7 +31,11 @@ object Spark
             hadoop ^ Provided,
             kryo,
             sparkTests ^ Conf.Test
-          )
+          ),
+
+        // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
+        excludeDependencies += SbtExclusionRule("javax.servlet", "servlet-api")
+
       )
   }
 
@@ -61,9 +65,6 @@ object Spark
       computedSparkVersion := System.getProperty("spark.version", sparkVersion.value),
 
       // SparkContexts play poorly with parallel test-execution
-      parallelExecution in sbt.Test := false,
-
-      // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
-      excludeDependencies += SbtExclusionRule("javax.servlet", "servlet-api")
+      parallelExecution in sbt.Test := false
     )
 }

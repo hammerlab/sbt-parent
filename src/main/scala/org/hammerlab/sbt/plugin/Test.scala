@@ -31,7 +31,7 @@ object Test
         ),
 
       scalatestVersion := "3.0.0",
-      testUtilsVersion := "1.3.1",
+      testUtilsVersion := "1.4.0",
 
       testOptions in sbt.Test += Tests.Argument(ScalaTest, "-oF"),
 

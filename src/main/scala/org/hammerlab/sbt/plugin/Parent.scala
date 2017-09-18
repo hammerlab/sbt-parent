@@ -14,9 +14,11 @@ object Parent
   object autoImport {
 
     def hammerlab(name: String) = "org.hammerlab" ^^ name
+    def hammerlab(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
 
     val adam = "org.hammerlab.adam" ^^ "core"
     val args4j = "args4j" ^ "args4j"
+    val args4j_cli = "org.hammerlab.cli" ^^ "args4j"
     val args4s = "org.hammerlab" ^^ "args4s"
     val bdg_formats = "org.bdgenomics.bdg-formats" ^ "bdg-formats"
     val bdg_utils_cli = "org.hammerlab.bdg-utils" ^^ "cli"
@@ -27,13 +29,15 @@ object Parent
     val breeze = "org.scalanlp" ^^ "breeze"
     val bytes = hammerlab("bytes")
     val case_app = "com.github.alexarchambault" ^^ "case-app"
+    val case_cli = "org.hammerlab.cli" ^^ "case-app"
     val cats = "org.typelevel" ^^ "cats"
     val channel = hammerlab("channel")
     val commons_io = "commons-io" ^ "commons-io"
     val commons_math = "org.apache.commons" ^ "commons-math3"
     val genomic_utils = "org.hammerlab.genomics" ^^ "utils"
     val guava = "com.google.guava" ^ "guava"
-    val hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
+    val hammerlab_hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
+    val seqdoop_hadoop_bam = ("org.seqdoop" ^ "hadoop-bam") - hadoop
     val htsjdk = ("com.github.samtools" ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
     val io = hammerlab("io")
     val iterators = hammerlab("iterator")
@@ -52,7 +56,6 @@ object Parent
     val shapeless = "com.chuusai" ^^ "shapeless"
     val slf4j = "org.clapper" ^^ "grizzled-slf4j"
     val spark_bam = hammerlab("spark-bam")
-    val spark_commands = hammerlab("spark-commands")
     val spark_util = hammerlab("spark-util")
     val spire = "org.spire-math" ^^ "spire"
     val stats = hammerlab("stats")
@@ -86,6 +89,7 @@ object Parent
           mllib → sparkVersion.value,
           parquet_avro → "1.8.1",
           scalautils → "2.1.5",
+          seqdoop_hadoop_bam → "7.9.0",
           shapeless → "2.3.2",
           slf4j → "1.3.1",
           spire → "0.13.0"

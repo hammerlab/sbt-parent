@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.deps
 
-import sbt.{ ExclusionRule, ModuleID }
+import sbt.{ ExclusionRule, ModuleID, SbtExclusionRule }
 
 case class Dep(group: Group,
                artifact: Artifact,

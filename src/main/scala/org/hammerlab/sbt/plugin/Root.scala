@@ -18,12 +18,24 @@ object Root
         root := true
       )
 
-    def rootProject(modules: ProjectReference*): Project =
-      Project("base", new File("."))
+    def rootProject(name: String,
+                    modules: ProjectReference*): Project = {
+      val file = new File(".")
+      Project(name, file)
+      .settings(
+        rootSettings
+      )
+      .aggregate(modules: _*)
+    }
+
+    def rootProject(modules: ProjectReference*): Project = {
+      val file = new File(".")
+      Project(file.getCanonicalFile.getName, file)
         .settings(
           rootSettings
         )
         .aggregate(modules: _*)
+    }
   }
 
   import autoImport._
