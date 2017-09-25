@@ -4,7 +4,7 @@ name := "sbt-parent"
 
 organization := "org.hammerlab"
 
-version := "3.2.0"
+version := "4.0.0-SNAPSHOT"
 
 enablePlugins(GitVersioning)
 
@@ -48,12 +48,13 @@ pomExtra :=
 
 crossPaths := false
 
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
-addSbtPlugin("org.hammerlab" % "sbt-coveralls" % "1.1.1")
-addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.4")
-addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
+resolvers += Resolver.sonatypeRepo("snapshots")
+
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.3-SNAPSHOT")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+addSbtPlugin("org.hammerlab" % "sbt-coveralls" % "1.2.0-SNAPSHOT")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.5")
 
 test in assembly := {}
