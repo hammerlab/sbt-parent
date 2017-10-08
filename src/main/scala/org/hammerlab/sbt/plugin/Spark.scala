@@ -56,7 +56,7 @@ object Spark
         ),
 
       kryoVersion := "2.24.0",
-      sparkTestsVersion := "2.2.0",
+      sparkTestsVersion := "2.3.0-SNAPSHOT",
 
       hadoopVersion := "2.7.3",
       computedHadoopVersion := System.getProperty("hadoop.version", hadoopVersion.value),
