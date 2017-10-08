@@ -4,7 +4,7 @@ name := "sbt-parent"
 
 organization := "org.hammerlab"
 
-version := "3.2.0"
+version := "3.3.0-SNAPSHOT"
 
 enablePlugins(GitVersioning)
 
@@ -55,5 +55,7 @@ addSbtPlugin("org.hammerlab" % "sbt-coveralls" % "1.1.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8")
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.4")
 addSbtPlugin("com.typesafe.sbt" % "sbt-scalariform" % "1.3.0")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC12")
 
+// Don't run tests when building an assembly JAR
 test in assembly := {}
