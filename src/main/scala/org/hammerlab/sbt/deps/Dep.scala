@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.deps
 
+import sbt.impl.GroupArtifactID
 import sbt.{ ExclusionRule, ModuleID, SbtExclusionRule }
 
 case class Dep(group: Group,
@@ -98,16 +99,7 @@ case class Dep(group: Group,
 }
 
 object Dep {
-  def apply(group: Group,
-            artifact: Artifact,
-            crossVersion: CrossVersion,
-            configuration: Configuration): Dep =
-    Dep(
-      group,
-      artifact,
-      crossVersion,
-      configuration
-    )
+  implicit def fromSBT(ga: GroupArtifactID): Dep = ga: GroupArtifact
 }
 
 case class GroupArtifactNotFound(group: Group,

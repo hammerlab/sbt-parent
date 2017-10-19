@@ -4,10 +4,15 @@
 
 SBT plugin factoring out boilerplate for publishing to Maven Central, optionally cross-building against Apache Spark 1.x and 2.x versions, and building+publishing thin shaded JARs.
 
-## Installation
+## Usage
 
-### `create-scala-project` script
-The easiest way to get started is to use the [`create-scala-project`](https://github.com/hammerlab/sbt-parent/blob/master/scripts/create-scala-project) script in this repo:
+Add to `project/plugins.sbt` of an existing project:
+
+```scala
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.3.1")
+```
+
+or create a new project using the `create-scala-project` script:
 
 ```bash
 # Create a project called "proj" at /path/to/proj 
@@ -21,108 +26,127 @@ GROUP=org.foo GITHUB_USER=bar create-scala-project baz
 ```
 
 This will set create stubs for the following files:
+
 - `build.sbt`: initialize `organization`, `name`, `version`, `libraryDependencies` settings.
 - `project/plugins.sbt`: adding a dependency on this plugin.
 - `.gitignore`
 - `LICENSE` (Apache 2)
 - `.travis.yml`
 
-### Manually
-To use `sbt-parent` in an existing project, add this to its `project/plugins.sbt`:
+## Examples
 
-```
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.1.2")
-```
+Project-ID fields work as they normally do:
 
-Then you can specify minimal configuration in your `build.sbt`:
+### Dependency-management configs
 
-```
-organization := "x.y"  // Default: "org.hammerlab"
-name := "z"
-version := "1.0.0"
-libraryDependencies ++= Seq(
-  "foo" %% "bar" % "baz",
-  libraries.value('spark)
-)
-```
+[The bundled `Deps` plugin](src/main/scala/org/hammerlab/sbt/plugin/Deps.scala) offers settings for easier dependency-configuration:
 
-[A few named dependencies (like `'spark` above) are provided for convenience](https://github.com/hammerlab/sbt-parent/blob/master/src/main/scala/org/hammerlab/sbt/ParentPlugin.scala#L30-L33).
-
-## Usage
-
-### Publish snapshots
-To publish snapshots of such a project, for both Scala 2.10 and 2.11:
-
-```
-sbt +publish
-```
-
-### Publish signed releases
-Similarly, to publish releases for Scala 2.10 and 2.11:
-
-```
-sbt +publishSigned releaseSonatype
-```
-
-### Build/Publish "Thin" Shaded JARs
-In general, [it is unwise to publish full assembly JARs](https://github.com/sbt/sbt-assembly#publishing-not-recommended). However, sometimes you may want to shade specific dependencies into the JAR that you publish.
- 
- `sbt-parent` exposes hooks to enable this; in `build.sbt`:
-  
 ```scala
-// Declare deps to be shaded
-shadedDeps += "org" % "name" % "version"
- 
-// Rename shaded classes.
-shadeRenames += "org.name.**" -> "my_org.new_name.@1"
-
-// Publish JAR that includes shaded Guava.
-ParentPlugin.publishThinShadedJar
+testDeps           += scalatest  // like "org.scalatest" %% "scalatest" % "3.0.0"; change version via scalatestVersion
+testTestDeps       += spark      // test-scoped dependency on Spark's test JAR
+compileAndTestDeps += spark      // compile->compile and test->test dependencies on Spark
+providedDeps       += hadoop     // "provided"-scope dependency on Hadoop
 ```
 
-### Build Assembly JAR
-`sbt-parent` sets a number of default `sbt-assembly` options, so that `sbt assembly` should Just Work without any additional configuration in downstream projects.
+Global excludes can be added like:
 
-The `shadeRenames` hook above is also honored even when building a full assembly JAR. 
-
-### Spark 1.x/2.x cross-building
-To publish artifacts that depend on Spark 1.x and 2.x:
-
-- Define the desired versions of each in your project's `build.sbt`:
-
-  ```scala
-  sparkVersion := "1.6.3"
-  spark2Version := "2.0.0"
-  ```
-
-  (The above values are also the defaults).
-
-- You'll also want to wrap your project's `name` setting in `build.sbt`:
-
-  ```scala
-  name := ParentPlugin.sparkName("foo")
-  ```
-
-  This will append `_spark2` to your artifact-names (before the Scala-version cross-publishing append of e.g. `_2.11`) when building against Spark 2.x.
-
-- Finally, build/test/publish for Spark 2.x by passing `-Dspark2` to SBT:
-
-  ```bash
-  sbt -Dspark2 +test  # Run tests for Scala 2.10 and 2.11, linking against Spark 2.x.
-  ```
-
-### Scala 2.10 Builds
-By default, Scala 2.11 will be used, and SBT defaults apply:
-- a `+` prefix will run against both Scala 2.10 and 2.11, as in the above examples.
-- to run a task against only Scala 2.10.6, use `sbt ++2.10.6 …`:
-
-## Publish this plugin
-Snapshots:
-```bash
-sbt publish
+```scala
+excludes += "javax.servlet" % "servlet-api"
+excludes += "org.scalatest" %% "scalatest"   // cross-version syntax works!
 ```
 
-Releases:
-```bash
-sbt publish sonatypeRelease
+Additionally, many aliases for popular libraries, along with default versions, can be found in [`Parent`](src/main/scala/org/hammerlab/sbt/plugin/Parent.scala), with additional "default" versions appendable to the `versions` key defined in [`Versions`](src/main/scala/org/hammerlab/sbt/plugin/Versions.scala).
+
+### Test configs
+
+[The bundled `Test` plugin](src/main/scala/org/hammerlab/sbt/plugin/Test.scala) adds test-configurations:
+
+- ScalaTest framework with full stack-traces and a `test`-scoped dependency
+	- default version: `3.0.0`
+	- configurable as `scalatestVersion`
+- `test`-dependency on [hammerlab/test-utils]()
+	- default version: `1.5.1`
+	- configurable as `testUtilsVersion`
+  - default versions: `1.5.1` and `3.0.0`
+
+Configure adding a `-tests` artifact to Maven-Central publishing:
+
+```scala
+publishTestJar
 ```
+
+### Assembly/Shading
+
+Shade and rename some Guava classes:
+
+```scala
+shadedDeps += guava
+shadeRenames += "com.google.common.**" → "org.hammerlab.guava.@1"
+shadeRenames += "com.google.thirdparty.**" → "org.hammerlab.guava.@1"
+```
+
+([The `guava` alias refers to `com.google.guava:guava:19.0`](src/main/scala/org/hammerlab/sbt/plugin/Parent.scala))
+
+Publish a "thin" assembly JAR with `shadedDeps` above instead of the usual unshaded JAR or a full assembly/"uber"-JAR:
+
+```scala
+publishThinShadedJar
+``` 
+
+Slightly-shorter setting for specifying a JAR's "main" class:
+
+```scala
+main := "org.foo.Main"
+```
+
+### Publishing to Maven Central
+
+[Various settings are added automatically](src/main/scala/org/hammerlab/sbt/plugin/Maven.scala):
+
+- necessary POM settings
+- add Sonatype "releases" and "snapshots" resolvers
+
+`sbt +publish` will publish a snapshot to Sonatype for each Scala cross-version, and `sbt +publishSigned sonatypeRelease` will publish to Sonatype-staging and then release to Maven Central. 
+
+### TravisCI / Coveralls
+
+`travisCoverageScalaVersion`: only compute coverage and send a report to Coveralls if `TRAVIS_SCALA_VERSION` matches this value (default: `scala211Version`) and `coveralls.disable` system property is not set
+- `coverageTest`: command wrapping `test` and, if scoverage is enabled, `coverageReport` for preparing reports
+- `travis-report` command suitable for `.travis.yml` `after_success`:
+	- if coverage is enabled, send report to Coveralls
+	- if this is a multi-module project, run `coverageAggregate` first 
+
+### Spark-related configs
+[The `Spark` plugin](src/main/scala/org/hammerlab/sbt/plugin/Spark.scala) offers helpers for projects that depend on [Apache Spark](http://spark.apache.org/):
+
+```scala
+addSparkDeps
+```
+
+This adds `provided` dependencies on Spark and Hadoop, a `test`-dep on [hammerlab/spark-tests](https://github.com/hammerlab/spark-tests), and a regular dep on [Kryo]().
+
+`spark` above is shorthand for `"org.apache.spark" %% "spark-core" % "2.2.0"`; the version can be set separately:
+
+```scala
+sparkVersion := "2.1.1"
+```
+
+### Multi-module-project configs
+
+[The `Root` plugin](src/main/scala/org/hammerlab/sbt/plugin/Root.scala) provides the `rootProject` helper for aggregating a project's modules and no-op'ing various settings/tasks that should not operate directly on the root wrapper-module:
+
+```scala
+lazy val base = rootProject(module1, module2)
+lazy val module1 = project.settings(…)
+lazy val module2 = project.settings(…)
+```
+
+
+### Scala settings
+
+Scala-library and -version settings are available via [`Scala`](src/main/scala/org/hammerlab/sbt/plugin/Scala.scala):
+
+- `isScala21x`
+- `scala21xOnly`
+- `addScala212` (default: 2.11 only)
+- `scala21xVersion`
