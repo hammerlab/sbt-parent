@@ -8,11 +8,17 @@ object Versions
 
   implicit val versionsMap = settingKey[VersionsMap]("Map from 'group:artifact' aliases/literals to versions numbers")
 
-  val versions = settingKey[Seq[(GroupArtifact, String)]]("")
+  // Wrapper for [[GroupArtifact]]→<version string> tuples entered into a [[VersionsMap]] for managing default library
+  // versions.
+  case class DefaultVersion(groupArtifact: GroupArtifact, version: String)
+  object DefaultVersion {
+    implicit def fromTuple(t: (Dep, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
+  }
 
-  implicit def widenDepTuples(ts: Seq[(Dep, String)]): Seq[(GroupArtifact, String)] = ts.map(widenDepTuple)
-  implicit def widenDepTuple(t: (Dep, String)): (GroupArtifact, String) = t._1.groupArtifact → t._2
-
+  object autoImport {
+    val versions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
+  }
+  import autoImport._
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
@@ -21,8 +27,9 @@ object Versions
       versionsMap :=
         VersionsMap(
           versions
-          .value
-          .toMap
+            .value
+            .map(v ⇒ v.groupArtifact → v.version)
+            .toMap
         )
     )
 }

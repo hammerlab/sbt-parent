@@ -1,10 +1,9 @@
 package org.hammerlab.sbt.plugin
 
-import sbt.Keys.excludeDependencies
-import org.hammerlab.sbt.deps.{ Configuration, Dep, Group, GroupArtifact }
+import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
 import org.hammerlab.sbt.plugin.Scala.autoImport.appendCrossVersion
 import org.hammerlab.sbt.plugin.Versions.versionsMap
-import sbt.Keys.libraryDependencies
+import sbt.Keys.{ excludeDependencies, libraryDependencies }
 import sbt.{ Def, SbtExclusionRule, settingKey }
 
 object Deps

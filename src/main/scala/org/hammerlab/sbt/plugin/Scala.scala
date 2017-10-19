@@ -2,7 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.CrossVersion
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
+import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
 import sbt.{ Def, addCompilerPlugin, settingKey, toGroupID }
 

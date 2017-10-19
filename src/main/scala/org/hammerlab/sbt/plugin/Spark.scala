@@ -5,7 +5,7 @@ import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.deps.{ Configuration ⇒ Conf }
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
-import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
+import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys.{ excludeDependencies, parallelExecution }
 import sbt.{ Def, SbtExclusionRule, SettingsDefinition, settingKey }
 

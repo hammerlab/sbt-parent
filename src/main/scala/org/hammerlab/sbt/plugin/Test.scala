@@ -2,7 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
+import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys.{ publishArtifact, testFrameworks, testOptions }
 import sbt.TestFrameworks.ScalaTest
 import sbt.{ Def, Tests, settingKey }
@@ -31,7 +31,7 @@ object Test
         ),
 
       scalatestVersion := "3.0.0",
-      testUtilsVersion := "1.5.0",
+      testUtilsVersion := "1.5.1-SNAPSHOT",
 
       testOptions in sbt.Test += Tests.Argument(ScalaTest, "-oF"),
 

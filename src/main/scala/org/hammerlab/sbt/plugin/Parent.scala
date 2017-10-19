@@ -3,7 +3,7 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, sparkVersion }
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
-import org.hammerlab.sbt.plugin.Versions.{ versions, widenDepTuple }
+import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.settingKey
 
 object Parent

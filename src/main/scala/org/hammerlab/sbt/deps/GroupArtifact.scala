@@ -19,4 +19,6 @@ object GroupArtifact {
       groupArtifact.artifact,
       groupArtifact.crossVersion
     )
+
+  implicit def DepToGroupArtifact(dep: Dep): GroupArtifact = dep.groupArtifact
 }
