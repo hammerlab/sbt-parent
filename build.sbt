@@ -4,7 +4,7 @@ name := "sbt-parent"
 
 organization := "org.hammerlab"
 
-version := "3.3.1-SNAPSHOT"
+version := "3.3.1"
 
 enablePlugins(GitVersioning)
 
