@@ -3,8 +3,8 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
 import org.hammerlab.sbt.plugin.Scala.autoImport.appendCrossVersion
 import org.hammerlab.sbt.plugin.Versions.versionsMap
-import sbt.Keys.{ excludeDependencies, libraryDependencies }
-import sbt.{ Def, SbtExclusionRule, settingKey }
+import sbt.Keys.{ excludeDependencies, libraryDependencies, projectDependencies }
+import sbt.{ ClasspathDependency, Def, Project, SbtExclusionRule, settingKey }
 
 object Deps
   extends Plugin(Scala, Versions) {
@@ -18,6 +18,11 @@ object Deps
     val excludes = settingKey[Seq[Dep]]("Libraries to exclude as transitive dependencies from all direct dependencies; wrapper for 'excludeDependencies'")
 
     implicit val stringToGroup = Group.groupFromString _
+
+    implicit class ProjectConfigOps(val p: Project) extends AnyVal {
+      def andTest: ClasspathDependency = ClasspathDependency(p, Some("compile->compile;test->test"))
+      def test: ClasspathDependency = ClasspathDependency(p, Some("test->test"))
+    }
   }
 
   import autoImport._
@@ -70,6 +75,31 @@ object Deps
             _
               .withVersion(versionsMap.value)
               .toModuleID(appendCrossVersion.value)
-          )
+          ),
+
+      projectDependencies := projectDependencies.value.flatMap {
+        dep ⇒
+          val configurations = dep.configurations.toSeq.flatMap(_.split(";"))
+          val (testConfs, otherConfs) = configurations.partition(_ == "test->test")
+          val testConf = testConfs.headOption
+          if (testConf.isDefined)
+            Seq(
+              dep.copy(
+                configurations =
+                  if (otherConfs.nonEmpty)
+                    Some(otherConfs.mkString(";"))
+                  else
+                    None
+              ),
+              dep
+              .copy(
+                configurations =
+                  Some("test->test")
+              )
+              .classifier("tests")
+            )
+          else
+            Seq(dep)
+      }
     )
 }
