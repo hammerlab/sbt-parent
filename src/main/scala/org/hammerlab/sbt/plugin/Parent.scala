@@ -45,6 +45,7 @@ object Parent
     val log4j = "org.slf4j" ^ "slf4j-log4j12"
     val magic_rdds = hammerlab("magic-rdds")
     val math = hammerlab("math")
+    val monoids = hammerlab("monoids")
     val mllib = ("org.apache.spark" ^^ "spark-mllib") - scalatest
     val paths = hammerlab("paths")
     val parquet_avro = "org.apache.parquet" ^ "parquet-avro"
@@ -55,7 +56,7 @@ object Parent
     val scalautils = "org.scalautils" ^^ "scalautils"
     val shapeless = "com.chuusai" ^^ "shapeless"
     val slf4j = "org.clapper" ^^ "grizzled-slf4j"
-    val spark_bam = hammerlab("spark-bam")
+    val spark_bam = hammerlab("bam", "load")
     val spark_util = hammerlab("spark-util")
     val spire = "org.spire-math" ^^ "spire"
     val stats = hammerlab("stats")
