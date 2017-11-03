@@ -2,6 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.CrossVersion
 import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
 import sbt.{ Def, addCompilerPlugin, settingKey, toGroupID }
@@ -47,11 +48,16 @@ object Scala
         crossScalaVersions := Seq(scala212Version.value)
       )
 
-    val enableMacroParadise =
-      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross sbt.CrossVersion.full)
-
     val scala_lang = "org.scala-lang" ^ "scala-library"
     val scala_reflect = "org.scala-lang" ^ "scala-reflect"
+
+    val enableMacroParadise =
+      Seq(
+        addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross sbt.CrossVersion.full),
+        deps += scala_reflect
+      )
+
+    val debugMacros = (scalacOptions += "-Ymacro-debug-lite")
   }
 
   import autoImport._
@@ -88,6 +94,12 @@ object Scala
 
       isScala210 := (scalaBinaryVersion.value == "2.10"),
       isScala211 := (scalaBinaryVersion.value == "2.11"),
-      isScala212 := (scalaBinaryVersion.value == "2.12")
+      isScala212 := (scalaBinaryVersion.value == "2.12"),
+
+      scalacOptions ++= Seq(
+        "-feature",
+        "-language:implicitConversions",
+        "-language:postfixOps"
+      )
     )
 }
