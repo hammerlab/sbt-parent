@@ -9,7 +9,7 @@ SBT plugin factoring out boilerplate for publishing to Maven Central, optionally
 Add to `project/plugins.sbt` of an existing project:
 
 ```scala
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.3.1")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.4.0")
 ```
 
 or create a new project using the `create-scala-project` script:
