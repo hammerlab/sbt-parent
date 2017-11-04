@@ -89,8 +89,8 @@ object Scala
       crossScalaVersions := Seq(scala211Version.value),
 
       scala210Version := "2.10.6",
-      scala211Version := "2.11.8",
-      scala212Version := "2.12.1",
+      scala211Version := "2.11.11",
+      scala212Version := "2.12.4",
 
       isScala210 := (scalaBinaryVersion.value == "2.10"),
       isScala211 := (scalaBinaryVersion.value == "2.11"),
