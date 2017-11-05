@@ -58,6 +58,16 @@ object Scala
       )
 
     val debugMacros = (scalacOptions += "-Ymacro-debug-lite")
+
+    // Macros and doc-generation have many rough edges, so this is frequently useful
+    val skipDoc = publishArtifact in (sbt.Compile, packageDoc) := false
+
+    val scalameta = Seq(
+      addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross sbt.CrossVersion.full),
+      scalacOptions += "-Xplugin-require:macroparadise",
+      libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % sbt.Provided,
+      scalacOptions in (sbt.Compile, console) ~= (_ filterNot (_ contains "paradise")) // macroparadise plugin doesn't work in repl yet.
+    )
   }
 
   import autoImport._
@@ -99,7 +109,8 @@ object Scala
       scalacOptions ++= Seq(
         "-feature",
         "-language:implicitConversions",
-        "-language:postfixOps"
+        "-language:postfixOps",
+        "-language:higherKinds"
       )
     )
 }
