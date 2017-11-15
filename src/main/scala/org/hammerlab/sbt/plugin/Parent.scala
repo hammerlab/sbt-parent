@@ -41,6 +41,7 @@ object Parent
     val htsjdk = ("com.github.samtools" ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
     val io = hammerlab("io")
     val iterators = hammerlab("iterator")
+    val iterator_macros = hammerlab("iterator-macros")
     val loci = ("org.hammerlab.genomics" ^^ "loci") - guava
     val log4j = "org.slf4j" ^ "slf4j-log4j12"
     val magic_rdds = hammerlab("magic-rdds")
