@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.Group
+import org.hammerlab.sbt.deps.{ Configuration, Group }
 import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, sparkVersion }
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
@@ -65,6 +65,10 @@ object Parent
     val types = hammerlab("types")
 
     val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
+
+    val tests = Configuration.Test
+    val testtest = Configuration.TestTest
+    val provided = Configuration.Provided
   }
 
   import autoImport._

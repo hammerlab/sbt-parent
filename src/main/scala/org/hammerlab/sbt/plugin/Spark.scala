@@ -27,10 +27,10 @@ object Spark
       Seq(
         deps ++=
           Seq(
-            spark ^ Provided,
-            hadoop ^ Provided,
+            spark % Provided,
+            hadoop % Provided,
             kryo,
-            sparkTests ^ Conf.Test
+            sparkTests % Conf.Test
           ),
 
         // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.

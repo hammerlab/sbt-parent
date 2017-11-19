@@ -1,12 +1,12 @@
 package org.hammerlab.sbt.deps
 
 import sbt.impl.GroupArtifactID
-import sbt.{ ExclusionRule, ModuleID, SbtExclusionRule }
+import sbt.{ ExclusionRule, ModuleID }
 
 case class Dep(group: Group,
                artifact: Artifact,
                crossVersion: CrossVersion,
-               configuration: Configuration = Configuration.Default,
+               configurations: Configurations = Configurations.default,
                excludes: Seq[GroupArtifact] = Nil,
                version: Option[String] = None) {
 
@@ -17,40 +17,42 @@ case class Dep(group: Group,
       crossVersion
     )
 
-  def toModuleID(crossVersionFn: (CrossVersion, String) ⇒ String): ModuleID =
+  def toModuleIDs(crossVersionFn: (CrossVersion, String) ⇒ String): Seq[ModuleID] =
     version match {
       case Some(version) ⇒
-        val Configuration(scope, classifier) = configuration
-        val id =
-          ModuleID(
-            organization = group.value,
-            name = artifact.value,
-            revision = version,
-            configurations =
-              scope match {
-                case Scope.Compile ⇒ None
-                case _ ⇒ Some(scope.toString)
-              },
-            crossVersion = crossVersion,
-            exclusions =
-              this
-                .excludes
-                .map {
-                  case GroupArtifact(
-                    Group(group),
-                    Artifact(artifact),
-                    crossVersion
-                  ) ⇒
-                    ExclusionRule(
-                      group,
-                      crossVersionFn(crossVersion, artifact)
-                    )
-                }
-          )
+        configurations map {
+          case Configuration(scope, classifier) ⇒
+            val id =
+              ModuleID(
+                organization = group.value,
+                name = artifact.value,
+                revision = version,
+                configurations =
+                  scope match {
+                    case Scope.Compile ⇒ None
+                    case _ ⇒ Some(scope.toString)
+                  },
+                crossVersion = crossVersion,
+                exclusions =
+                  this
+                    .excludes
+                    .map {
+                      case GroupArtifact(
+                        Group(group),
+                        Artifact(artifact),
+                        crossVersion
+                      ) ⇒
+                        ExclusionRule(
+                          group,
+                          crossVersionFn(crossVersion, artifact)
+                        )
+                    }
+              )
 
-        classifier match {
-          case Classifier.Default ⇒ id
-          case _ ⇒ id.classifier(classifier.toString)
+            classifier match {
+              case Classifier.Default ⇒ id
+              case _ ⇒ id.classifier(classifier.toString)
+            }
         }
       case None ⇒
         throw VersionNotSetException(this)
@@ -88,8 +90,11 @@ case class Dep(group: Group,
       excludes = this.excludes ++ excludes.map(_.groupArtifact)
     )
 
-  def ^(configuration: Configuration): Dep =
-    copy(configuration = configuration)
+  def %(configurations: Configuration*): Dep =
+    copy(configurations = configurations)
+
+  def +(configurations: Configuration*): Dep =
+    copy(configurations = this.configurations ++ configurations)
 
   def %(version: String): Dep =
     this.copy(version = Some(version))

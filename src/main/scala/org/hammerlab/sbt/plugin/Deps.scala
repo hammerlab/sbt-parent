@@ -50,19 +50,19 @@ object Deps
       deps ++=
         testDeps
           .value
-          .map(_ ^ Configuration.Test),
+          .map(_ % Configuration.Test),
 
       providedDeps := Nil,
       deps ++=
         providedDeps
           .value
-          .map(_ ^ Configuration.Provided),
+          .map(_ % Configuration.Provided),
 
       testTestDeps := Nil,
       deps ++=
         testTestDeps
           .value
-          .map(_ ^ Configuration.TestTest),
+          .map(_ % Configuration.TestTest),
 
       compileAndTestDeps := Nil,
       deps ++= compileAndTestDeps.value,
@@ -71,10 +71,10 @@ object Deps
       libraryDependencies ++=
         deps
           .value
-          .map(
+          .flatMap(
             _
               .withVersion(versionsMap.value)
-              .toModuleID(appendCrossVersion.value)
+              .toModuleIDs(appendCrossVersion.value)
           ),
 
       projectDependencies := projectDependencies.value.flatMap {

@@ -5,7 +5,7 @@ import sbt.impl.{ ConvertGroupArtifact, GroupArtifactID }
 case class GroupArtifact(group: Group,
                          artifact: Artifact,
                          crossVersion: CrossVersion) {
-  def ^(configuration: Configuration): Dep =
+  def %(configuration: Configuration): Dep =
     Dep(
       group,
       artifact,

@@ -50,10 +50,10 @@ object Assembly
           val shadedDepJars =
             shadedDeps
               .value
-              .map(
+              .flatMap(
                 _
                   .withVersion(versionsMap.value)
-                  .toModuleID(appendCrossVersion.value)
+                  .toModuleIDs(appendCrossVersion.value)
               )
               .map {
                 dep ⇒
