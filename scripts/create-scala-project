@@ -52,7 +52,7 @@ EOF
 GITHUB_USER="${GITHUB_USER:-hammerlab}"
 
 mkdir -p project
-echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.4.3")' >> project/plugins.sbt
+echo 'addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.0")' >> project/plugins.sbt
 echo 'sbt.version=0.13.13' > project/build.properties
 
 echo target > .gitignore
