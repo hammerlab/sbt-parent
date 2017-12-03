@@ -23,6 +23,11 @@ object Deps
       def andTest: ClasspathDependency = ClasspathDependency(p, Some("compile->compile;test->test"))
       def test: ClasspathDependency = ClasspathDependency(p, Some("test->test"))
     }
+
+    /**
+     * Short-hand for declaring a sequence of dependencies
+     */
+    def dep(ds: Dep*) = (deps ++= ds)
   }
 
   import autoImport._

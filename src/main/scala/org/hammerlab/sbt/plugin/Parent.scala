@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Configuration, Group }
+import org.hammerlab.sbt.deps.{ Configuration, Group, SnapshotOps }
 import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, sparkVersion }
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
@@ -11,7 +11,8 @@ object Parent
 
   import Group._
 
-  object autoImport {
+  object autoImport
+    extends SnapshotOps {
 
     def hammerlab(name: String) = "org.hammerlab" ^^ name
     def hammerlab(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name

@@ -1,17 +1,21 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.plugin.Versions.autoImport.mavenLocal
+import sbt.Keys.{ publish, publishArtifact, publishM2, test }
 import sbt.{ Def, File, Project, ProjectReference, settingKey }
-import sbt.Keys.{ publish, publishArtifact, test }
 import scoverage.ScoverageKeys.coverageReport
+import scoverage.ScoverageSbtPlugin
 
 object Root
-  extends Plugin {
+  extends Plugin(ScoverageSbtPlugin, Versions) {
   object autoImport {
     val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
 
     val rootSettings: Seq[Def.Setting[_]] =
       Seq(
         publish := {},
+        mavenLocal := {},
+        publishM2 := {},
         (test in sbt.Test) := {},
         coverageReport := {},
         publishArtifact := false,

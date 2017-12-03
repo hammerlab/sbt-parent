@@ -69,6 +69,8 @@ object Scala
       libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % sbt.Provided,
       scalacOptions in (sbt.Compile, console) ~= (_ filterNot (_ contains "paradise")) // macroparadise plugin doesn't work in repl yet.
     )
+
+    val consolePkgs = settingKey[Seq[String]]("Wildcard-imports to add to console startup commands")
   }
 
   import autoImport._
@@ -112,6 +114,9 @@ object Scala
         "-language:implicitConversions",
         "-language:postfixOps",
         "-language:higherKinds"
-      )
+      ),
+
+      consolePkgs := Nil,
+      initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n")
     )
 }
