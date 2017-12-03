@@ -22,7 +22,7 @@ addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.1")
 ```scala
 dep(
   guava             // regular library dependency
-  scalatest test,   // test-scoped dependency
+  scalatest tests,  // test-scoped dependency
   spark provided,   // `provided` dependency
   hadoop testtest,  // test-scoped dependency on -tests JAR
   kryo  +testtest   // combined `compile`- and `test->test`-scoped dependency
