@@ -9,10 +9,10 @@ case class Dep(group: Group,
                crossVersion: CrossVersion,
                configurations: Configurations = Configurations.default,
                excludes: Seq[GroupArtifact] = Nil,
-               isSnapshot: Boolean = false,
+               forceSnapshot: Boolean = false,
                version: Option[String] = None) {
 
-  def snapshot: Dep = copy(isSnapshot = true)
+  def snapshot: Dep = copy(forceSnapshot = true)
 
   def tests: Dep = copy(configurations = Configuration.Test)
   def testtest: Dep = copy(configurations = Configuration.TestTest)
@@ -34,7 +34,7 @@ case class Dep(group: Group,
               ModuleID(
                 organization = group.value,
                 name = artifact.value,
-                revision = version.snapshot(isSnapshot),
+                revision = version.maybeForceSnapshot(forceSnapshot),
                 configurations =
                   scope match {
                     case Scope.Compile ⇒ None

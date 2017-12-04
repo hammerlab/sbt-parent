@@ -16,6 +16,11 @@ object Snapshot {
         case (false, true) ⇒ s.dropRight(suffix.length)
         case _ ⇒ s
       }
+    def maybeForceSnapshot(forceSnapshot: Boolean): String =
+      if (forceSnapshot)
+        snapshot
+      else
+        s
   }
 
   implicit class DefaultVersionOps(val t: (Dep, String)) extends AnyVal {

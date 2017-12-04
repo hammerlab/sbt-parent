@@ -71,6 +71,15 @@ object Scala
     )
 
     val consolePkgs = settingKey[Seq[String]]("Wildcard-imports to add to console startup commands")
+    val consoleImports = settingKey[Seq[String]]("Imports to add to console startup commands")
+
+    object consoleImport {
+      def apply(imports: String*) = (consoleImports ++= imports)
+    }
+
+    object consolePkg {
+      def apply(pkgs: String*) = (consolePkgs ++= pkgs)
+    }
   }
 
   import autoImport._
@@ -113,10 +122,14 @@ object Scala
         "-feature",
         "-language:implicitConversions",
         "-language:postfixOps",
-        "-language:higherKinds"
+        "-language:higherKinds",
+        "-language:reflectiveCalls"
       ),
 
       consolePkgs := Nil,
-      initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n")
+      initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n"),
+
+      consoleImports := Nil,
+      initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
     )
 }
