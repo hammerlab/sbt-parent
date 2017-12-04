@@ -1,6 +1,6 @@
 # sbt-parent
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-3.5.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Csbt-parent)
+[![Maven Central](https://img.shields.io/badge/maven%20central-3.5.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Csbt-parent)
 
 SBT plugin factoring out boilerplate for:
 - publishing to Maven Central
@@ -10,7 +10,7 @@ SBT plugin factoring out boilerplate for:
 - and more!
 
 ```scala
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.1")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.2")
 ```
 
 ## Features
@@ -165,7 +165,7 @@ Scala-library and -version settings are available via [`Scala`](src/main/scala/o
 Add to `project/plugins.sbt` of an existing project:
 
 ```scala
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.1")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.2")
 ```
 
 or create a new project using the `create-scala-project` script:
