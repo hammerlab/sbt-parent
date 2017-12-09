@@ -3,13 +3,19 @@ package org.hammerlab.sbt.plugin
 import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype
-import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
 object Maven
   extends Plugin(Sonatype) {
 
+  case class Developer(id: String, name: String, url: String)
+  object Developer {
+    implicit def fromTuple(t: (String, String, String)): Developer = Developer(t._1, t._2, t._3)
+  }
+
   object autoImport {
     val githubUser = settingKey[String]("Github user/org to point to")
+    val githubName = settingKey[String]("Github repository basename")
+    val developers = settingKey[Seq[Developer]]("Entries for the <developers> POM tag")
   }
 
   import autoImport._
@@ -28,43 +34,39 @@ object Maven
       publishArtifact in sbt.Test := false,
       pomIncludeRepository := { _ => false },
 
+      githubName := name.value,
+
       pomExtra := {
-        val n = name.value
         val user = githubUser.value
+        val name = githubName.value
         <url>
-          https://github.com/{user}/{n}
+          https://github.com/{user}/{name}
         </url>
           <licenses>
             <license>
               <name>Apache License</name>
-              <url>https://raw.github.com/{user}/{n}/master/LICENSE</url>
+              <url>https://raw.github.com/{user}/{name}/master/LICENSE</url>
               <distribution>repo</distribution>
             </license>
           </licenses>
           <scm>
-            <url>git@github.com:{user}/{n}.git</url>
-            <connection>scm:git:git@github.com:{user}/{n}.git</connection>
-            <developerConnection>scm:git:git@github.com:{user}/{n}.git</developerConnection>
+            <url>git@github.com:{user}/{name}.git</url>
+            <connection>scm:git:git@github.com:{user}/{name}.git</connection>
+            <developerConnection>scm:git:git@github.com:{user}/{name}.git</developerConnection>
           </scm>
           <developers>
-            <developer>
-              <id>hammerlab</id>
-              <name>Hammer Lab</name>
-              <url>https://github.com/{user}</url>
-            </developer>
+            {
+              developers.value.map {
+                case Developer(id, name, url) =>
+                  <developer>
+                    <id>{id}</id>
+                    <name>{name}</name>
+                    <url>{url}</url>
+                  </developer>
+              }
+            }
           </developers>
       },
-
-      organization := "org.hammerlab",
-      githubUser := "hammerlab",
-
-      // All org.hammerlab* repos are published with this Sonatype profile.
-      sonatypeProfileName := (
-        if (organization.value.startsWith("org.hammerlab"))
-          "org.hammerlab"
-        else
-          sonatypeProfileName.value
-        ),
 
       resolvers += Resolver.sonatypeRepo("releases"),
       resolvers += Resolver.sonatypeRepo("snapshots")

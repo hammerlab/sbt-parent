@@ -40,7 +40,7 @@ object Parent
     val hammerlab_hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
     val seqdoop_hadoop_bam = ("org.seqdoop" ^ "hadoop-bam") - hadoop
     val htsjdk = ("com.github.samtools" ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
-    val io = hammerlab("io")
+    val io_utils = hammerlab("io")
     val iterators = hammerlab("iterator")
     val iterator_macros = hammerlab("iterator-macros")
     val loci = ("org.hammerlab.genomics" ^^ "loci") - guava

@@ -1,6 +1,8 @@
 package org.hammerlab.sbt.plugin
 
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys.preferences
+import com.typesafe.sbt.SbtScalariform.autoImport.scalariformAutoformat
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys._
+import sbt.Def
 
 import scalariform.formatter.preferences._
 
@@ -20,4 +22,9 @@ object Scalariform
               .setPreference(DanglingCloseParenthesis, Preserve)
       )
   }
+
+  override def projectSettings: Seq[Def.Setting[_]] =
+    Seq(
+      scalariformAutoformat := false
+    )
 }
