@@ -50,9 +50,9 @@ object Spark
 
       versions ++=
         Seq(
-          hadoop → computedHadoopVersion.value,
-          spark → computedSparkVersion.value,
-          kryo → kryoVersion.value,
+              hadoop → computedHadoopVersion.value,
+               spark → computedSparkVersion.value,
+                kryo → kryoVersion.value,
           sparkTests → sparkTestsVersion.value
         ),
 
