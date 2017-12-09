@@ -5,7 +5,7 @@ import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
-import sbt.{ Def, addCompilerPlugin, settingKey, toGroupID }
+import sbt._
 
 object Scala
   extends Plugin(Versions) {

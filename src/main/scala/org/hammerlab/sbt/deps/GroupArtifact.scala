@@ -1,7 +1,5 @@
 package org.hammerlab.sbt.deps
 
-import sbt.impl.{ ConvertGroupArtifact, GroupArtifactID }
-
 case class GroupArtifact(group: Group,
                          artifact: Artifact,
                          crossVersion: CrossVersion) {
@@ -23,5 +21,4 @@ object GroupArtifact {
     )
 
   implicit def DepToGroupArtifact(dep: Dep): GroupArtifact = dep.groupArtifact
-  implicit def fromSBT(ga: GroupArtifactID): GroupArtifact = ConvertGroupArtifact.fromSBT(ga)
 }

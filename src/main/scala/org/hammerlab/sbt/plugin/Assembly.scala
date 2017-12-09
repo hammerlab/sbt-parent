@@ -10,6 +10,7 @@ import sbtassembly.AssemblyKeys.assemblyOption
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{ AssemblyPlugin, PathList }
 
+
 object Assembly
   extends Plugin(
     AssemblyPlugin,
@@ -103,12 +104,12 @@ object Assembly
 
         artifact in (Compile, assembly) := {
           // Make the assembly JAR the unclassified artifact.
-          (artifact in (Compile, assembly)).value.copy(classifier = None)
+          (artifact in (Compile, assembly)).value.withClassifier(None)
         },
 
         packagedArtifacts := {
           // Don't publish the unshaded JAR.
-          val newArtifacts = packagedArtifacts.value.filterKeys(_.classifier != Some("unshaded"))
+          val newArtifacts = packagedArtifacts.value.filterKeys(!_.classifier.exists(_ == "unshaded"))
           streams.value.log.debug(
             s"packagedArtifacts, after removing unshaded JAR:\n${newArtifacts.mkString("\t", "\n\t", "")}"
           )
@@ -121,7 +122,7 @@ object Assembly
       Seq(
         artifact in (Compile, assembly) := {
           val art = (artifact in (Compile, assembly)).value
-          art.copy(`classifier` = Some("assembly"))
+          art.withClassifier(Some("assembly"))
         }
       ) ++
         addArtifact(artifact in (Compile, assembly), assembly)

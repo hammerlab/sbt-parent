@@ -1,10 +1,11 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
+import org.hammerlab.sbt.deps.{ Configuration, CrossVersion, Dep, Group }
 import org.hammerlab.sbt.plugin.Scala.autoImport.appendCrossVersion
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import sbt.Keys.{ excludeDependencies, libraryDependencies, projectDependencies }
-import sbt.{ ClasspathDependency, Def, Project, SbtExclusionRule, settingKey }
+import sbt.{ ClasspathDependency, Def, Project, settingKey }
+import sbt.librarymanagement.syntax.ExclusionRule
 
 object Deps
   extends Plugin(Scala, Versions) {
@@ -42,12 +43,12 @@ object Deps
           .value
           .map(
             exclude ⇒
-              SbtExclusionRule(
+              ExclusionRule(
                 exclude.group.value,
-                appendCrossVersion.value(
-                  exclude.crossVersion,
-                  exclude.artifact.value
-                )
+                exclude.artifact.value,
+                "*",
+                Vector(),
+                exclude.crossVersion
               )
           ),
 
@@ -89,19 +90,18 @@ object Deps
           val testConf = testConfs.headOption
           if (testConf.isDefined)
             Seq(
-              dep.copy(
-                configurations =
+              dep
+                .withConfigurations(
                   if (otherConfs.nonEmpty)
                     Some(otherConfs.mkString(";"))
                   else
                     None
-              ),
+                ),
               dep
-              .copy(
-                configurations =
+                .withConfigurations(
                   Some("test->test")
-              )
-              .classifier("tests")
+                )
+                .classifier("tests")
             )
           else
             Seq(dep)

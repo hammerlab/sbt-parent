@@ -10,13 +10,13 @@ object CrossVersion {
 
   implicit def fromSBT(cv: sbt.CrossVersion): CrossVersion =
     cv match {
-      case sbt.CrossVersion.Disabled ⇒ Disabled
+      case _: sbt.librarymanagement.Disabled ⇒ Disabled
       case _: sbt.CrossVersion.Binary ⇒ Binary
       case _: sbt.CrossVersion.Full ⇒ Full
     }
 
   case object Disabled extends CrossVersion {
-    override def toSBT: sbt.CrossVersion = sbt.CrossVersion.Disabled
+    override def toSBT: sbt.CrossVersion = sbt.librarymanagement.Disabled()
   }
   case object Binary extends CrossVersion {
     override def toSBT: sbt.CrossVersion = sbt.CrossVersion.binary

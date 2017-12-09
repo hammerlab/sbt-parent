@@ -1,16 +1,14 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.Util.runTask
 import org.hammerlab.sbt.plugin.Root.autoImport.root
 import org.hammerlab.sbt.plugin.Scala.autoImport.scala211Version
-import org.scoverage.coveralls.CommandSupport
-import sbt.Keys.{ commands, streams, test }
-import sbt.{ Command, Def, Project, settingKey, taskKey }
+import org.scoverage.coveralls.CoverallsPlugin.coveralls
+import sbt.Keys.{ state, streams, test }
+import sbt.{ Def, Project, settingKey, taskKey }
 import scoverage.ScoverageKeys.{ coverageAggregate, coverageEnabled, coverageReport }
 
 object Travis
-  extends Plugin(Root, Scala)
-    with CommandSupport {
+  extends Plugin(Root, Scala) {
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
@@ -25,38 +23,36 @@ object Travis
    * Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
    * Scala version (indicated by travisCoverageScalaVersion).
    */
-  val travisReportCmd =
-    Command.command("travis-report") {
-      state ⇒
-        implicit val iState = state
-        val extracted = Project.extract(state)
-        implicit val pr = extracted.currentRef
-        implicit val bs = extracted.structure
+  val travisReportCmd = taskKey[Unit]("Wrapper for coverageAggregate and coveralls, iff TRAVIS_SCALA_VERSION matches `travisCoverageScalaVersion`")
 
-        val actualTravisScalaVersion = System.getenv("TRAVIS_SCALA_VERSION")
-        val tcsv = travisCoverageScalaVersion.gimme
+  def travisReportCmdTask = Def.taskDyn {
+    val log = streams.value.log
+    val extracted = Project.extract(state.value)
+    implicit val pr = extracted.currentRef
+    implicit val bs = extracted.structure
 
-        if (disableCoverallsEnv) {
-          log.info(s"Coveralls reporting disabled by -Dcoveralls.disable")
-          state
-        } else if (actualTravisScalaVersion == tcsv) {
+    val actualTravisScalaVersion = System.getenv("TRAVIS_SCALA_VERSION")
+    val tcsv = travisCoverageScalaVersion.value
 
-          val postAggregateState =
-            if (root.gimme) {
-              log.info("Aggregating coverage from submodules")
-              runTask(coverageAggregate, state)
-            } else
-              state
+    if (disableCoverallsEnv) {
+      log.info(s"Coveralls reporting disabled by -Dcoveralls.disable")
+      Def.task {}
+    } else if (actualTravisScalaVersion == tcsv) {
 
-          log.info(s"Running coveralls")
-          Command.process("coveralls", postAggregateState)
-        } else {
-          log.info(
-            s"Skipping coverage reporting for scala version '${Option(actualTravisScalaVersion).getOrElse("")}' (env var: TRAVIS_SCALA_VERSION); reporting enabled for $tcsv (sbt key: travisCoverageScalaVersion)"
-          )
-          state
-        }
+      if (root.value) {
+        log.info("Aggregating coverage from submodules")
+        coverageAggregate.value
+      }
+
+      log.info(s"Running coveralls")
+      coveralls
+    } else {
+      log.info(
+        s"Skipping coverage reporting for scala version '${Option(actualTravisScalaVersion).getOrElse("")}' (env var: TRAVIS_SCALA_VERSION); reporting enabled for $tcsv (sbt key: travisCoverageScalaVersion)"
+      )
+      Def.task {}
     }
+  }
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
@@ -75,8 +71,7 @@ object Travis
         }
       ).value,
 
-      // Register `travis-report` from above.
-      commands += travisReportCmd,
+      travisReportCmd := travisReportCmdTask.value,
 
       // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
       coverageEnabled := (

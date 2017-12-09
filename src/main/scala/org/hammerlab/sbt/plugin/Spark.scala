@@ -7,7 +7,8 @@ import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys.{ excludeDependencies, parallelExecution }
-import sbt.{ Def, SbtExclusionRule, SettingsDefinition, settingKey }
+import sbt.{ Def, SettingsDefinition, settingKey }
+import sbt.librarymanagement.syntax.ExclusionRule
 
 object Spark
   extends Plugin(Deps) {
@@ -34,7 +35,7 @@ object Spark
           ),
 
         // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
-        excludeDependencies += SbtExclusionRule("javax.servlet", "servlet-api")
+        excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
 
       )
   }

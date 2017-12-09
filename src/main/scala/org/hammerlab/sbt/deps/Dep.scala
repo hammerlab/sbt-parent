@@ -1,8 +1,8 @@
 package org.hammerlab.sbt.deps
 
 import org.hammerlab.sbt.deps.VersionOps._
-import sbt.impl.GroupArtifactID
-import sbt.{ ExclusionRule, ModuleID }
+import sbt.librarymanagement.ModuleID
+import sbt.librarymanagement.compat.exclude
 
 case class Dep(group: Group,
                artifact: Artifact,
@@ -25,7 +25,18 @@ case class Dep(group: Group,
       crossVersion
     )
 
-  def toModuleIDs(crossVersionFn: (CrossVersion, String) ⇒ String): Seq[ModuleID] =
+  private implicit def convertCrossVersionFn(implicit fn: (CrossVersion, String) ⇒ String): (sbt.CrossVersion, String) ⇒ String =
+    (cv, name) ⇒
+      fn(cv: sbt.CrossVersion, name)
+
+  /**
+   * Convert this [[Dep]] to one or more [[ModuleID]]s (one for each [[configurations configuration]])
+   *
+   * @param crossVersionFn used for back-compat with SBT 0.13 where [[ModuleID.withExclusions]] takes Ivy-style rules
+   *                       with the cross-version already applied. The compatibility shim [[exclude]] takes this
+   *                       conversion function as an implicit parameter in 0.13, but it's unused in 1.0.
+   */
+  def toModuleIDs(implicit crossVersionFn: (CrossVersion, String) ⇒ String): Seq[ModuleID] =
     version match {
       case Some(version) ⇒
         configurations map {
@@ -34,25 +45,29 @@ case class Dep(group: Group,
               ModuleID(
                 organization = group.value,
                 name = artifact.value,
-                revision = version.maybeForceSnapshot(forceSnapshot),
-                configurations =
-                  scope match {
-                    case Scope.Compile ⇒ None
-                    case _ ⇒ Some(scope.toString)
-                  },
-                crossVersion = crossVersion,
-                exclusions =
+                revision = version.maybeForceSnapshot(forceSnapshot)
+              )
+              .withConfigurations(
+                scope match {
+                  case Scope.Compile ⇒ None
+                  case _ ⇒ Some(scope.toString)
+                }
+              )
+              .cross(crossVersion)
+              .withExclusions(
                   this
                     .excludes
+                    .toVector
                     .map {
                       case GroupArtifact(
                         Group(group),
                         Artifact(artifact),
                         crossVersion
                       ) ⇒
-                        ExclusionRule(
+                        exclude(
                           group,
-                          crossVersionFn(crossVersion, artifact)
+                          artifact,
+                          crossVersion
                         )
                     }
               )
@@ -109,10 +124,6 @@ case class Dep(group: Group,
 
   def ^(version: String): Dep =
     this.copy(version = Some(version))
-}
-
-object Dep {
-  implicit def fromSBT(ga: GroupArtifactID): Dep = ga: GroupArtifact
 }
 
 case class GroupArtifactNotFound(group: Group,
