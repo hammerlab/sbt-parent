@@ -2,6 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import sbt.Keys._
 import sbt._
+import Resolver.{sonatypeRepo, mavenLocal}
 import xerial.sbt.Sonatype
 
 object Maven
@@ -41,7 +42,10 @@ object Maven
         </url>
       },
 
-      resolvers += Resolver.sonatypeRepo("releases"),
-      resolvers += Resolver.sonatypeRepo("snapshots")
+      resolvers ++= Seq(
+        sonatypeRepo("releases"),
+        sonatypeRepo("snapshots"),
+        mavenLocal
+      )
     )
 }
