@@ -1,7 +1,35 @@
-organization := "org.hammerlab"
-name := "sbt-parent"
-version := "4.0.0-SNAPSHOT"
-sbtPlugin := true
+
+val defaults = Seq(
+  organization := "org.hammerlab.sbt"
+)
+
+val plugin = defaults ++ Seq(
+  sbtPlugin := true,
+  crossSbtVersions := Seq("0.13.16", "1.0.4"),
+  libraryDependencies += Defaults.sbtPluginExtra(
+    "com.dwijnand" % "sbt-compat" % "1.1.1-SNAPSHOT",
+    (sbtBinaryVersion in pluginCrossBuild).value,
+    (scalaBinaryVersion in update).value
+  )
+)
+
+lazy val lib = project.settings(
+  plugin,
+  version := "1.0.0-SNAPSHOT"
+)
+
+lazy val maven = project.settings(
+  plugin,
+  version := "1.0.0-SNAPSHOT",
+  addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
+).dependsOn(
+  lib
+)
+
+lazy val all = project.settings(
+  plugin,
+  version := "1.0.0-SNAPSHOT"
+)
 
 enablePlugins(GitVersioning)
 
@@ -43,18 +71,9 @@ pomExtra :=
       </developer>
     </developers>
 
-crossSbtVersions := Seq("0.13.16", "1.0.4")
-
-libraryDependencies += Defaults.sbtPluginExtra(
-  "com.dwijnand" % "sbt-compat" % "1.1.1-SNAPSHOT",
-  (sbtBinaryVersion in pluginCrossBuild).value,
-  (scalaBinaryVersion in update).value
-)
-
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
-addSbtPlugin("org.hammerlab" % "sbt-coveralls" % "1.2.3")
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
-addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
+//addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+//addSbtPlugin("org.hammerlab" % "sbt-coveralls" % "1.2.3")
+//addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
+//addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
+//addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
+//addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
