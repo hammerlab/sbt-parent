@@ -64,7 +64,7 @@ object HammerLab
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       organization := "org.hammerlab",
-      githubUser := "hammerlab",
+      github := ("hammerlab", name.value),
 
       apache2,
 
@@ -84,16 +84,15 @@ object HammerLab
           url   = "https://github.com/hammerlab"
         ),
 
-      scmInfo := {
-        val user = githubUser.value
-        val name = githubName.value
-        val url = s"https://github.com/$user/$name"
-        val connection = s"scm:git:git@github.com:$user/$name.git"
-        ScmInfo(
-          url,
-          connection,
-          connection
-        )
+      scmInfo := github.value.map {
+        case GitHub(user, name) ⇒
+          val url = s"https://github.com/$user/$name"
+          val connection = s"scm:git:git@github.com:$user/$name.git"
+          ScmInfo(
+            url,
+            connection,
+            connection
+          )
       },
 
       testUtilsVersion := "1.5.1",

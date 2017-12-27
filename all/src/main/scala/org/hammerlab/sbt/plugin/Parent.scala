@@ -58,7 +58,7 @@ object Parent
           bdg_utils_io → bdgUtilsVersion.value,
           bdg_utils_metrics → bdgUtilsVersion.value,
           bdg_utils_misc → bdgUtilsVersion.value,
-          breeze → "0.12",
+          breeze → "0.13.2",
           cats → "0.9.0",
           commons_io → "2.5",
           commons_math → "3.6.1",

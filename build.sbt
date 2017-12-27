@@ -1,13 +1,11 @@
 
-val defaults = Seq(
-  organization := "org.hammerlab.sbt"
-)
+organization in ThisBuild := "org.hammerlab.sbt"
 
-val plugin = defaults ++ Seq(
+val plugin = Seq(
   sbtPlugin := true,
   crossSbtVersions := Seq("0.13.16", "1.0.4"),
   libraryDependencies += Defaults.sbtPluginExtra(
-    "com.dwijnand" % "sbt-compat" % "1.1.1-SNAPSHOT",
+    "org.hammerlab.sbt" % "compat" % "1.1.1-SNAPSHOT",
     (sbtBinaryVersion in pluginCrossBuild).value,
     (scalaBinaryVersion in update).value
   )
@@ -22,15 +20,27 @@ lazy val maven = project.settings(
   plugin,
   version := "1.0.0-SNAPSHOT",
   addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
-).dependsOn(
-  lib
 )
 
 lazy val all = project.settings(
   plugin,
-  version := "1.0.0-SNAPSHOT"
+  version := "1.0.0-SNAPSHOT",
+  addSbtPlugin("com.eed3si9n"    % "sbt-assembly"    % "0.14.6"),
+  addSbtPlugin("org.scoverage"   % "sbt-scoverage"   % "1.5.1"),
+  addSbtPlugin("org.hammerlab"   % "sbt-coveralls"   % "1.2.3"),
+  addSbtPlugin("com.jsuereth"    % "sbt-pgp"         % "1.1.0"),
+  addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2"),
+  addSbtPlugin("io.get-coursier" % "sbt-coursier"    % "1.0.0"),
+  addSbtPlugin("org.xerial.sbt"  % "sbt-sonatype"    % "2.0")
+).dependsOn(
+  lib,
+  maven
 )
 
+github in ThisBuild := ("hammerlab", "sbt-parent")
+apache2
+
+/*
 enablePlugins(GitVersioning)
 
 git.formattedShaVersion := git.gitHeadCommit.value map { sha => s"${sha.substring(0, 8)}" }
@@ -70,10 +80,4 @@ pomExtra :=
         <url>https://github.com/hammerlab</url>
       </developer>
     </developers>
-
-//addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
-//addSbtPlugin("org.hammerlab" % "sbt-coveralls" % "1.2.3")
-//addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
-//addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
-//addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
-//addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
+*/

@@ -2,20 +2,34 @@ package org.hammerlab.sbt.plugin
 
 import sbt.Keys._
 import sbt._
-import Resolver.{sonatypeRepo, mavenLocal}
+import Resolver.{ mavenLocal, sonatypeRepo }
 import xerial.sbt.Sonatype
+import System.getenv
+
+import scala.xml.NodeSeq.Empty
 
 object Maven
-  extends Plugin(Sonatype) {
+  extends AutoPlugin {
+
+  override def trigger = allRequirements
+  override def requires = Sonatype
 
   object autoImport {
-    object github {
-      val user = settingKey[String]("Github user/org to point to")
-      val name = settingKey[String]("Github repository basename")
+
+    case class GitHub(org: String, name: String)
+    object GitHub {
+      implicit def apply(t: (String, String)): Option[GitHub] = Some(GitHub(t._1, t._2))
     }
 
+    val github = settingKey[Option[GitHub]]("Github user/org to point to")
+
+//    val githubUser = settingKey[String]("Github user/org to point to")
+//    val githubName = settingKey[String]("Github repository basename")
+
     val apache2License = ("Apache 2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0"))
-    val apache2 = licenses += apache2License
+    val apache2 = (licenses in ThisBuild) += apache2License
+
+    def env(key: String): Option[String] = Option(getenv(key))
 
     val mavenSettings =
       Seq(
@@ -31,14 +45,18 @@ object Maven
         publishArtifact in sbt.Test := false,
         pomIncludeRepository := { _ => false },
 
-        github.name := name.value,
+        github in Global := None,
 
         pomExtra := {
-          val user = github.user.value
-          val name = github.name.value
-          <url>
-            https://github.com/{user}/{name}
-          </url>
+          github
+            .value
+            .map {
+              case GitHub(org, name) ⇒
+                <url>
+                  https://github.com/{org}/{name}
+                </url>
+            }
+            .getOrElse(Empty)
         },
 
         resolvers ++= Seq(
