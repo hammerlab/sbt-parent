@@ -28,6 +28,8 @@ object HammerLab
   object autoImport {
     val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
 
+    val githubName = settingKey[String]("Github repository basename")
+
     def hammerlab(name: String) = "org.hammerlab" ^^ name
     def hammerlab(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
 
@@ -64,7 +66,9 @@ object HammerLab
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       organization := "org.hammerlab",
-      github := ("hammerlab", name.value),
+      github := ("hammerlab", githubName.value),
+
+      githubName := name.value,
 
       apache2,
 
@@ -74,7 +78,7 @@ object HammerLab
           "org.hammerlab"
         else
           sonatypeProfileName.value
-        ),
+      ),
 
       developers +=
         Developer(
