@@ -2,7 +2,6 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Dep
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
-import org.hammerlab.sbt.plugin.Scala.autoImport.appendCrossVersion
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import sbt.Keys._
 import sbt._
@@ -54,7 +53,7 @@ object Assembly
               .flatMap(
                 _
                   .withVersion(versionsMap.value)
-                  .toModuleIDs(appendCrossVersion.value)
+                  .toModuleIDs
               )
               .map {
                 dep ⇒

@@ -1,11 +1,10 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Configuration, CrossVersion, Dep, Group }
-import org.hammerlab.sbt.plugin.Scala.autoImport.appendCrossVersion
+import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import sbt.Keys.{ excludeDependencies, libraryDependencies, projectDependencies }
-import sbt.{ ClasspathDependency, Def, Project, settingKey }
 import sbt.librarymanagement.syntax.ExclusionRule
+import sbt.{ ClasspathDependency, Def, Project, settingKey }
 
 object Deps
   extends Plugin(Scala, Versions) {
@@ -80,7 +79,7 @@ object Deps
           .flatMap(
             _
               .withVersion(versionsMap.value)
-              .toModuleIDs(appendCrossVersion.value)
+              .toModuleIDs
           ),
 
       projectDependencies := projectDependencies.value.flatMap {
