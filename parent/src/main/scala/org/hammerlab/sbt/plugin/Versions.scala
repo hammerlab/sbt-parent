@@ -5,7 +5,7 @@ import org.hammerlab.sbt.deps.VersionOps._
 import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, VersionsMap }
 import sbt.KeyRanks.ATask
 import sbt.Keys._
-import sbt.{ Def, TaskKey, settingKey }
+import sbt._
 
 object Versions
   extends Plugin {
@@ -23,6 +23,10 @@ object Versions
 
   object autoImport {
     val versions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
+
+    implicit class VersionOps(val key: SettingKey[Seq[DefaultVersion]]) extends AnyVal {
+      def apply(defaults: DefaultVersion*) = (versions in ThisBuild) ++= defaults
+    }
 
     val revision = settingKey[String]("Implementation of `version` setting that automatically appends '-SNAPSHOT', except in publishSigned")
 

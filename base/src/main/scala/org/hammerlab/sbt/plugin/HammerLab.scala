@@ -2,17 +2,17 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.Maven.autoImport._
+import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
 import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
-import sbt.librarymanagement.{ Developer, ScmInfo }
-import sbt.{ Def, settingKey }
+import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
 object HammerLab
   extends Plugin(
+    GitHub,
     Maven,
     Versions,
     Test
@@ -24,8 +24,6 @@ object HammerLab
 
   object autoImport {
     val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
-
-    val githubName = settingKey[String]("Github repository basename")
 
     def hammerlab(name: String) = "org.hammerlab" ^^ name
     def hammerlab(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
@@ -62,12 +60,10 @@ object HammerLab
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      organization := "org.hammerlab",
-      github := ("hammerlab", githubName.value),
-
-      githubName := name.value,
-
+      organization in Global := "org.hammerlab",
       apache2,
+
+      github.user("hammerlab"),
 
       // All org.hammerlab* repos are published with this Sonatype profile.
       sonatypeProfileName := (

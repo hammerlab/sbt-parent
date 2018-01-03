@@ -2,9 +2,9 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
 import org.hammerlab.sbt.plugin.Versions.versionsMap
-import sbt.Keys.{ excludeDependencies, libraryDependencies, projectDependencies }
+import sbt.Keys._
+import sbt._
 import sbt.librarymanagement.syntax.ExclusionRule
-import sbt.{ ClasspathDependency, Def, Project, settingKey }
 
 object Deps
   extends Plugin(Scala, Versions) {
@@ -28,6 +28,8 @@ object Deps
      * Short-hand for declaring a sequence of dependencies
      */
     def dep(ds: Dep*) = (deps ++= ds)
+
+    def org(name: String) = (organization in ThisBuild) := name
   }
 
   import autoImport._
