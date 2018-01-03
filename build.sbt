@@ -1,3 +1,4 @@
+import sbt.librarymanagement.{ Developer, ScmInfo }
 
 organization in ThisBuild := "org.hammerlab.sbt"
 
@@ -10,7 +11,7 @@ lazy val lib = project.settings(
 
 lazy val maven = project.settings(
   plugin,
-  version := "1.0.0-SNAPSHOT",
+  version := "1.0.0",
   addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
 )
 
@@ -38,15 +39,14 @@ lazy val hammerlab = project.settings(
   all
 )
 
-github in ThisBuild := ("hammerlab", "sbt-parent")
-apache2
+developers in ThisBuild += Developer(
+  id    = "HammerLab",
+  name  = "Hammer Lab",
+  email = "info@hammerlab.org",
+  url   = new URL("https://github.com/hammerlab")
+)
 
-/*
-enablePlugins(GitVersioning)
-
-git.formattedShaVersion := git.gitHeadCommit.value map { sha => s"${sha.substring(0, 8)}" }
-
-publishTo := {
+publishTo in ThisBuild := {
   val nexus = "https://oss.sonatype.org/"
   if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
@@ -54,31 +54,21 @@ publishTo := {
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
-publishMavenStyle := true
-publishArtifact in Test := false
-pomIncludeRepository := { _ => false }
+publishMavenStyle in ThisBuild := true
+publishArtifact in (ThisBuild, Test) := false
+pomIncludeRepository in ThisBuild := { _ => false }
 
-pomExtra :=
-  <url>
-    https://github.com/hammerlab/${name}
-  </url>
-    <licenses>
-      <license>
-        <name>Apache License</name>
-        <url>https://raw.github.com/hammerlab/${name}/master/LICENSE</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <scm>
-      <url>git@github.com:hammerlab/${name}.git</url>
-      <connection>scm:git:git@github.com:hammerlab/${name}.git</connection>
-      <developerConnection>scm:git:git@github.com:hammerlab/${name}.git</developerConnection>
-    </scm>
-    <developers>
-      <developer>
-        <id>hammerlab</id>
-        <name>Hammer Lab</name>
-        <url>https://github.com/hammerlab</url>
-      </developer>
-    </developers>
-*/
+licenses in ThisBuild += ("Apache 2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0"))
+
+val githubUser = "hammerlab"
+val repo = "sbt-parent"
+val connection = s"scm:git:git@github.com:$githubUser/$repo.git"
+scmInfo in ThisBuild := Some(
+  ScmInfo(
+    new URL(s"https://github.com/$githubUser/$repo"),
+    connection,
+    connection
+  )
+)
+
+pomExtra in ThisBuild := <url>https://github.com/{githubUser}/{repo}</url>

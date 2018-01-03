@@ -1,7 +1,5 @@
 package org.hammerlab.sbt.plugin
 
-import java.net.URL
-
 import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.Maven.autoImport._
@@ -23,7 +21,6 @@ object HammerLab
   import Group._
 
   implicit def liftOption[T](t: T): Option[T] = Some(t)
-  implicit def liftURL(url: String): URL = new URL(url)
 
   object autoImport {
     val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
@@ -87,17 +84,6 @@ object HammerLab
           email = "info@hammerlab.org",
           url   = "https://github.com/hammerlab"
         ),
-
-      scmInfo := github.value.map {
-        case GitHub(user, name) ⇒
-          val url = s"https://github.com/$user/$name"
-          val connection = s"scm:git:git@github.com:$user/$name.git"
-          ScmInfo(
-            url,
-            connection,
-            connection
-          )
-      },
 
       testUtilsVersion := "1.5.1",
       versions += testUtils → testUtilsVersion.value,
