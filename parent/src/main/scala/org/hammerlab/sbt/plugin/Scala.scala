@@ -104,13 +104,13 @@ object Scala
       ),
 
       // Build for Scala 2.11 by default
-      scalaVersion := scala211Version.value,
+      scalaVersion in Global := scala211Version.value,
 
       // Only build for Scala 2.11, by default
-      crossScalaVersions := Seq(scala211Version.value),
+      crossScalaVersions in Global := Seq(scala211Version.value),
 
-      scala210Version := "2.10.6",
-      scala211Version := "2.11.11",
+      scala210Version := "2.10.7",
+      scala211Version := "2.11.12",
       scala212Version := "2.12.4",
 
       isScala210 := (scalaBinaryVersion.value == "2.10"),
