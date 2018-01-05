@@ -20,7 +20,6 @@ object Defaults
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       organization := "org.hammerlab.sbt",
-      version := "1.0.0-SNAPSHOT",
 
       sonatypeProfileName := "org.hammerlab",
 
