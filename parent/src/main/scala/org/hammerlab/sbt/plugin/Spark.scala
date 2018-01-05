@@ -48,13 +48,12 @@ object Spark
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
 
-      versions ++=
-        Seq(
-              hadoop → computedHadoopVersion.value,
-               spark → computedSparkVersion.value,
-                kryo → kryoVersion.value,
-          sparkTests → sparkTestsVersion.value
-        ),
+      versions ++= Seq(
+            hadoop → computedHadoopVersion.value,
+             spark → computedSparkVersion.value,
+              kryo → kryoVersion.value,
+        sparkTests → sparkTestsVersion.value
+      ),
 
       kryoVersion := "2.24.0",
       sparkTestsVersion := "2.3.0",

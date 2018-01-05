@@ -50,29 +50,28 @@ object Parent
     Seq(
       bdgUtilsVersion := "0.2.13",
 
-      versions ++=
-        Seq(
-          args4j → "2.33",
-          bdg_formats → "0.10.1",
-          bdg_utils_intervalrdd → bdgUtilsVersion.value,
-          bdg_utils_io → bdgUtilsVersion.value,
-          bdg_utils_metrics → bdgUtilsVersion.value,
-          bdg_utils_misc → bdgUtilsVersion.value,
-          breeze → "0.13.2",
-          cats → "0.9.0",
-          commons_io → "2.5",
-          commons_math → "3.6.1",
-          case_app → "1.2.0-M3",
-          guava → "19.0",
-          htsjdk → "2.9.1",
-          log4j → "1.7.21",
-          mllib → sparkVersion.value,
-          parquet_avro → "1.8.1",
-          scalautils → "2.1.5",
-          seqdoop_hadoop_bam → "7.9.0",
-          shapeless → "2.3.2",
-          slf4j → "1.3.1",
-          spire → "0.13.0"
-        )
+      versions ++= Seq(
+        args4j → "2.33",
+        bdg_formats → "0.10.1",
+        bdg_utils_intervalrdd → bdgUtilsVersion.value,
+        bdg_utils_io → bdgUtilsVersion.value,
+        bdg_utils_metrics → bdgUtilsVersion.value,
+        bdg_utils_misc → bdgUtilsVersion.value,
+        breeze → "0.13.2",
+        cats → "0.9.0",
+        commons_io → "2.5",
+        commons_math → "3.6.1",
+        case_app → "1.2.0-M3",
+        guava → "19.0",
+        htsjdk → "2.9.1",
+        log4j → "1.7.21",
+        mllib → sparkVersion.value,
+        parquet_avro → "1.8.1",
+        scalautils → "2.1.5",
+        seqdoop_hadoop_bam → "7.9.0",
+        shapeless → "2.3.2",
+        slf4j → "1.3.1",
+        spire → "0.13.0"
+      )
     )
 }

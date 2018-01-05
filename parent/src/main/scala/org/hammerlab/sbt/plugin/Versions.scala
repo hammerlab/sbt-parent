@@ -22,11 +22,18 @@ object Versions
   }
 
   object autoImport {
-    val versions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
+    val defaultVersions: SettingKey[Seq[DefaultVersion]] = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
 
-    implicit class VersionOps(val key: SettingKey[Seq[DefaultVersion]]) extends AnyVal {
-      def apply(defaults: DefaultVersion*) = (versions in ThisBuild) ++= defaults
+    /**
+     * Syntax around [[defaultVersions]] that supports the usual [[SettingKey.+= +=]]/[[SettingKey.++= ++=]] syntax as
+     * well as calling directly with via [[versions.apply apply]]
+     */
+    object versions {
+      def apply(defaults: DefaultVersion*) =
+        (defaultVersions in ThisBuild) ++= defaults
     }
+
+    implicit def versionsAlias(v: versions.type): defaultVersions.type = defaultVersions
 
     val revision = settingKey[String]("Implementation of `version` setting that automatically appends '-SNAPSHOT', except in publishSigned")
 
@@ -56,7 +63,7 @@ object Versions
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      versions := Nil,
+      defaultVersions in Global := Nil,
 
       revision := "0.0",
       version := revision.value.snapshot,
@@ -75,9 +82,9 @@ object Versions
 
       versionsMap :=
         VersionsMap(
-          versions
+          defaultVersions
             .value
-            .map { v ⇒ v.groupArtifact → v.version }
+            .map { d ⇒ d.groupArtifact → d.version }
             .toMap
         )
     )

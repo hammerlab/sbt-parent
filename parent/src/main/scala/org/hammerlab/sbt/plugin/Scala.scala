@@ -98,11 +98,10 @@ object Scala
           .getOrElse(artifact)
       ),
 
-      versions ++=
-        Seq(
-          scala_lang → scalaVersion.value,
-          scala_reflect → scalaVersion.value
-        ),
+      versions ++= Seq(
+        scala_lang    → scalaVersion.value,
+        scala_reflect → scalaVersion.value
+      ),
 
       // Build for Scala 2.11 by default
       scalaVersion := scala211Version.value,

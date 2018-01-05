@@ -2,7 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.Versions.autoImport.versions
+import org.hammerlab.sbt.plugin.Versions.autoImport._
 import sbt.Keys.{ publishArtifact, testFrameworks, testOptions }
 import sbt.TestFrameworks.ScalaTest
 import sbt.{ Def, Tests, settingKey }
@@ -26,6 +26,7 @@ object Test
 
       scalatestVersion := "3.0.0",
 
+      // Output full stack-traces
       testOptions in sbt.Test += Tests.Argument(ScalaTest, "-oF"),
 
       // Only use ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
