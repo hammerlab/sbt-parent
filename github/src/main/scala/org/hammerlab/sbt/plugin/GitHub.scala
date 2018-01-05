@@ -32,7 +32,7 @@ object GitHub
     }
 
     val apache2License = ("Apache 2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0"))
-    val apache2 = (licenses in ThisBuild) += apache2License
+    val apache2 = (licenses in ThisBuild) := Seq(apache2License)
 
     implicit def liftURL(url: String): URL = new URL(url)
   }

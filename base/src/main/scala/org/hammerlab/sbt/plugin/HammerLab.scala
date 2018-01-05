@@ -73,12 +73,14 @@ object HammerLab
           sonatypeProfileName.value
       ),
 
-      developers +=
-        Developer(
-          id    = "HammerLab",
-          name  = "Hammer Lab",
-          email = "info@hammerlab.org",
-          url   = "https://github.com/hammerlab"
+      developers :=
+        List(
+          Developer(
+            id    = "HammerLab",
+            name  = "Hammer Lab",
+            email = "info@hammerlab.org",
+            url   = "https://github.com/hammerlab"
+          )
         ),
 
       testUtilsVersion := "1.5.1",
