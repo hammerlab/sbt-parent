@@ -1,25 +1,16 @@
-import sbt.librarymanagement.{ Developer, ScmInfo }
-import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
-
-organization in ThisBuild := "org.hammerlab.sbt"
-version in ThisBuild := "1.0.0-SNAPSHOT"
-
-val plugin = sbtPlugin := true
-
-lazy val gh = (project in file("github")).settings(
-  name := "github",
-  plugin
-)
 
 lazy val lib = project.settings(
   libraryDependencies += "org.scala-sbt" % "sbt" % "1.0.4" % "provided"
 )
+
+lazy val github = project.settings(plugin)
 
 lazy val maven = project.settings(
   plugin,
   addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
 )
 
+// Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
   plugin,
   addSbtPlugin("com.eed3si9n"    % "sbt-assembly"    % "0.14.6"),
@@ -30,60 +21,27 @@ lazy val parent = project.settings(
   addSbtPlugin("io.get-coursier" % "sbt-coursier"    % "1.0.0"),
   addSbtPlugin("org.xerial.sbt"  % "sbt-sonatype"    % "2.0")
 ).dependsOn(
-  gh,
+  github,
   lib,
   maven
 )
 
+// All-purpose hammerlab-specific plugin
 lazy val base = project.settings(
   plugin,
 ).dependsOn(
   parent
 )
 
-developers in ThisBuild += Developer(
-  id    = "HammerLab",
-  name  = "Hammer Lab",
-  email = "info@hammerlab.org",
-  url   = new URL("https://github.com/hammerlab")
+lazy val root = project in file(".") settings(
+  publish := {},
+  publishLocal := {},
+  publishM2 := {},
+  publishArtifact := false
+) aggregate(
+  github,
+  lib,
+  maven,
+  parent,
+  base
 )
-
-sonatypeProfileName := (
-  if (organization.value.startsWith("org.hammerlab"))
-    "org.hammerlab"
-  else
-    sonatypeProfileName.value
-)
-
-github.user("hammerlab")
-github.repo("sbt-parent")
-apache2
-
-/*
-publishTo in ThisBuild := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-
-publishMavenStyle in ThisBuild := true
-publishArtifact in (ThisBuild, Test) := false
-pomIncludeRepository in ThisBuild := { _ => false }
-
-licenses in ThisBuild += ("Apache 2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0"))
-
-val githubUser = "hammerlab"
-val repo = "sbt-parent"
-val connection = s"scm:git:git@github.com:$githubUser/$repo.git"
-scmInfo in ThisBuild := Some(
-  ScmInfo(
-    new URL(s"https://github.com/$githubUser/$repo"),
-    connection,
-    connection
-  )
-)
-
-pomExtra in ThisBuild := <url>https://github.com/{githubUser}/{repo}</url>
-*/
