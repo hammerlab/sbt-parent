@@ -65,8 +65,8 @@ object Versions
     Seq(
       defaultVersions in Global := Nil,
 
-      revision := "0.0",
-      version := revision.value.snapshot,
+      revision in Global := "0.0",
+      version in Global := revision.value.snapshot,
       (version in publishSigned) := revision.value,
 
       mavenLocal := Def.taskDyn[Unit] {

@@ -1,13 +1,16 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.Versions.autoImport.mavenLocal
-import sbt.Keys.{ publish, publishArtifact, publishM2, test }
-import sbt.{ Def, File, Project, ProjectReference, settingKey }
+import sbt.Keys._
+import sbt._
 import scoverage.ScoverageKeys.coverageReport
 import scoverage.ScoverageSbtPlugin
 
 object Root
-  extends Plugin(ScoverageSbtPlugin, Versions) {
+  extends Plugin(
+    ScoverageSbtPlugin,
+    Versions
+  ) {
   object autoImport {
     val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
 
@@ -26,10 +29,10 @@ object Root
                     modules: ProjectReference*): Project = {
       val file = new File(".")
       Project(name, file)
-      .settings(
-        rootSettings
-      )
-      .aggregate(modules: _*)
+        .settings(
+          rootSettings
+        )
+        .aggregate(modules: _*)
     }
 
     def rootProject(modules: ProjectReference*): Project = {
@@ -40,6 +43,19 @@ object Root
         )
         .aggregate(modules: _*)
     }
+
+    /**
+     * [[sbt.Def.MapScoped]] that applies [[ThisBuild]] scope to a setting
+     */
+    def thisBuildScope[T] = new ~>[ScopedKey, ScopedKey] {
+      def apply[T](a: ScopedKey[T]): ScopedKey[T] =
+        a.copy(scope = a.scope.copy(project = Select(ThisBuild)))
+    }
+
+    /**
+     * Set [[ThisBuild]] scope to some [[Setting]]s
+     */
+    def build(ss: Setting[_]*): Seq[Setting[_]] = ss.map(_.mapKey(thisBuildScope))
   }
 
   import autoImport._

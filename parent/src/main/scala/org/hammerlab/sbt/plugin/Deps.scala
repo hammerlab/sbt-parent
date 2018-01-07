@@ -29,7 +29,7 @@ object Deps
      */
     def dep(ds: Dep*) = (deps ++= ds)
 
-    def group(name: String) = (organization in ThisBuild) := name
+    def group(name: String) = organization := name
   }
 
   import autoImport._
