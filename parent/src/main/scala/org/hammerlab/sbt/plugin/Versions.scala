@@ -35,7 +35,7 @@ object Versions
 
     implicit def versionsAlias(v: versions.type): defaultVersions.type = defaultVersions
 
-    val revision = settingKey[String]("Implementation of `version` setting that automatically appends '-SNAPSHOT', except in publishSigned")
+    val revision = settingKey[Option[String]]("Implementation of `version` setting that automatically appends '-SNAPSHOT', except in publishSigned")
 
     val mavenLocal = TaskKey[Unit]("maven-local", "Wrapper for publishM2 which skips non-SNAPSHOT modules", ATask)
 
@@ -43,7 +43,7 @@ object Versions
      * Minimal syntax for setting [[revision]]
      */
     object v {
-      def apply(v: String) = (revision := v)
+      def apply(v: String) = (revision := Some(v))
     }
 
     /**
@@ -65,9 +65,9 @@ object Versions
     Seq(
       defaultVersions in Global := Nil,
 
-      revision in Global := "0.0",
-      version in Global := revision.value.snapshot,
-      (version in publishSigned) := revision.value,
+      revision in Global := None,
+      version in Global := revision.value.map(_.snapshot).getOrElse((version in Global).value),
+      (version in publishSigned) := revision.value.getOrElse((version in publishSigned).value),
 
       mavenLocal := Def.taskDyn[Unit] {
         if (version.value.isSnapshot) {
