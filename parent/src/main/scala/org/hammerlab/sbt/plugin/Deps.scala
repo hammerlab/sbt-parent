@@ -4,7 +4,6 @@ import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import sbt.Keys._
 import sbt._
-import sbt.librarymanagement.syntax.ExclusionRule
 
 object Deps
   extends Plugin(Scala, Versions) {
@@ -53,7 +52,7 @@ object Deps
               )
           ),
 
-      testDeps := Nil,
+      testDeps in Global := Nil,
       deps ++=
         testDeps
           .value

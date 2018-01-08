@@ -85,6 +85,6 @@ object HammerLab
 
       testUtilsVersion := "1.5.1",
       versions += testUtils → testUtilsVersion.value,
-      testDeps += testUtils
+      testDeps in Global += testUtils
     )
 }

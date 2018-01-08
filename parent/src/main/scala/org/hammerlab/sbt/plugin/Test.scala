@@ -3,9 +3,9 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.Versions.autoImport._
-import sbt.Keys.{ publishArtifact, testFrameworks, testOptions }
+import sbt.Keys._
 import sbt.TestFrameworks.ScalaTest
-import sbt.{ Def, Tests, settingKey }
+import sbt._
 
 object Test
   extends Plugin(Deps) {
@@ -34,8 +34,6 @@ object Test
       testFrameworks := Seq(ScalaTest),
 
       // Add hammerlab:test-utils and scalatest as test-deps by default.
-      testDeps := Seq(
-        scalatest
-      )
+      testDeps in Global += scalatest
     )
 }
