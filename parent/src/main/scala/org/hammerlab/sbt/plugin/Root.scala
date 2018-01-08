@@ -55,7 +55,7 @@ object Root
     /**
      * Set [[ThisBuild]] scope to some [[Setting]]s
      */
-    def build(ss: Setting[_]*): Seq[Setting[_]] = ss.map(_.mapKey(thisBuildScope))
+    def build(ss: SettingsDefinition*): Seq[Setting[_]] = ss.flatten.map(_.mapKey(thisBuildScope))
   }
 
   import autoImport._
