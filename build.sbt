@@ -9,7 +9,7 @@ val    coursier = addSbtPlugin("io.get-coursier" % "sbt-coursier"    % "1.0.0")
 
 lazy val lib = project.settings(
   sbtPlugin := false,
-  libraryDependencies += "org.scala-sbt" % "sbt" % "1.0.4" % "provided"
+  libraryDependencies += "org.scala-sbt" % "sbt" % sbtVersion.value % "provided"
 )
 
 lazy val assembly = project.settings(
