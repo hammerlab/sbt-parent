@@ -29,6 +29,10 @@ object Deps
     def dep(ds: Dep*) = deps ++= ds
 
     def group(name: String) = organization := name
+
+    val tests = Configuration.Test
+    val testtest = Configuration.TestTest
+    val provided = Configuration.Provided
   }
 
   import autoImport._

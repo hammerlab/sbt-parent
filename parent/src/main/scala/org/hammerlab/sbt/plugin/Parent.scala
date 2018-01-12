@@ -43,10 +43,6 @@ object Parent
     val spire = "org.spire-math" ^^ "spire"
 
     val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
-
-    val tests = Configuration.Test
-    val testtest = Configuration.TestTest
-    val provided = Configuration.Provided
   }
 
   import autoImport._

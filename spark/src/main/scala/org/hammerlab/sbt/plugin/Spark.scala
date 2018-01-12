@@ -36,7 +36,6 @@ object Spark
 
         // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
         excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
-
       )
   }
 
