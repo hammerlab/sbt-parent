@@ -8,7 +8,7 @@ import sbt.TestFrameworks.ScalaTest
 import sbt._
 
 object Test
-  extends Plugin(Deps) {
+  extends Plugin(Deps, Versions) {
 
   object autoImport {
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")

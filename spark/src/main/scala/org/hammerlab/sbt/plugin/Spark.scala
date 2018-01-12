@@ -11,7 +11,7 @@ import sbt.{ Def, SettingsDefinition, settingKey }
 import sbt.librarymanagement.syntax.ExclusionRule
 
 object Spark
-  extends Plugin(Deps) {
+  extends Plugin(Deps, Versions) {
 
   object autoImport {
     val sparkVersion = settingKey[String]("Spark version to use")

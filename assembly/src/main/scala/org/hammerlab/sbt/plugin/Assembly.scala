@@ -14,7 +14,8 @@ object Assembly
   extends Plugin(
     AssemblyPlugin,
     Deps,
-    Scala
+    Scala,
+    Versions
   ) {
 
   object autoImport {
