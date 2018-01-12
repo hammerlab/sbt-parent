@@ -3,11 +3,17 @@
 [![Maven Central](https://img.shields.io/badge/maven%20central-3.5.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Csbt-parent)
 [![](https://travis-ci.org/hammerlab/sbt-parent.svg?branch=master)](https://travis-ci.org/hammerlab/sbt-parent)
 
-SBT plugins factoring out boilerplate for:
-- publishing to Maven Central
-- managing dependencies
-- building+publishing thin shaded JARs
-- interfacing with [Coveralls](https://coveralls.io/) on [TravisCI](https://travis-ci.org/)
+SBT plugins reducing boilerplate for a variety of commmon tasks:
+- [`assembly`](assembly): building+publishing thin shaded JARs
+- [`deps`](deps): managing dependencies
+- [`maven`](maven): publishing to Maven Central
+- [`github`](github): filling in `scmInfo` information (and populating relevant POM fields)
+- [`root`](root): configuring multi-module projects
+- [`scala`](scala): managing Scala versions
+- [`spark`](spark): configuring projects that use [Apache Spark](http://spark.apache.org/)
+- [`test`](test): using [calaTest](http://www.scalatest.org/), publishing `-tests` JARs
+- [`travis`](travis): interfacing with [Coveralls](https://coveralls.io/) on [TravisCI](https://travis-ci.org/)
+- [`versions`](versions): managing dependency-versions
 - and more!
 
 Add to `project/plugins.sbt`:

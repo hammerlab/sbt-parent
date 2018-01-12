@@ -26,7 +26,7 @@ object Deps
     /**
      * Short-hand for declaring a sequence of dependencies
      */
-    def dep(ds: Dep*) = (deps ++= ds)
+    def dep(ds: Dep*) = deps ++= ds
 
     def group(name: String) = organization := name
   }
