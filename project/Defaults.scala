@@ -13,15 +13,14 @@ object Defaults
   val repo = "sbt-parent"
   val connection = s"scm:git:git@github.com:$githubUser/$repo.git"
 
-  object autoImport {
-    val plugin = sbtPlugin := true
-  }
-
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       organization := "org.hammerlab.sbt",
 
       sonatypeProfileName := "org.hammerlab",
+
+      // All modules in this project other than `lib` are plugins
+      sbtPlugin := true,
 
       publishTo := {
         val nexus = "https://oss.sonatype.org/"

@@ -8,11 +8,11 @@ val         pgp = addSbtPlugin("com.jsuereth"    % "sbt-pgp"         % "1.1.0")
 val    coursier = addSbtPlugin("io.get-coursier" % "sbt-coursier"    % "1.0.0")
 
 lazy val lib = project.settings(
+  sbtPlugin := false,
   libraryDependencies += "org.scala-sbt" % "sbt" % "1.0.4" % "provided"
 )
 
 lazy val assembly = project.settings(
-  plugin,
   sbtAssembly
 ).dependsOn(
   deps,
@@ -21,27 +21,21 @@ lazy val assembly = project.settings(
   versions
 )
 
-lazy val deps = project.settings(plugin).dependsOn(lib, versions)
+lazy val deps = project.dependsOn(lib, versions)
 
-lazy val github = project.settings(plugin)
+lazy val github = project
 
-lazy val maven = project.settings(plugin, sonatype)
+lazy val maven = project.settings(sonatype)
 
-lazy val root = project.settings(
-  plugin,
-  scoverage
-).dependsOn(
-  versions
-)
+lazy val root = project.settings(scoverage).dependsOn(versions)
 
-lazy val scala = project.settings(plugin).dependsOn(deps, lib, versions)
+lazy val scala = project.dependsOn(deps, lib, versions)
 
-lazy val spark = project.settings(plugin).dependsOn(deps, lib, test, versions)
+lazy val spark = project.dependsOn(deps, lib, test, versions)
 
-lazy val test = project.settings(plugin).dependsOn(deps, lib, versions)
+lazy val test = project.dependsOn(deps, lib, versions)
 
 lazy val travis = project.settings(
-  plugin,
   scoverage,
   coveralls
 ).dependsOn(
@@ -50,16 +44,10 @@ lazy val travis = project.settings(
 )
 
 
-lazy val versions = project.settings(
-  plugin,
-  pgp
-).dependsOn(
-  lib
-)
+lazy val versions = project.settings(pgp).dependsOn(lib)
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
-  plugin,
   coursier
 ).dependsOn(
   assembly,
@@ -76,11 +64,7 @@ lazy val parent = project.settings(
 )
 
 // All-purpose hammerlab-specific plugin
-lazy val base = project.settings(
-  plugin,
-).dependsOn(
-  parent
-)
+lazy val base = project.dependsOn(parent)
 
 lazy val sbt_parent = Project("sbt-parent", file(".")) settings(
   publish := {},
