@@ -10,7 +10,7 @@ SBT plugin factoring out boilerplate for:
 - and more!
 
 ```scala
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.2")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "4.0.0-SNAPSHOT")
 ```
 
 ## Features
@@ -165,7 +165,7 @@ Scala-library and -version settings are available via [`Scala`](src/main/scala/o
 Add to `project/plugins.sbt` of an existing project:
 
 ```scala
-addSbtPlugin("org.hammerlab" % "sbt-parent" % "3.5.2")
+addSbtPlugin("org.hammerlab" % "sbt-parent" % "4.0.0-SNAPSHOT")
 ```
 
 or create a new project using the `create-scala-project` script:
