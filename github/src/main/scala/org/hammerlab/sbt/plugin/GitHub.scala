@@ -19,13 +19,15 @@ object GitHub
   }
 
   object autoImport {
-    val github = settingKey[Option[GitHub]]("Github repository")
     val githubUser = settingKey[Option[String]]("Github user/org")
     val githubRepo = settingKey[Option[String]]("Github repository basename")
 
-    implicit class GitHubOps(val key: SettingKey[Option[GitHub]]) extends AnyVal {
+    object github {
       def apply(org: String, repo: String) =
-        key := (org, repo)
+        Seq(
+          githubUser in ThisBuild := Some( org),
+          githubRepo in ThisBuild := Some(repo)
+        )
 
       def user(name: String) = githubUser in ThisBuild := Some(name)
       def repo(name: String) = githubRepo in ThisBuild := Some(name)
@@ -41,39 +43,33 @@ object GitHub
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      github in Global := (
+      githubUser in Global := None,
+      githubRepo in Global := None,
+
+      scmInfo := (
         (githubUser.value, githubRepo.value) match {
-          case (Some(user), Some(repo)) ⇒ Some(GitHub(user, repo))
+          case (Some(user), Some(repo)) ⇒
+            val url = s"https://github.com/$user/$repo"
+            val connection = s"scm:git:git@github.com:$user/$repo.git"
+            Some(
+              ScmInfo(
+                url,
+                connection,
+                connection
+              )
+            )
           case (None, None) ⇒ None
           case (Some(user), _) ⇒ throw new Exception(s"Github-user set ($user) but not repo")
           case (_, Some(repo)) ⇒ throw new Exception(s"Github-repo set ($repo) but not user")
         }
       ),
 
-      githubUser in Global := None,
-      githubRepo in Global := None,
-
-      scmInfo := (
-        github
-          .value
-          .map {
-            case GitHub(user, name) ⇒
-              val url = s"https://github.com/$user/$name"
-              val connection = s"scm:git:git@github.com:$user/$name.git"
-              ScmInfo(
-                url,
-                connection,
-                connection
-              )
-          }
-      ),
-
       pomExtra := {
-        github
+        scmInfo
           .value
           .map {
-            case GitHub(org, name) ⇒
-              <url>https://github.com/{org}/{name}</url>
+            scm ⇒
+              <url>{scm.browseUrl}</url>
           }
           .getOrElse(Empty)
       }

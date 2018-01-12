@@ -7,7 +7,12 @@ import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.settingKey
 
 object Parent
-  extends Plugin(Versions) {
+  extends Plugin(
+    GitHub,
+    Maven,
+    Spark,
+    Versions
+  ) {
 
   import Group._
 
