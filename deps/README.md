@@ -3,7 +3,7 @@
 To use this plugin, depend on `org.hammerlab.sbt:parent`, or add this to your `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "deps" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "deps" % "4.0.0")
 ``` 
 
 ## Dependency-DSL

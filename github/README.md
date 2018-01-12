@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:github
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "github" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.0")
 ```
 
 Some helpers for setting projects' `scmInfo` key:

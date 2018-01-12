@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:scala
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "scala" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "scala" % "4.0.0")
 ```
 
 Exposes Scala-library and -version settings:

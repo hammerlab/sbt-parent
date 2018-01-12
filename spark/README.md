@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:spark
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "spark" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "spark" % "4.0.0")
 ```
 
 SBT configs for projects that use [Apache Spark](http://spark.apache.org/):

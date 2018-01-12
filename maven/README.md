@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:maven
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "maven" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.0.0")
 ```
 
 [Various settings for publishing to Maven repositories (especially Maven Central)](src/main/scala/org/hammerlab/sbt/plugin/Maven.scala):

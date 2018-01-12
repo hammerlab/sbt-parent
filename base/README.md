@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:base
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "base" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.0.0")
 ```
 
 Adds hammerlab-specific configurations to builds:

@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:test
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "test" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "test" % "4.0.0")
 ```
 
 Offers some test-configurations:

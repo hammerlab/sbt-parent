@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:assembly
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "assembly" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "assembly" % "4.0.0")
 ```
 
 Plugin providing shading / executable-JAR configs:

@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:travis
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "travis" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "travis" % "4.0.0")
 ```
 
 SBT settings for interfacing with Coveralls and TravisCI:

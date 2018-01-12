@@ -1,7 +1,7 @@
 # org.hammerlab.sbt:root
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "root" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "root" % "4.0.0")
 ```
 
 [The `Root` plugin](src/main/scala/org/hammerlab/sbt/plugin/Root.scala) provides the `rootProject` helper for aggregating a project's modules and no-op'ing various settings/tasks that should not operate directly on the root wrapper-module:

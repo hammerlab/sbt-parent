@@ -18,17 +18,17 @@ SBT plugins reducing boilerplate for a variety of commmon tasks:
 To depend on all of them, add to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "parent" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.0.0")
 ```
 
 They are also available individually:
 
 ```scala
 // Settings for publishing to Maven Central 
-addSbtPlugin("org.hammerlab.sbt" % "maven" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.0.0")
 
 // Adding GitHub-repo info
-addSbtPlugin("org.hammerlab.sbt" % "github" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.0")
 
 // etc.
 ```
@@ -57,7 +57,7 @@ A derivative of [`parent`](parent) with hammerlab-specific configs can also be f
 Add to `project/plugins.sbt` of an existing project:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "parent" % "1.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.0.0")
 ```
 
 or create a new project using the `create-scala-project` script:
