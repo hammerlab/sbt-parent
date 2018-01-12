@@ -6,7 +6,7 @@ import sbt.Keys._
 import sbt._
 
 object Deps
-  extends Plugin(Scala, Versions) {
+  extends Plugin(Versions) {
 
   object autoImport {
     val deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
@@ -26,9 +26,13 @@ object Deps
     /**
      * Short-hand for declaring a sequence of dependencies
      */
-    def dep(ds: Dep*) = (deps ++= ds)
+    def dep(ds: Dep*) = deps ++= ds
 
     def group(name: String) = organization := name
+
+    val tests = Configuration.Test
+    val testtest = Configuration.TestTest
+    val provided = Configuration.Provided
   }
 
   import autoImport._

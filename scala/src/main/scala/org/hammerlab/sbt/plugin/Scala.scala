@@ -1,6 +1,5 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.CrossVersion
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
@@ -8,14 +7,12 @@ import sbt.Keys._
 import sbt._
 
 object Scala
-  extends Plugin(Versions) {
+  extends Plugin(Deps, Versions) {
 
   object autoImport {
     val isScala210 = settingKey[Boolean]("True iff the Scala binary version is 2.10")
     val isScala211 = settingKey[Boolean]("True iff the Scala binary version is 2.11")
     val isScala212 = settingKey[Boolean]("True iff the Scala binary version is 2.12")
-
-    val appendCrossVersion = settingKey[(CrossVersion, String) ⇒ String]("Helper for appending a cross-version component to artifact names")
 
     val noCrossPublishing =
       Seq(
@@ -53,7 +50,7 @@ object Scala
 
     val enableMacroParadise =
       Seq(
-        addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross sbt.CrossVersion.full),
+        addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
         deps += scala_reflect
       )
 
@@ -64,7 +61,7 @@ object Scala
     val emptyDocJar = sources in (sbt.Compile, doc) := Seq()
 
     val scalameta = Seq(
-      addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross sbt.CrossVersion.full),
+      addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full),
       scalacOptions += "-Xplugin-require:macroparadise",
       libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % sbt.Provided,
       scalacOptions in (sbt.Compile, console) ~= (_ filterNot (_ contains "paradise")) // macroparadise plugin doesn't work in repl yet.
@@ -86,17 +83,6 @@ object Scala
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-
-      appendCrossVersion := (
-        (crossVersion, artifact) ⇒
-          sbt.CrossVersion(
-            crossVersion,
-            scalaVersion.value,
-            scalaBinaryVersion.value
-          )
-          .map(_(artifact))
-          .getOrElse(artifact)
-      ),
 
       versions ++= Seq(
         scala_lang    → scalaVersion.value,

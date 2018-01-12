@@ -11,7 +11,7 @@ import sbt.{ Def, SettingsDefinition, settingKey }
 import sbt.librarymanagement.syntax.ExclusionRule
 
 object Spark
-  extends Plugin(Deps) {
+  extends Plugin(Deps, Versions) {
 
   object autoImport {
     val sparkVersion = settingKey[String]("Spark version to use")
@@ -36,7 +36,6 @@ object Spark
 
         // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
         excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
-
       )
   }
 

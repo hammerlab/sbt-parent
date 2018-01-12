@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.plugin.Versions.autoImport.mavenLocal
+import org.hammerlab.sbt.plugin.Maven.autoImport.mavenLocal
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys.coverageReport
@@ -9,7 +9,7 @@ import scoverage.ScoverageSbtPlugin
 object Root
   extends Plugin(
     ScoverageSbtPlugin,
-    Versions
+    Maven
   ) {
   object autoImport {
     val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")

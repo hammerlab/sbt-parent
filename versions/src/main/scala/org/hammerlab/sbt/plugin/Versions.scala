@@ -3,7 +3,6 @@ package org.hammerlab.sbt.plugin
 import com.typesafe.sbt.pgp.PgpKeys.publishSigned
 import org.hammerlab.sbt.deps.VersionOps._
 import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, VersionsMap }
-import sbt.KeyRanks.ATask
 import sbt.Keys._
 import sbt._
 
@@ -37,8 +36,6 @@ object Versions
 
     val revision = settingKey[Option[String]]("Implementation of `version` setting that automatically appends '-SNAPSHOT', except in publishSigned")
 
-    val mavenLocal = TaskKey[Unit]("maven-local", "Wrapper for publishM2 which skips non-SNAPSHOT modules", ATask)
-
     /**
      * Minimal syntax for setting [[revision]]
      */
@@ -68,17 +65,6 @@ object Versions
       revision in Global := None,
       version in Global := revision.value.map(_.snapshot).getOrElse((version in Global).value),
       (version in publishSigned) := revision.value.getOrElse((version in publishSigned).value),
-
-      mavenLocal := Def.taskDyn[Unit] {
-        if (version.value.isSnapshot) {
-          streams.value.log.info(s"publishing: ${version.value}")
-          publishM2
-        } else {
-          streams.value.log.info(s"skipping publishing: ${version.value}")
-          Def.task {}
-        }
-      }
-      .value,
 
       versionsMap :=
         VersionsMap(

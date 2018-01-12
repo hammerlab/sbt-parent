@@ -7,7 +7,12 @@ import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.settingKey
 
 object Parent
-  extends Plugin(Versions) {
+  extends Plugin(
+    GitHub,
+    Maven,
+    Spark,
+    Versions
+  ) {
 
   import Group._
 
@@ -38,10 +43,6 @@ object Parent
     val spire = "org.spire-math" ^^ "spire"
 
     val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
-
-    val tests = Configuration.Test
-    val testtest = Configuration.TestTest
-    val provided = Configuration.Provided
   }
 
   import autoImport._

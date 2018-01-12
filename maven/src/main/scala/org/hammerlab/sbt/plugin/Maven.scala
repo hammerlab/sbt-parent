@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.deps.VersionOps._
 import sbt.Keys._
 import sbt._
 import Resolver.{ mavenLocal, sonatypeRepo }
@@ -9,6 +10,9 @@ object Maven
   extends AutoPlugin {
   override def trigger = allRequirements
   override def requires = Sonatype
+  object autoImport {
+    val mavenLocal = TaskKey[Unit]("maven-local", "Wrapper for publishM2 which skips non-SNAPSHOT modules")
+  }
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       publishTo := {
@@ -27,6 +31,17 @@ object Maven
         sonatypeRepo("releases"),
         sonatypeRepo("snapshots"),
         mavenLocal
-      )
+      ),
+
+      autoImport.mavenLocal := Def.taskDyn[Unit] {
+        if (version.value.isSnapshot) {
+          streams.value.log.info(s"publishing: ${version.value}")
+          publishM2
+        } else {
+          streams.value.log.info(s"skipping publishing: ${version.value}")
+          Def.task {}
+        }
+      }
+      .value
     )
 }
