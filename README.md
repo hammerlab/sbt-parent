@@ -1,5 +1,6 @@
 # sbt-parent
 
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
 [![](https://travis-ci.org/hammerlab/sbt-parent.svg?branch=master)](https://travis-ci.org/hammerlab/sbt-parent)
 
 SBT plugins reducing boilerplate for a variety of commmon tasks:
