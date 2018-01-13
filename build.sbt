@@ -36,7 +36,7 @@ lazy val github = project
 
 lazy val maven = project.settings(sonatype).dependsOn(lib)
 
-lazy val root = project.settings(scoverage).dependsOn(maven)
+lazy val root = project.settings(scoverage).dependsOn(github, maven)
 
 lazy val scala = project.dependsOn(deps, lib, versions)
 
