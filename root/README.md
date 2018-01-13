@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:root
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%root%22)
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%root%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "root" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "root" % "4.0.1")
 ```
 
 [The `Root` plugin](src/main/scala/org/hammerlab/sbt/plugin/Root.scala) provides the `rootProject` helper for aggregating a project's modules and no-op'ing various settings/tasks that should not operate directly on the root wrapper-module:

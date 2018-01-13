@@ -1,11 +1,11 @@
 # org.hammerlab.sbt:github
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%github%22)
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%github%22)
 
 Helpers for setting projects' SCM-metadata keys to point to a GitHub repo:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.1")
 ```
 
 Set GitHub user and repo-name:
