@@ -1,6 +1,8 @@
 # org.hammerlab.sbt:deps
 
-To use this plugin, depend on `org.hammerlab.sbt:parent`, or add this to your `project/plugins.sbt`:
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%deps%22)
+
+SBT plugin providing dependency-management helpers:
 
 ```scala
 addSbtPlugin("org.hammerlab.sbt" % "deps" % "4.0.0")

@@ -1,3 +1,12 @@
+import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ gh }
+
+build(
+  scala212Only,
+  group("org.hammerlab.sbt"),
+  gh.repo("sbt-parent"),
+  testDeps := Nil,
+  sbtPlugin := true
+)
 
 // external plugin short-hands
 val sbtAssembly = addSbtPlugin("com.eed3si9n"    % "sbt-assembly"    % "0.14.6")
@@ -9,7 +18,7 @@ val    coursier = addSbtPlugin("io.get-coursier" % "sbt-coursier"    % "1.0.0")
 
 lazy val lib = project.settings(
   sbtPlugin := false,
-  libraryDependencies += "org.scala-sbt" % "sbt" % sbtVersion.value % "provided"
+  providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value
 )
 
 lazy val assembly = project.settings(
@@ -27,7 +36,7 @@ lazy val github = project
 
 lazy val maven = project.settings(sonatype).dependsOn(lib)
 
-lazy val root = project.settings(scoverage).dependsOn(maven)
+lazy val root = project.settings(scoverage).dependsOn(github, maven)
 
 lazy val scala = project.dependsOn(deps, lib, versions)
 
@@ -66,12 +75,8 @@ lazy val parent = project.settings(
 // All-purpose hammerlab-specific plugin
 lazy val base = project.dependsOn(parent)
 
-lazy val sbt_parent = Project("sbt-parent", file(".")) settings(
-  publish := {},
-  publishLocal := {},
-  publishM2 := {},
-  publishArtifact := false
-) aggregate(
+lazy val sbt_parent = rootProject(
+  "sbt-parent",
   assembly,
   base,
   deps,

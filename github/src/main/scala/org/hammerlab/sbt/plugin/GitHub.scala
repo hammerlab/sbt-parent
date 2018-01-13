@@ -47,20 +47,16 @@ object GitHub
       githubRepo in Global := None,
 
       scmInfo := (
-        (githubUser.value, githubRepo.value) match {
-          case (Some(user), Some(repo)) ⇒
+        githubUser.value.map {
+          user ⇒
+            val repo = githubRepo.value.getOrElse(name.value)
             val url = s"https://github.com/$user/$repo"
             val connection = s"scm:git:git@github.com:$user/$repo.git"
-            Some(
-              ScmInfo(
-                url,
-                connection,
-                connection
-              )
+            ScmInfo(
+              url,
+              connection,
+              connection
             )
-          case (None, None) ⇒ None
-          case (Some(user), _) ⇒ throw new Exception(s"Github-user set ($user) but not repo")
-          case (_, Some(repo)) ⇒ throw new Exception(s"Github-repo set ($repo) but not user")
         }
       ),
 

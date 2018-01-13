@@ -1,10 +1,12 @@
 # org.hammerlab.sbt:assembly
 
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%assembly%22)
+
+Plugin providing shading / executable-JAR configs
+
 ```scala
 addSbtPlugin("org.hammerlab.sbt" % "assembly" % "4.0.0")
 ```
-
-Plugin providing shading / executable-JAR configs:
 
 ## Examples
 

@@ -1,10 +1,14 @@
 # org.hammerlab.sbt:github
 
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%github%22)
+
+Helpers for setting projects' SCM-metadata keys to point to a GitHub repo:
+
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.1")
 ```
 
-Some helpers for setting projects' `scmInfo` key:
+Set GitHub user and repo-name:
 
 ```scala
 github("my-org", "repo-name")
@@ -24,3 +28,4 @@ then downstream projects may just set the repository portion:
 github.repo("repo-name")
 ```
 
+The [`base`](../base) plugin in this repo does this for Hammer Lab projects.

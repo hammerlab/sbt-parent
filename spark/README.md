@@ -1,5 +1,7 @@
 # org.hammerlab.sbt:spark
 
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%spark%22)
+
 ```scala
 addSbtPlugin("org.hammerlab.sbt" % "spark" % "4.0.0")
 ```
@@ -19,4 +21,3 @@ sparkVersion := "2.1.1"
 hadoopVersion := "2.6.0"
 kryoVersion := "2.21.0"
 ```
-

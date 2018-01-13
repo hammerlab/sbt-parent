@@ -29,7 +29,7 @@ object Versions
      */
     object versions {
       def apply(defaults: DefaultVersion*) =
-        (defaultVersions in ThisBuild) ++= defaults
+        defaultVersions in ThisBuild ++= defaults
     }
 
     implicit def versionsAlias(v: versions.type): defaultVersions.type = defaultVersions
@@ -40,7 +40,7 @@ object Versions
      * Minimal syntax for setting [[revision]]
      */
     object v {
-      def apply(v: String) = (revision := Some(v))
+      def apply(v: String) = revision := Some(v)
     }
 
     /**

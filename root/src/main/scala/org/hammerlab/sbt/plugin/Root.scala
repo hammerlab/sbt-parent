@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Maven.autoImport.mavenLocal
 import sbt.Keys._
 import sbt._
@@ -8,8 +9,9 @@ import scoverage.ScoverageSbtPlugin
 
 object Root
   extends Plugin(
-    ScoverageSbtPlugin,
-    Maven
+    GitHub,
+    Maven,
+    ScoverageSbtPlugin
   ) {
   object autoImport {
     val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
@@ -30,16 +32,19 @@ object Root
       val file = new File(".")
       Project(name, file)
         .settings(
-          rootSettings
+          rootSettings,
+          github.repo(name)
         )
         .aggregate(modules: _*)
     }
 
     def rootProject(modules: ProjectReference*): Project = {
       val file = new File(".")
-      Project(file.getCanonicalFile.getName, file)
+      val name = file.getCanonicalFile.getName
+      Project(name, file)
         .settings(
-          rootSettings
+          rootSettings,
+          github.repo(name)
         )
         .aggregate(modules: _*)
     }
