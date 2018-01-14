@@ -29,9 +29,12 @@ object Versions
      */
     object versions {
       def apply(defaults: DefaultVersion*) =
-        defaultVersions in ThisBuild ++= defaults
+        defaultVersions ++= defaults
     }
 
+    /**
+     * Allow appends to [[versions]] to delegate to [[defaultVersions]]
+     */
     implicit def versionsAlias(v: versions.type): defaultVersions.type = defaultVersions
 
     val revision = settingKey[Option[String]]("Implementation of `version` setting that automatically appends '-SNAPSHOT', except in publishSigned")
@@ -53,18 +56,32 @@ object Versions
      */
     implicit class VersionContext(val sc: StringContext) extends AnyVal {
       def v() = autoImport.v(sc.parts.head)
-      def r() = (version := sc.parts.head)
+      def r() = version := sc.parts.head
     }
   }
+
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def globalSettings =
     Seq(
-      defaultVersions in Global := Nil,
+      defaultVersions := Nil,
+      revision := None
+    )
 
-      revision in Global := None,
-      version in Global := revision.value.map(_.snapshot).getOrElse((version in Global).value),
-      (version in publishSigned) := revision.value.getOrElse((version in publishSigned).value),
+  override def projectSettings =
+    inTask(publishSigned) {
+      /**
+       * In [[com.typesafe.sbt.pgp.PgpKeys.publishSigned publishSigned]], turn [[revision]] (if present) directly into
+       * [[version]] without appending "-SNAPSHOT"
+       */
+      version := revision.value.getOrElse(version.value)
+    } ++
+    Seq(
+      /**
+       * In general, append "-SNAPSHOT" when turning [[revision]] (which can be set with helpful syntaxes defined in
+       * this plugin) into [[version]] (used by main/downstream SBT machinery)
+       */
+      version := revision.value.map(_.snapshot).getOrElse(version.value),
 
       versionsMap :=
         VersionsMap(

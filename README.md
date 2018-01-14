@@ -19,7 +19,7 @@
 To depend on all of them, add to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.0.1")
 ```
 
 They are also available individually:
@@ -29,7 +29,7 @@ They are also available individually:
 addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.0.0")
 
 // Adding GitHub-repo info
-addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "github" % "4.0.1")
 
 // etc.
 ```

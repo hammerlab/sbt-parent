@@ -58,20 +58,12 @@ object HammerLab
 
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def globalSettings =
     Seq(
-      organization in Global := "org.hammerlab",
+      organization := "org.hammerlab",
       apache2,
 
-      github.user("hammerlab"),
-
-      // All org.hammerlab* repos are published with this Sonatype profile.
-      sonatypeProfileName := (
-        if (organization.value.startsWith("org.hammerlab"))
-          "org.hammerlab"
-        else
-          sonatypeProfileName.value
-      ),
+      githubUser := Some("hammerlab"),
 
       developers :=
         List(
@@ -85,6 +77,22 @@ object HammerLab
 
       testUtilsVersion := "1.5.1",
       versions += testUtils → testUtilsVersion.value,
-      testDeps in Global += testUtils
+      testDeps += testUtils
+    )
+
+  override def projectSettings =
+    Seq(
+      /**
+       * All org.hammerlab* repos are published with this Sonatype profile
+       *
+       * Must be defined here instead of [[globalSettings]] because it is originally only defined in
+       * [[projectSettings]] (in [[xerial.sbt.Sonatype]])
+       */
+      sonatypeProfileName := (
+        if (organization.value.startsWith("org.hammerlab"))
+          "org.hammerlab"
+        else
+          sonatypeProfileName.value
+        )
     )
 }

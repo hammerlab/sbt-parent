@@ -14,11 +14,11 @@ lazy val module1 = project.settings(…)
 lazy val module2 = project.settings(…)
 ```
 
-Additionally, `build` is a wrapper for applying settings `in ThisBuild`, which will apply to all subprojects in a project:
+Additionally, `default` is a wrapper for applying settings `in ThisBuild`, which will apply to all subprojects in a project:
 
 ```scala
-build(
-  v"1.2.3",                          // version-setting shorthand
+default(
+  v"1.2.3",                      // version-setting shorthand
   github("my-org", "repo-name")  // fills in scmInfo setting, e.g. for corresponding POM field
 )
 

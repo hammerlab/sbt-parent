@@ -9,12 +9,12 @@ object Deps
   extends Plugin(Versions) {
 
   object autoImport {
-    val deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
-    val testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies")
-    val providedDeps = settingKey[Seq[Dep]]("Provided-scoped dependencies")
+    val               deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
+    val           testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies")
+    val       providedDeps = settingKey[Seq[Dep]]("Provided-scoped dependencies")
     val compileAndTestDeps = settingKey[Seq[Dep]]("Dependencies whose '-tests' JAR should be a test-scoped dependency (in addition to the normal compile->default dependency)")
-    val testTestDeps = settingKey[Seq[Dep]]("Dependencies whose '-tests' JAR should be a test-scoped dependency")
-    val excludes = settingKey[Seq[Dep]]("Libraries to exclude as transitive dependencies from all direct dependencies; wrapper for 'excludeDependencies'")
+    val       testTestDeps = settingKey[Seq[Dep]]("Dependencies whose '-tests' JAR should be a test-scoped dependency")
+    val           excludes = settingKey[Seq[Dep]]("Libraries to exclude as transitive dependencies from all direct dependencies; wrapper for 'excludeDependencies'")
 
     implicit val stringToGroup = Group.groupFromString _
 
@@ -30,14 +30,14 @@ object Deps
 
     def group(name: String) = organization := name
 
-    val tests = Configuration.Test
+    val    tests = Configuration.Test
     val testtest = Configuration.TestTest
     val provided = Configuration.Provided
   }
 
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def globalSettings =
     Seq(
       deps := Nil,
 
@@ -56,28 +56,35 @@ object Deps
               )
           ),
 
-      testDeps in Global := Nil,
+      testDeps := Nil,
       deps ++=
         testDeps
           .value
-          .map(_ % Configuration.Test),
+          .map(_ tests),
 
       providedDeps := Nil,
       deps ++=
         providedDeps
           .value
-          .map(_ % Configuration.Provided),
+          .map(_ provided),
 
       testTestDeps := Nil,
       deps ++=
         testTestDeps
           .value
-          .map(_ % Configuration.TestTest),
+          .map(_ testtest),
 
       compileAndTestDeps := Nil,
-      deps ++= compileAndTestDeps.value,
-      testTestDeps ++= compileAndTestDeps.value,
+              deps ++= compileAndTestDeps.value,
+      testTestDeps ++= compileAndTestDeps.value
+    )
 
+  override def projectSettings =
+    Seq(
+      /**
+       * Convert the [[deps]] hierarchy into SBT's native [[ModuleID]] format, joining with [[versionsMap]] to fill in
+       * default versions for [[Dep]]s without explicit versions specified
+       */
       libraryDependencies ++=
         deps
           .value
@@ -87,28 +94,36 @@ object Deps
               .toModuleIDs
           ),
 
-      projectDependencies := projectDependencies.value.flatMap {
-        dep ⇒
-          val configurations = dep.configurations.toSeq.flatMap(_.split(";"))
-          val (testConfs, otherConfs) = configurations.partition(_ == "test->test")
-          val testConf = testConfs.headOption
-          if (testConf.isDefined)
-            Seq(
-              dep
-                .withConfigurations(
-                  if (otherConfs.nonEmpty)
-                    Some(otherConfs.mkString(";"))
-                  else
-                    None
-                ),
-              dep
-                .withConfigurations(
-                  Some("test->test")
+      /**
+       * Work-around for https://github.com/sbt/sbt/issues/3709: `dependsOn(foo % "test->test")` does not get correctly
+       * translated into a test-scoped dependency on foo's "-tests" JAR in the depending project's POM
+       */
+      projectDependencies := (
+        projectDependencies
+          .value
+          .flatMap {
+            dep ⇒
+              val configurations = dep.configurations.toSeq.flatMap(_.split(";"))
+              val (testConfs, otherConfs) = configurations.partition(_ == "test->test")
+              val testConf = testConfs.headOption
+              if (testConf.isDefined)
+                Seq(
+                  dep
+                    .withConfigurations(
+                      if (otherConfs.nonEmpty)
+                        Some(otherConfs.mkString(";"))
+                      else
+                        None
+                    ),
+                  dep
+                    .withConfigurations(
+                      Some("test->test")
+                    )
+                    .classifier("tests")
                 )
-                .classifier("tests")
-            )
-          else
-            Seq(dep)
-      }
+              else
+                Seq(dep)
+          }
+      )
     )
 }
