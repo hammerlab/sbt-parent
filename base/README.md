@@ -13,3 +13,9 @@ Inherits all plugins in this repo (via [`parent`](..parent)), and adds hammerlab
   - configurable as `testUtilsVersion`
 - aliases for common `org.hammerlab` deps
 - sets an Apache 2.0 license and relevant GitHub metadata
+
+This plugin has [its own giter8 template](https://github.com/hammerlab/sbt-base.g8):
+
+```bash
+g8 hammerlab/sbt-base.g8
+```

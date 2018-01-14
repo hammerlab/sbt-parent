@@ -61,23 +61,10 @@ Add to `project/plugins.sbt` of an existing project:
 addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.0.0")
 ```
 
-or create a new project using the `create-scala-project` script:
+or create a new project using [giter8](http://www.foundweekends.org/giter8/):
 
 ```bash
-# Create a project called "proj" at /path/to/proj
-create-scala-project /path/to/proj
-
-# Create a project called "foo" at /path/to/proj
-create-scala-project /path/to/proj foo
-
-# Create a project called "baz" at ./baz, and set Maven "group" and github-user to "org.foo" and "bar", resp.
-GROUP=org.foo GITHUB_USER=bar create-scala-project baz
+g8 hammerlab/sbt-parent.g8
 ```
 
-This will create stubs for the following files:
-
-- `build.sbt`: initialize `organization`, `name`, `version`, `libraryDependencies` settings.
-- `project/plugins.sbt`: adding a dependency on this plugin.
-- `.gitignore`
-- `LICENSE` (Apache 2)
-- `.travis.yml`
+(This template lives at [hammerlab/sbt-parent.g8](https://github.com/hammerlab/sbt-parent.g8))
