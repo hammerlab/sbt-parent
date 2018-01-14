@@ -68,7 +68,7 @@ object HammerLab
       developers :=
         List(
           Developer(
-            id    = "HammerLab",
+            id    = "hammerlab",
             name  = "Hammer Lab",
             email = "info@hammerlab.org",
             url   = "https://github.com/hammerlab"
