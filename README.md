@@ -26,7 +26,7 @@ They are also available individually:
 
 ```scala
 // Settings for publishing to Maven Central 
-addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.1.0")
+addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.0.0")
 
 // Adding GitHub-repo info
 addSbtPlugin("org.hammerlab.sbt" % "github" % "4.1.0")
