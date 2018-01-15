@@ -1,9 +1,9 @@
+// upstream setting conflicts with module name in this project
 import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ gh }
 
 build(
   scala212Only,
   group("org.hammerlab.sbt"),
-  gh.repo("sbt-parent"),
   testDeps := Nil,
   sbtPlugin := true
 )
@@ -40,7 +40,13 @@ lazy val root = project.settings(scoverage).dependsOn(github, maven)
 
 lazy val scala = project.dependsOn(deps, lib, versions)
 
-lazy val spark = project.dependsOn(deps, lib, test, versions)
+lazy val spark = project.dependsOn(
+  deps,
+  lib,
+  scala,
+  test,
+  versions
+)
 
 lazy val test = project.dependsOn(deps, lib, versions)
 
@@ -51,7 +57,6 @@ lazy val travis = project.settings(
   root,
   scala
 )
-
 
 lazy val versions = project.settings(pgp).dependsOn(lib)
 

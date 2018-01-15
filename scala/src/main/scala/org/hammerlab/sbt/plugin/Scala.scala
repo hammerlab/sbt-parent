@@ -7,7 +7,10 @@ import sbt.Keys._
 import sbt._
 
 object Scala
-  extends Plugin(Deps, Versions) {
+  extends Plugin(
+    Deps,
+    Versions
+  ) {
 
   object autoImport {
     val isScala210 = settingKey[Boolean]("True iff the Scala binary version is 2.10")
@@ -24,18 +27,21 @@ object Scala
     val scala211Version = settingKey[String]("Patch version of Scala 2.11.x line to use")
     val scala212Version = settingKey[String]("Patch version of Scala 2.12.x line to use")
 
-    val addScala212 = (crossScalaVersions += scala212Version.value)
-    val omitScala210 = (crossScalaVersions -= scala210Version.value)
+    val addScala210 = crossScalaVersions += scala210Version.value
+    val addScala211 = crossScalaVersions += scala211Version.value
+    val addScala212 = crossScalaVersions += scala212Version.value
+
+    val omitScala210 = crossScalaVersions -= scala210Version.value
 
     val scala210Only =
       Seq(
-        scalaVersion := scala210Version.value,
+             scalaVersion  :=     scala210Version.value,
         crossScalaVersions := Seq(scala210Version.value)
       )
 
     val scala211Only =
       Seq(
-        scalaVersion := scala211Version.value,
+             scalaVersion  :=     scala211Version.value,
         crossScalaVersions := Seq(scala211Version.value)
       )
 
@@ -54,7 +60,7 @@ object Scala
         deps += scala_reflect
       )
 
-    val debugMacros = (scalacOptions += "-Ymacro-debug-lite")
+    val debugMacros = scalacOptions += "-Ymacro-debug-lite"
 
     // Macros and doc-generation have many rough edges, so this is frequently useful
     val skipDoc = publishArtifact in (sbt.Compile, packageDoc) := false
@@ -81,24 +87,30 @@ object Scala
 
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def globalSettings =
     Seq(
+      // Build for Scala 2.11 by default
+      scalaVersion := scala212Version.value,
+
+      // Only build for Scala 2.11, by default
+      crossScalaVersions :=
+        Seq(
+          scala211Version.value,
+          scala212Version.value
+        ),
+
+      scala210Version  := "2.10.7",
+      scala211Version  := "2.11.12",
+      scala212Version  := "2.12.4",
 
       versions ++= Seq(
         scala_lang    → scalaVersion.value,
         scala_reflect → scalaVersion.value
-      ),
+      )
+    )
 
-      // Build for Scala 2.11 by default
-      scalaVersion in Global := scala211Version.value,
-
-      // Only build for Scala 2.11, by default
-      crossScalaVersions in Global := Seq(scala211Version.value),
-
-      scala210Version := "2.10.7",
-      scala211Version := "2.11.12",
-      scala212Version := "2.12.4",
-
+  override def projectSettings =
+    Seq(
       isScala210 := (scalaBinaryVersion.value == "2.10"),
       isScala211 := (scalaBinaryVersion.value == "2.11"),
       isScala212 := (scalaBinaryVersion.value == "2.12"),

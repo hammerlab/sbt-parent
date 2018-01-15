@@ -1,5 +1,5 @@
 
-build(
+default(
   testDeps := Nil,
   github.repo("foo"),
   r"1.2.3"

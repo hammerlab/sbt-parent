@@ -34,30 +34,35 @@ object GitHub
     }
 
     val apache2License = ("Apache 2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0"))
-    val apache2 = (licenses in ThisBuild) := Seq(apache2License)
+    val apache2 = licenses := Seq(apache2License)
 
     implicit def liftURL(url: String): URL = new URL(url)
   }
 
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def globalSettings =
     Seq(
-      githubUser in Global := None,
-      githubRepo in Global := None,
+      githubUser := None,
+      githubRepo := None
+    )
 
+  override def projectSettings =
+    Seq(
       scmInfo := (
-        githubUser.value.map {
-          user ⇒
-            val repo = githubRepo.value.getOrElse(name.value)
-            val url = s"https://github.com/$user/$repo"
-            val connection = s"scm:git:git@github.com:$user/$repo.git"
-            ScmInfo(
-              url,
-              connection,
-              connection
-            )
-        }
+        githubUser
+          .value
+          .map {
+            user ⇒
+              val repo = githubRepo.value.getOrElse(name.value)
+              val url = s"https://github.com/$user/$repo"
+              val connection = s"scm:git:git@github.com:$user/$repo.git"
+              ScmInfo(
+                url,
+                connection,
+                connection
+              )
+          }
       ),
 
       pomExtra := {

@@ -50,17 +50,10 @@ object Root
     }
 
     /**
-     * [[sbt.Def.MapScoped]] that applies [[ThisBuild]] scope to a setting
-     */
-    def thisBuildScope[T] = new ~>[ScopedKey, ScopedKey] {
-      def apply[T](a: ScopedKey[T]): ScopedKey[T] =
-        a.copy(scope = a.scope.copy(project = Select(ThisBuild)))
-    }
-
-    /**
      * Set [[ThisBuild]] scope to some [[Setting]]s
      */
-    def build(ss: SettingsDefinition*): Seq[Setting[_]] = ss.flatten.map(_.mapKey(thisBuildScope))
+    def build(ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
+    def default(ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
   }
 
   import autoImport._

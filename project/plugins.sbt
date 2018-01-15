@@ -4,4 +4,4 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
 
-addSbtPlugin("org.hammerlab.sbt" % "base" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.0.1")
