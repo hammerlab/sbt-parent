@@ -1,7 +1,8 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
-import org.hammerlab.sbt.plugin.Maven.autoImport.mavenLocal
+import org.hammerlab.sbt.plugin.Maven.autoImport._
+import org.hammerlab.sbt.plugin.Versions.autoImport._
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys.coverageReport
@@ -11,19 +12,18 @@ object Root
   extends Plugin(
     GitHub,
     Maven,
+    Versions,
     ScoverageSbtPlugin
   ) {
   object autoImport {
     val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
 
     val rootSettings: Seq[Def.Setting[_]] =
+      noPublish ++
       Seq(
-        publish := {},
         mavenLocal := {},
-        publishM2 := {},
         (test in sbt.Test) := {},
         coverageReport := {},
-        publishArtifact := false,
         root := true
       )
 
@@ -52,7 +52,7 @@ object Root
     /**
      * Set [[ThisBuild]] scope to some [[Setting]]s
      */
-    def build(ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
+    def build  (ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
     def default(ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
   }
 

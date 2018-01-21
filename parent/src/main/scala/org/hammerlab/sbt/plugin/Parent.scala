@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Configuration, Group, SnapshotOps }
+import org.hammerlab.sbt.deps.{ Group, SnapshotOps }
 import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, sparkVersion }
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions

@@ -16,9 +16,17 @@ val   coveralls = addSbtPlugin("org.hammerlab"   % "sbt-coveralls"   % "1.2.3")
 val         pgp = addSbtPlugin("com.jsuereth"    % "sbt-pgp"         % "1.1.0")
 val    coursier = addSbtPlugin("io.get-coursier" % "sbt-coursier"    % "1.0.0")
 
+def fixed(v: String): Seq[Setting[_]] =
+  Seq(
+    version := v,
+    publishLocal := {},
+    publishArtifact := false
+  )
+
 lazy val lib = project.settings(
   sbtPlugin := false,
-  providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value
+  providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
+  fixed("4.0.0")
 )
 
 lazy val assembly = project.settings(
@@ -32,11 +40,11 @@ lazy val assembly = project.settings(
 
 lazy val deps = project.dependsOn(lib, versions)
 
-lazy val github = project
+lazy val github = project.settings(fixed("4.1.0"))
 
-lazy val maven = project.settings(sonatype).dependsOn(lib)
+lazy val maven = project.settings(sonatype, fixed("4.0.0")).dependsOn(lib)
 
-lazy val root = project.settings(scoverage).dependsOn(github, maven)
+lazy val root = project.settings(scoverage).dependsOn(github, maven, versions)
 
 lazy val scala = project.dependsOn(deps, lib, versions)
 

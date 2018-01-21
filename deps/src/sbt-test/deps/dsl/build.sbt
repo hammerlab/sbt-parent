@@ -1,12 +1,17 @@
 
 import sbt.librarymanagement.InclExclRule
 
+/**
+ * Test setting dependencies and excludes via [[default]] ([[ThisBuild]])
+ */
 default(
   dep(
-    "org.scalatest" ^^ "scalatest" ^ "3.0.0" tests
+    "a1" ^^ "a2" ^ "a3" tests
   ),
 
-  excludes += "org.apache.spark" ^^ "spark-core"
+  excludes += "b1" ^^ "b2",
+
+  providedDeps += "c1" ^ "c2" ^ "c3"
 )
 
 TaskKey[Unit]("check") := {
@@ -14,7 +19,8 @@ TaskKey[Unit]("check") := {
     libraryDependencies.value ==
       Seq(
         "org.scala-lang" % "scala-library" % "2.12.4",
-        "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+        "a1" %% "a2" % "a3" % "test",
+        "c1"  % "c2" % "c3" % "provided"
       )
   )
 
@@ -22,8 +28,8 @@ TaskKey[Unit]("check") := {
     excludeDependencies.value ==
       Seq(
         InclExclRule(
-          "org.apache.spark",
-          "spark-core",
+          "b1",
+          "b2",
           "*",
           Vector(),
           CrossVersion.Binary()
@@ -33,13 +39,15 @@ TaskKey[Unit]("check") := {
   ()
 }
 
+// test the same settings in a subproject
 lazy val a = project.settings(
   TaskKey[Unit]("check") := {
     assert(
       libraryDependencies.value ==
         Seq(
           "org.scala-lang" % "scala-library" % "2.12.4",
-          "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+          "a1" %% "a2" % "a3" % "test",
+          "c1"  % "c2" % "c3" % "provided"
         )
     )
 
@@ -47,8 +55,8 @@ lazy val a = project.settings(
       excludeDependencies.value ==
         Seq(
           InclExclRule(
-            "org.apache.spark",
-            "spark-core",
+            "b1",
+            "b2",
             "*",
             Vector(),
             CrossVersion.Binary()
