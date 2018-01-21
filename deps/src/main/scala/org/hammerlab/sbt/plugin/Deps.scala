@@ -39,31 +39,12 @@ object Deps
 
   override def globalSettings =
     Seq(
-      deps := Nil,
-
-      excludes := Nil,
-
-      testDeps := Nil,
-      deps ++=
-        testDeps
-          .value
-          .map(_ tests),
-
-      providedDeps := Nil,
-      deps ++=
-        providedDeps
-          .value
-          .map(_ provided),
-
-      testTestDeps := Nil,
-      deps ++=
-        testTestDeps
-          .value
-          .map(_ testtest),
-
-      compileAndTestDeps := Nil,
-              deps ++= compileAndTestDeps.value,
-      testTestDeps ++= compileAndTestDeps.value
+                    deps := Nil,
+                excludes := Nil,
+                testDeps := Nil,
+            providedDeps := Nil,
+            testTestDeps := Nil,
+      compileAndTestDeps := Nil
     )
 
   override def projectSettings =
@@ -97,6 +78,25 @@ object Deps
                 exclude.crossVersion
               )
           ),
+
+      deps ++=
+        testDeps
+          .value
+          .map(_ tests),
+
+      deps ++=
+        providedDeps
+          .value
+          .map(_ provided),
+
+      deps ++=
+        testTestDeps
+          .value
+          .map(_ testtest),
+
+      deps ++= compileAndTestDeps.value,
+
+      testTestDeps ++= compileAndTestDeps.value,
 
       /**
        * Work-around for https://github.com/sbt/sbt/issues/3709: `dependsOn(foo % "test->test")` does not get correctly

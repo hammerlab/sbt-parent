@@ -3,9 +3,9 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.plugin.Root.autoImport.root
 import org.hammerlab.sbt.plugin.Scala.autoImport.scala211Version
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
-import sbt.Keys.{ state, streams, test }
-import sbt.{ Def, Project, settingKey, taskKey }
-import scoverage.ScoverageKeys.{ coverageAggregate, coverageEnabled, coverageReport }
+import sbt.Keys._
+import sbt._
+import scoverage.ScoverageKeys._
 
 object Travis
   extends Plugin(Root, Scala) {
@@ -23,9 +23,9 @@ object Travis
    * Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
    * Scala version (indicated by travisCoverageScalaVersion).
    */
-  val travisReportCmd = taskKey[Unit]("Wrapper for coverageAggregate and coveralls, iff TRAVIS_SCALA_VERSION matches `travisCoverageScalaVersion`")
+  val travisReport = taskKey[Unit]("Wrapper for coverageAggregate and coveralls, iff TRAVIS_SCALA_VERSION matches `travisCoverageScalaVersion`")
 
-  def travisReportCmdTask = Def.taskDyn {
+  def travisReportTask = Def.taskDyn {
     val log = streams.value.log
     val extracted = Project.extract(state.value)
     implicit val pr = extracted.currentRef
@@ -71,7 +71,7 @@ object Travis
         }
       ).value,
 
-      travisReportCmd := travisReportCmdTask.value,
+      travisReport := travisReportTask.value,
 
       // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
       coverageEnabled := (

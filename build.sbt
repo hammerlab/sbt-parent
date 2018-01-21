@@ -5,8 +5,7 @@ build(
   scala212Only,
   group("org.hammerlab.sbt"),
   testDeps := Nil,
-  sbtPlugin := true,
-  r"4.1.1"
+  sbtPlugin := true
 )
 
 // external plugin short-hands
@@ -45,7 +44,7 @@ lazy val github = project.settings(fixed("4.1.0"))
 
 lazy val maven = project.settings(sonatype, fixed("4.0.0")).dependsOn(lib)
 
-lazy val root = project.settings(scoverage).dependsOn(github, maven)
+lazy val root = project.settings(scoverage).dependsOn(github, maven, versions)
 
 lazy val scala = project.dependsOn(deps, lib, versions)
 
@@ -67,7 +66,7 @@ lazy val travis = project.settings(
   scala
 )
 
-lazy val versions = project.settings(pgp, fixed("4.1.0")).dependsOn(lib)
+lazy val versions = project.settings(pgp).dependsOn(lib)
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
