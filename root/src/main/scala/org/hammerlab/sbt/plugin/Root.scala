@@ -52,7 +52,7 @@ object Root
     /**
      * Set [[ThisBuild]] scope to some [[Setting]]s
      */
-    def build(ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
+    def build  (ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
     def default(ss: SettingsDefinition*): Seq[Setting[_]] = inThisBuild(ss.flatten)
   }
 
