@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:spark
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.1.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%spark%22)
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.1.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%spark%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "spark" % "4.1.0")
+addSbtPlugin("org.hammerlab.sbt" % "spark" % "4.1.1")
 ```
 
 SBT configs for projects that use [Apache Spark](http://spark.apache.org/):
