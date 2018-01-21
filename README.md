@@ -1,6 +1,6 @@
 # sbt-parent
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.1.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+[![Maven Central](https://img.shields.io/badge/maven%20central-4.1.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
 [![](https://travis-ci.org/hammerlab/sbt-parent.svg?branch=master)](https://travis-ci.org/hammerlab/sbt-parent)
 
 [SBT](http://www.scala-sbt.org/) plugins reducing boilerplate for a variety of commmon tasks:
@@ -19,7 +19,7 @@
 To depend on all of them, add to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.1.0")
+addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.1.1")
 ```
 
 They are also available individually:
@@ -58,7 +58,7 @@ A derivative of [`parent`](parent) with hammerlab-specific configs can also be f
 Add to `project/plugins.sbt` of an existing project:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.1.0")
+addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.1.1")
 ```
 
 or create a new project using [giter8](http://www.foundweekends.org/giter8/):

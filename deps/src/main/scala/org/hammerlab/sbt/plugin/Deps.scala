@@ -42,19 +42,6 @@ object Deps
       deps := Nil,
 
       excludes := Nil,
-      excludeDependencies ++=
-        excludes
-          .value
-          .map(
-            exclude ⇒
-              ExclusionRule(
-                exclude.group.value,
-                exclude.artifact.value,
-                "*",
-                Vector(),
-                exclude.crossVersion
-              )
-          ),
 
       testDeps := Nil,
       deps ++=
@@ -92,6 +79,23 @@ object Deps
             _
               .withVersion(versionsMap.value)
               .toModuleIDs
+          ),
+
+      /**
+       * [[excludes]] is a simple syntax for scala-cross-versioned entries in [[excludeDependencies]]
+       */
+      excludeDependencies ++=
+        excludes
+          .value
+          .map(
+            exclude ⇒
+              ExclusionRule(
+                exclude.group.value,
+                exclude.artifact.value,
+                "*",
+                Vector(),
+                exclude.crossVersion
+              )
           ),
 
       /**
