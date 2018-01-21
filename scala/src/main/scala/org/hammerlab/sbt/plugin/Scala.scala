@@ -51,13 +51,13 @@ object Scala
         crossScalaVersions := Seq(scala212Version.value)
       )
 
-    val scala_lang = "org.scala-lang" ^ "scala-library"
+    val scala_lang    = "org.scala-lang" ^ "scala-library"
     val scala_reflect = "org.scala-lang" ^ "scala-reflect"
 
     val enableMacroParadise =
       Seq(
         addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-        deps += scala_reflect
+        deps += scala_reflect % scalaVersion.value
       )
 
     val debugMacros = scalacOptions += "-Ymacro-debug-lite"
