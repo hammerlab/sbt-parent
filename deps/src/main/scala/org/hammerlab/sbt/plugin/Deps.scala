@@ -1,12 +1,15 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Configuration, Dep, Group }
+import org.hammerlab.sbt.deps.{ Configuration, Dep, Group, CrossVersion }
 import org.hammerlab.sbt.plugin.Versions.versionsMap
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
-import sbt._
+import sbt.{ CrossVersion ⇒ _, _ }
 
 object Deps
-  extends Plugin(Versions) {
+  extends Plugin(
+    Versions
+  ) {
 
   object autoImport {
     val               deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
@@ -50,8 +53,8 @@ object Deps
   override def projectSettings =
     Seq(
       /**
-       * Convert the [[deps]] hierarchy into SBT's native [[ModuleID]] format, joining with [[versionsMap]] to fill in
-       * default versions for [[Dep]]s without explicit versions specified
+       * Convert the [[deps]] hierarchy into SBT's native [[ModuleID]] format, joining with [[Versions.versionsMap]] to
+       * fill in default versions for [[Dep]]s without explicit versions specified
        */
       libraryDependencies ++=
         deps
@@ -59,7 +62,7 @@ object Deps
           .flatMap(
             _
               .withVersion(versionsMap.value)
-              .toModuleIDs
+              .toModuleIDs(isScalaJSProject.value)
           ),
 
       /**
@@ -75,7 +78,7 @@ object Deps
                 exclude.artifact.value,
                 "*",
                 Vector(),
-                exclude.crossVersion
+                CrossVersion.toSBT(exclude.crossVersion)(isScalaJSProject.value)
               )
           ),
 

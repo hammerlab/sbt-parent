@@ -6,6 +6,7 @@ import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
 import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
@@ -52,7 +53,8 @@ object HammerLab
     val spark_util = hammerlab("spark-util")
     val stats = hammerlab("stats")
     val string_utils = hammerlab("string-utils")
-    val testUtils = hammerlab("test-utils")
+    val testSuite = hammerlab("test", "suite")
+    val testUtils = hammerlab("test", "base")
     val types = hammerlab("types")
   }
 
@@ -75,9 +77,7 @@ object HammerLab
           )
         ),
 
-      testUtilsVersion := "1.5.1",
-      versions += testUtils → testUtilsVersion.value,
-      testDeps += testUtils
+      testUtilsVersion := "1.0.0".snapshot
     )
 
   override def projectSettings =
@@ -93,6 +93,17 @@ object HammerLab
           "org.hammerlab"
         else
           sonatypeProfileName.value
+      ),
+
+      versions ++= Seq(
+        testSuite → testUtilsVersion.value,
+        testUtils → testUtilsVersion.value
+      ),
+      testDeps += (
+        if (isScalaJSProject.value)
+          testSuite
+        else
+          testUtils
         )
     )
 }

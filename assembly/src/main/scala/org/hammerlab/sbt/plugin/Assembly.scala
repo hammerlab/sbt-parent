@@ -3,6 +3,7 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.deps.Dep
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.versionsMap
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyKeys.assemblyOption
@@ -51,11 +52,11 @@ object Assembly
           val shadedDepJars =
             shadedDeps
               .value
-              .flatMap(
+              .flatMap {
                 _
                   .withVersion(versionsMap.value)
-                  .toModuleIDs
-              )
+                  .toModuleIDs(isScalaJSProject.value)
+              }
               .map {
                 dep ⇒
                   val crossFn =
