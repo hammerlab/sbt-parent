@@ -1,6 +1,6 @@
 
 default(
-  testDeps := Nil,
+  clearTestDeps,
   github.repo("foo"),
   r"1.2.3"
 )
@@ -22,6 +22,7 @@ lazy val a = project.settings(
     ()
   }
 )
+
 lazy val b = project.settings(
   testDeps += scalatest,
   TaskKey[Unit]("check") := {
@@ -29,3 +30,13 @@ lazy val b = project.settings(
     ()
   }
 )
+
+lazy val c = crossProject.settings(
+  testDeps += scalatest,
+  TaskKey[Unit]("check") := {
+    assert(testDeps.value == Seq(scalatest))
+    ()
+  }
+)
+lazy val cJS  = c.js
+lazy val cJVM = c.jvm

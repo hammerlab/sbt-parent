@@ -64,7 +64,7 @@ object Parent
         cats                  → "1.0.1",
         commons_io            → "2.5",
         commons_math          → "3.6.1",
-        case_app              → "1.2.0-M3",
+        case_app              → "1.2.0",
         guava                 → "19.0",
         htsjdk                → "2.9.1",
         kittens               → "1.0.0-RC2",

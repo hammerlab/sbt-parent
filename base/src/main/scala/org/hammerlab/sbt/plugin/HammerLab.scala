@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.Group
+import org.hammerlab.sbt.deps.{ Dep, Group }
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
@@ -56,7 +56,15 @@ object HammerLab
     val testSuite = hammerlab("test", "suite")
     val testUtils = hammerlab("test", "base")
     val types = hammerlab("types")
+
+    val scalatestOnly = addTestLib := false
+    val clearTestDeps = Seq(
+      addTestLib := false,
+      testDeps := Nil
+    )
   }
+
+  val addTestLib = settingKey[Boolean]("")
 
   import autoImport._
 
@@ -77,7 +85,8 @@ object HammerLab
           )
         ),
 
-      testUtilsVersion := "1.0.0".snapshot
+      testUtilsVersion := "1.0.0".snapshot,
+      addTestLib := true
     )
 
   override def projectSettings =
@@ -99,11 +108,27 @@ object HammerLab
         testSuite → testUtilsVersion.value,
         testUtils → testUtilsVersion.value
       ),
-      testDeps += (
-        if (isScalaJSProject.value)
-          testSuite
+
+      /**
+       * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
+       *
+       * {{{
+       * default(testDeps := Seq(scalatest)
+       * }}}
+       *
+       * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
+       * project level, so reading it in global scope always returns `false`.
+       */
+      testDeps ++= (
+        if (addTestLib.value)
+          Seq(
+            if (isScalaJSProject.value)
+              testSuite
+            else
+              testUtils
+          )
         else
-          testUtils
-        )
+          Nil
+      )
     )
 }
