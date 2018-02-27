@@ -117,6 +117,7 @@ object Scala
 
       scalacOptions ++= Seq(
         "-feature",
+        "-language:existentials",
         "-language:implicitConversions",
         "-language:postfixOps",
         "-language:higherKinds",

@@ -42,7 +42,7 @@ object Parent
     val scalautils = "org.scalautils" ^^ "scalautils"
     val shapeless = "com.chuusai" ^^ "shapeless"
     val slf4j = "org.clapper" ^^ "grizzled-slf4j"
-    val spire = "org.spire-math" ^^ "spire"
+    val spire = "org.typelevel" ^^ "spire"
 
     val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
   }
@@ -64,7 +64,7 @@ object Parent
         cats                  → "1.0.1",
         commons_io            → "2.5",
         commons_math          → "3.6.1",
-        case_app              → "1.2.0",
+        case_app              → "2.0.0-M3",
         guava                 → "19.0",
         htsjdk                → "2.9.1",
         kittens               → "1.0.0-RC2",
@@ -75,7 +75,7 @@ object Parent
         seqdoop_hadoop_bam    → "7.9.0",
         shapeless             → "2.3.3",
         slf4j                 → "1.3.1",
-        spire                 → "0.13.0"
+        spire                 → "0.15.0"
       )
     )
 }

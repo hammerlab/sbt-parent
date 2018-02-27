@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.{ Dep, Group }
+import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
@@ -51,7 +51,7 @@ object HammerLab
     val shapeless_utils = hammerlab("shapeless-utils")
     val spark_bam = hammerlab("bam", "load")
     val spark_util = hammerlab("spark-util")
-    val stats = hammerlab("stats")
+    val stats = hammerlab("math", "stats")
     val string_utils = hammerlab("string-utils")
     val testSuite = hammerlab("test", "suite")
     val testUtils = hammerlab("test", "base")
