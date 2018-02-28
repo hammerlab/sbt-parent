@@ -2,7 +2,11 @@ language: scala
 sudo: false
 jdk: oraclejdk8
 scala: 2.12.4
-script: sbt -mem 2048 scripted
+
+env:
+  - SBT_OPTS="-Xmx2G"
+
+script: sbt scripted
 
 cache:
   directories:
