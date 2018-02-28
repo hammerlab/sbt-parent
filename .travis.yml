@@ -2,7 +2,7 @@ language: scala
 sudo: false
 jdk: oraclejdk8
 scala: 2.12.4
-script: sbt scripted
+script: sbt -mem 2048 scripted
 
 cache:
   directories:
