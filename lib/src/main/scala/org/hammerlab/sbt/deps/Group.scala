@@ -12,7 +12,7 @@ case class Group(value: String) {
     GroupArtifact(
       this,
       artifact,
-      CrossVersion.Binary
+      CrossVersion.BinaryJS
     )
 
   def ^^^(artifact: Artifact): Dep =

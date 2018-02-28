@@ -24,7 +24,7 @@ object Test
     Seq(
       defaultVersions += scalatest → scalatestVersion.value,
 
-      scalatestVersion := "3.0.0",
+      scalatestVersion := "3.0.4",
 
       // Output full stack-traces
       testOptions in sbt.Test += Tests.Argument(ScalaTest, "-oF"),

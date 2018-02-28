@@ -28,7 +28,7 @@ case class Dep(group: Group,
   /**
    * Convert this [[Dep]] to one or more [[ModuleID]]s (one for each [[configurations configuration]])
    */
-  def toModuleIDs: Seq[ModuleID] =
+  def toModuleIDs(implicit isScalaJS: IsScalaJS): Seq[ModuleID] =
     version match {
       case Some(version) ⇒
         configurations map {

@@ -6,6 +6,7 @@ import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
 import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
@@ -50,11 +51,20 @@ object HammerLab
     val shapeless_utils = hammerlab("shapeless-utils")
     val spark_bam = hammerlab("bam", "load")
     val spark_util = hammerlab("spark-util")
-    val stats = hammerlab("stats")
+    val stats = hammerlab("math", "stats")
     val string_utils = hammerlab("string-utils")
-    val testUtils = hammerlab("test-utils")
+    val testSuite = hammerlab("test", "suite")
+    val testUtils = hammerlab("test", "base")
     val types = hammerlab("types")
+
+    val scalatestOnly = addTestLib := false
+    val clearTestDeps = Seq(
+      addTestLib := false,
+      testDeps := Nil
+    )
   }
+
+  val addTestLib = settingKey[Boolean]("")
 
   import autoImport._
 
@@ -75,9 +85,8 @@ object HammerLab
           )
         ),
 
-      testUtilsVersion := "1.5.1",
-      versions += testUtils → testUtilsVersion.value,
-      testDeps += testUtils
+      testUtilsVersion := "1.0.0".snapshot,
+      addTestLib := true
     )
 
   override def projectSettings =
@@ -93,6 +102,33 @@ object HammerLab
           "org.hammerlab"
         else
           sonatypeProfileName.value
-        )
+      ),
+
+      versions ++= Seq(
+        testSuite → testUtilsVersion.value,
+        testUtils → testUtilsVersion.value
+      ),
+
+      /**
+       * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
+       *
+       * {{{
+       * default(testDeps := Seq(scalatest)
+       * }}}
+       *
+       * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
+       * project level, so reading it in global scope always returns `false`.
+       */
+      testDeps ++= (
+        if (addTestLib.value)
+          Seq(
+            if (isScalaJSProject.value)
+              testSuite
+            else
+              testUtils
+          )
+        else
+          Nil
+      )
     )
 }
