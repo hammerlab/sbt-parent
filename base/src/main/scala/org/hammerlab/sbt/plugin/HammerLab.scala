@@ -85,7 +85,7 @@ object HammerLab
           )
         ),
 
-      testUtilsVersion := "1.0.0".snapshot,
+      testUtilsVersion := "1.0.0",
       addTestLib := true
     )
 

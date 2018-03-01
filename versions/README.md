@@ -13,13 +13,12 @@ SBT plugin for setting and managing dependencies' versions.
 Set the current project's version with a variety of short-hands:
 
 ```scala
-// Set the version to 1.2.3-SNAPSHOT, except during sbt-pgp's `publishSigned` task, where it will be "1.2.3"
+// Set the version to "1.2.3-SNAPSHOT", or "1.2.3" if "snapshot" is true
 v"1.2.3"
 v("1.2.3")
 
-// when this is true, the above will be a -SNAPSHOT even inside `publishSigned` (e.g. for publishing signed artifacts to 
-// Sonatype snapshots repo)
-snapshot := true
+// un-snapshot the versions set above
+snapshot := false
 ```
 
 These work by setting the `revision` key, which then propagates to the `version` key.
