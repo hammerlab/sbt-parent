@@ -4,7 +4,7 @@ import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ gh }
 default(
   scala212Only,
   group("org.hammerlab.sbt"),
-  testDeps := Nil,
+  clearTestDeps,
   sbtPlugin := true,
   v"4.3.0"
 )

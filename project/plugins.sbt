@@ -4,4 +4,5 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
 
-addSbtPlugin("org.hammerlab.sbt" % "base" % "4.2.0")
+// bootstrap off this very snapshot, just for one release, to pick up new version/snapshot/release functionality
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.3.0-SNAPSHOT")
