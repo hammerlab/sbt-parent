@@ -1,14 +1,20 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.Root.autoImport.root
-import org.hammerlab.sbt.plugin.Scala.autoImport.scala211Version
+import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys._
 
 object Travis
-  extends Plugin(Root, Scala) {
+  extends Plugin(
+    Root,
+    Scala,
+    Versions
+  ) {
+
+  noopSettings += (coverageReport := {})
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
@@ -56,7 +62,29 @@ object Travis
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      travisCoverageScalaVersion := scala211Version.value,
+      travisCoverageScalaVersion :=
+        crossScalaVersions
+          .value
+          .sortWith {
+            (ls, rs) ⇒
+              def ints(s: String) =
+                s
+                  .split("\\.")
+                  .map(_.toInt)
+
+              val (l, r) = (ints(ls), ints(rs))
+
+              l
+                .zip(r)
+                .find { case (l, r) ⇒ l != r }
+                .map {
+                  case (l, r) ⇒ l < r
+                }
+                .getOrElse(
+                  l.length < r.length
+                )
+          }
+          .last,
 
       coverageTest := Def.sequential(
         (test in sbt.Test),

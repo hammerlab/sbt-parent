@@ -2,10 +2,8 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Maven.autoImport._
-import org.hammerlab.sbt.plugin.Versions.autoImport._
-import sbt.Keys._
+import org.hammerlab.sbt.plugin.Versions.noopSettings
 import sbt._
-import scoverage.ScoverageKeys.coverageReport
 import scoverage.ScoverageSbtPlugin
 
 object Root
@@ -19,13 +17,11 @@ object Root
     val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
 
     val rootSettings: Seq[Def.Setting[_]] =
-      noPublish ++
       Seq(
-        mavenLocal := {},
-        (test in sbt.Test) := {},
-        coverageReport := {},
-        root := true
-      )
+          root := true,
+          mavenLocal := {}
+      ) ++
+      noopSettings
 
     def rootProject(name: String,
                     modules: ProjectReference*): Project = {
