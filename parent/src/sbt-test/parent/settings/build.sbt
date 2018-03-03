@@ -8,6 +8,11 @@ build(
 )
 
 lazy val a = project.settings(
+  /*
+   * disable coverage otherwise (on Travis, or when TRAVIS_SCALA_VERSION matches [[scalaVersion]]) we get an extra
+   * POM dependency on the scoverage scalac plugin that we are not expecting in `pom.xml`
+   */
+  coverageEnabled := false,
   TaskKey[Unit]("check") := {
     assert(githubUser.value == Some("my-org"))
     assert(githubRepo.value == Some("repo-name"))
