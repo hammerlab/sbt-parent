@@ -6,6 +6,7 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt._
 import Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.defaultVersions
+import org.scalajs.sbtplugin.cross.{ CrossClasspathDependency, CrossProject }
 import sbt.Keys.libraryDependencies
 
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
@@ -48,6 +49,12 @@ object JS
         deps += scalajs.dom,
         scalaJSUseMainModuleInitializer := true
       )
+
+    implicit class CrossProjectConfigOps(val p: CrossProject) extends AnyVal {
+      def  andTest: CrossClasspathDependency = new CrossClasspathDependency(p, Some("compile->compile;test->test"))
+      def testtest: CrossClasspathDependency = new CrossClasspathDependency(p, Some("test->test"))
+      def     test: CrossClasspathDependency = new CrossClasspathDependency(p, Some("compile->test"))
+    }
   }
 
   import autoImport._

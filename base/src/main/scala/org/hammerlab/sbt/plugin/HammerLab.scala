@@ -64,7 +64,7 @@ object HammerLab
 
     val iterators =
       new Dep("org.hammerlab", "iterator", BinaryJS) {
-        val macros = hammerlab("iterator-macros")
+        val macros = hammerlab("macros", "iterators")
       }
 
     object math {

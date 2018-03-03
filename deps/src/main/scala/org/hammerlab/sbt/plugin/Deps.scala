@@ -23,7 +23,8 @@ object Deps
 
     implicit class ProjectConfigOps(val p: Project) extends AnyVal {
       def andTest: ClasspathDependency = ClasspathDependency(p, Some("compile->compile;test->test"))
-      def test: ClasspathDependency = ClasspathDependency(p, Some("test->test"))
+      def testtest: ClasspathDependency = ClasspathDependency(p, Some("test->test"))
+      def test: ClasspathDependency = ClasspathDependency(p, Some("compile->test"))
     }
 
     /**
