@@ -1,6 +1,7 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.Group
+import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
+import org.hammerlab.sbt.deps.{ Dep, Group, GroupArtifact }
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
@@ -29,33 +30,48 @@ object HammerLab
     def hammerlab(name: String) = "org.hammerlab" ^^ name
     def hammerlab(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
 
-    val adam = hammerlab("adam", "core")
-    val args4j_cli = hammerlab("cli", "args4j")
-    val args4s = hammerlab("args4s")
-    val bdg_utils_cli = hammerlab("bdg-utils", "cli")
-    val bytes = hammerlab("bytes")
-    val case_cli = hammerlab("cli", "case-app")
-    val channel = hammerlab("channel")
-    val genomic_utils = hammerlab("genomics", "utils")
-    val hammerlab_hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
-    val io_utils = hammerlab("io")
-    val iterators = hammerlab("iterator")
-    val iterator_macros = hammerlab("iterator-macros")
-    val loci = hammerlab("genomics", "loci") - guava
-    val magic_rdds = hammerlab("magic-rdds")
-    val math = hammerlab("math")
-    val paths = hammerlab("paths")
-    val reads = hammerlab("genomics", "reads")
-    val readsets = hammerlab("genomics", "readsets")
-    val reference = hammerlab("genomics", "reference")
+    val           adam = hammerlab("adam", "core")
+    val     args4j_cli = hammerlab("cli", "args4j")
+    val         args4s = hammerlab("args4s")
+    val  bdg_utils_cli = hammerlab("bdg-utils", "cli")
+    val          bytes = hammerlab("bytes")
+    val       case_cli = hammerlab("cli", "case-app")
+    val        channel = hammerlab("channel")
+    val        io_utils = hammerlab("io")
+    val      magic_rdds = hammerlab("magic-rdds")
+    val        parallel = hammerlab("parallel")
+    val           paths = hammerlab("paths")
     val shapeless_utils = hammerlab("shapeless-utils")
-    val spark_bam = hammerlab("bam", "load")
-    val spark_util = hammerlab("spark-util")
-    val stats = hammerlab("math", "stats")
-    val string_utils = hammerlab("string-utils")
-    val testSuite = hammerlab("test", "suite")
-    val testUtils = hammerlab("test", "base")
-    val types = hammerlab("types")
+    val       spark_bam = hammerlab("bam", "load")
+    val      spark_util = hammerlab("spark-util")
+    val           stats = hammerlab("math", "stats")
+    val    string_utils = hammerlab("string-utils")
+    val       testSuite = hammerlab("test", "suite")
+    val       testUtils = hammerlab("test", "base")
+    val           types = hammerlab("types")
+
+    object genomics {
+      val      loci = hammerlab("genomics",      "loci") - guava
+      val     reads = hammerlab("genomics",     "reads")
+      val  readsets = hammerlab("genomics",  "readsets")
+      val reference = hammerlab("genomics", "reference")
+      val     utils = hammerlab("genomics",     "utils")
+    }
+
+    object hammerlab {
+      val hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
+    }
+
+    val iterators =
+      new Dep("org.hammerlab", "iterator", BinaryJS) {
+        val macros = hammerlab("macros", "iterators")
+      }
+
+    object math {
+      val    format = hammerlab("math",    "format")
+      val tolerance = hammerlab("math", "tolerance")
+      val     utils = hammerlab("math",     "utils")
+    }
 
     val scalatestOnly = addTestLib := false
     val clearTestDeps = Seq(

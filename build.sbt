@@ -4,9 +4,9 @@ import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ gh }
 default(
   scala212Only,
   group("org.hammerlab.sbt"),
-  testDeps := Nil,
+  clearTestDeps,
   sbtPlugin := true,
-  v"4.3.0"
+  v"4.4.0"
 )
 
 // external-plugin short-hands
@@ -24,7 +24,7 @@ lazy val lib = project.settings(
   resolvers += Resolver.url("sbt-plugins", "https://dl.bintray.com/scala-js/scala-js-releases/")(Resolver.ivyStylePatterns),
   providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
   sbtScalaJS,
-  v"4.1.0"
+  r"4.1.0"
 )
 
 lazy val assembly = project.settings(
@@ -37,12 +37,17 @@ lazy val assembly = project.settings(
   versions
 )
 
-lazy val deps = project.settings(sbtScalaJS).dependsOn(lib, versions)
+lazy val deps = project.settings(
+  sbtScalaJS
+).dependsOn(
+  lib,
+  versions
+)
 
 lazy val github = project.settings(r"4.1.0")
 
 lazy val js = project.settings(
-  v"1.0.0",
+  v"1.1.0",
   sbtScalaJS,
   scalaJSBundler
 ).dependsOn(
@@ -50,11 +55,26 @@ lazy val js = project.settings(
   versions
 )
 
-lazy val maven = project.settings(v"4.1.0", sonatype).dependsOn(lib)
+lazy val maven = project.settings(
+  r"4.1.0",
+  sonatype
+).dependsOn(
+  lib
+)
 
-lazy val root = project.settings(scoverage).dependsOn(github, maven, versions)
+lazy val root = project.settings(
+  scoverage
+).dependsOn(
+  github,
+  maven,
+  versions
+)
 
-lazy val scala = project.dependsOn(deps, lib, versions)
+lazy val scala = project.dependsOn(
+  deps,
+  lib,
+  versions
+)
 
 lazy val spark = project.dependsOn(
   deps,
@@ -64,7 +84,11 @@ lazy val spark = project.dependsOn(
   versions
 )
 
-lazy val test = project.dependsOn(deps, lib, versions)
+lazy val test = project.dependsOn(
+  deps,
+  lib,
+  versions
+)
 
 lazy val travis = project.settings(
   scoverage,
@@ -74,7 +98,11 @@ lazy val travis = project.settings(
   scala
 )
 
-lazy val versions = project.settings(pgp).dependsOn(lib)
+lazy val versions = project.settings(
+  pgp
+).dependsOn(
+  lib
+)
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
@@ -95,7 +123,10 @@ lazy val parent = project.settings(
 )
 
 // All-purpose hammerlab-specific plugin
-lazy val base = project.dependsOn(parent)
+lazy val base = project.settings(
+).dependsOn(
+  parent
+)
 
 lazy val sbt_parent = rootProject(
   "sbt-parent",

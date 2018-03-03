@@ -38,6 +38,7 @@ object Parent
     val log4j = "org.slf4j" ^ "slf4j-log4j12"
     val mllib = ("org.apache.spark" ^^ "spark-mllib") - scalatest
     val parquet_avro = "org.apache.parquet" ^ "parquet-avro"
+    val purecsv = "com.github.melrief" ^^ "purecsv"
     val quinine_core = ("org.bdgenomics.quinine" ^^ "quinine-core") - ("org.bdgenomics.adam" ^^ "adam-core")
     val scalautils = "org.scalautils" ^^ "scalautils"
     val shapeless = "com.chuusai" ^^ "shapeless"
@@ -71,6 +72,7 @@ object Parent
         log4j                 → "1.7.21",
         mllib                 → sparkVersion.value,
         parquet_avro          → "1.8.1",
+        purecsv               → "0.1.1",
         scalautils            → "2.1.5",
         seqdoop_hadoop_bam    → "7.9.0",
         shapeless             → "2.3.3",
