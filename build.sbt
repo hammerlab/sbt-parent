@@ -9,7 +9,7 @@ default(
   v"4.3.0"
 )
 
-// external plugin short-hands
+// external-plugin short-hands
 val    sbtAssembly = addSbtPlugin("com.eed3si9n"    % "sbt-assembly"        % "0.14.6")
 val       sonatype = addSbtPlugin("org.xerial.sbt"  % "sbt-sonatype"        % "2.0")
 val      scoverage = addSbtPlugin("org.scoverage"   % "sbt-scoverage"       % "1.5.1")
