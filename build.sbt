@@ -6,7 +6,7 @@ default(
   group("org.hammerlab.sbt"),
   clearTestDeps,
   sbtPlugin := true,
-  v"4.4.0"
+  v"4.4.1"
 )
 
 // external-plugin short-hands
@@ -47,7 +47,7 @@ lazy val deps = project.settings(
 lazy val github = project.settings(r"4.1.0")
 
 lazy val js = project.settings(
-  v"1.1.0",
+  v"1.1.1",
   sbtScalaJS,
   scalaJSBundler
 ).dependsOn(

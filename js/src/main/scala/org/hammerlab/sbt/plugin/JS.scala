@@ -1,16 +1,15 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.plugin.Deps.autoImport._
+import org.hammerlab.sbt.plugin.Versions.autoImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import org.scalajs.sbtplugin.cross._
+import sbt.Keys._
 import sbt._
-import Deps.autoImport.deps
-import org.hammerlab.sbt.plugin.Versions.autoImport.defaultVersions
-import org.scalajs.sbtplugin.cross.{ CrossClasspathDependency, CrossProject }
-import sbt.Keys.libraryDependencies
 
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin
-import ScalaJSBundlerPlugin.autoImport.npmDependencies
+import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.npmDependencies
 
 object JS
   extends Plugin(

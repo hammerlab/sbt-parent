@@ -5,6 +5,7 @@ import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, Snapshot, VersionsMap }
 import sbt.Defaults.artifactPathSetting
 import sbt.Keys._
 import sbt._
+import Command.command
 import sbt.plugins.{ IvyPlugin, JvmPlugin }
 
 import scala.collection.mutable.ArrayBuffer
@@ -44,6 +45,20 @@ object Versions
   object autoImport {
     val defaultVersions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
     val snapshot = settingKey[Boolean]("When true, versions set via `v\"x.y.z\"` shorthands will have '-SNAPSHOT' appended, and snapshots repository will be used")
+
+    val unsnap =
+      command("unsnap") {
+        s ⇒
+          val e = Project.extract(s)
+          e.append(Seq(snapshot := false), s)
+      }
+
+    val unsnapAll =
+      command("unsnapAll") {
+        s ⇒
+          val e = Project.extract(s)
+          e.append(Seq(snapshot in ThisBuild := false), s)
+      }
 
     /*
      * Set the version and disable publishing, for e.g. when a module in a project has not changed and is to remain
@@ -104,6 +119,10 @@ object Versions
 
   override def projectSettings =
     Seq(
+
+      commands += unsnap,
+      commands += unsnapAll,
+
       /**
        * Turn [[revision]] (if present) directly into [[version]] appending "-SNAPSHOT" or not based on [[snapshot]]
        */
