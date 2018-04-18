@@ -1,7 +1,7 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
-import org.hammerlab.sbt.deps.{ Dep, Group, GroupArtifact }
+import org.hammerlab.sbt.deps.{ Dep, Group }
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
@@ -24,53 +24,52 @@ object HammerLab
 
   implicit def liftOption[T](t: T): Option[T] = Some(t)
 
-  object autoImport {
-    val testUtilsVersion = settingKey[String]("Version of org.hammerlab:test_utils test-dep to use")
+  trait all {
+    def lib(name: String) = "org.hammerlab" ^^ name
+    def lib(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
 
-    def hammerlab(name: String) = "org.hammerlab" ^^ name
-    def hammerlab(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
+    val            adam = lib("adam", "core")
+    val      args4j_cli = lib("cli", "args4j")
+    val          args4s = lib("args4s")
+    val   bdg_utils_cli = lib("bdg-utils", "cli")
+    val           bytes = lib("bytes")
+    val        case_cli = lib("cli", "case-app")
+    val         channel = lib("channel")
+    val        io_utils = lib("io")
+    val      magic_rdds = lib("magic-rdds")
+    val        parallel = lib("parallel")
+    val           paths = lib("paths")
+    val shapeless_utils = lib("shapeless-utils")
+    val       spark_bam = lib("bam", "load")
+    val      spark_util = lib("spark-util")
+    val           stats = lib("math", "stats")
+    val    string_utils = lib("string-utils")
+    val       testSuite = lib("test", "suite")
+    val       testUtils = lib("test", "base")
+    val           types = lib("types")
 
-    val           adam = hammerlab("adam", "core")
-    val     args4j_cli = hammerlab("cli", "args4j")
-    val         args4s = hammerlab("args4s")
-    val  bdg_utils_cli = hammerlab("bdg-utils", "cli")
-    val          bytes = hammerlab("bytes")
-    val       case_cli = hammerlab("cli", "case-app")
-    val        channel = hammerlab("channel")
-    val        io_utils = hammerlab("io")
-    val      magic_rdds = hammerlab("magic-rdds")
-    val        parallel = hammerlab("parallel")
-    val           paths = hammerlab("paths")
-    val shapeless_utils = hammerlab("shapeless-utils")
-    val       spark_bam = hammerlab("bam", "load")
-    val      spark_util = hammerlab("spark-util")
-    val           stats = hammerlab("math", "stats")
-    val    string_utils = hammerlab("string-utils")
-    val       testSuite = hammerlab("test", "suite")
-    val       testUtils = hammerlab("test", "base")
-    val           types = hammerlab("types")
-
-    object genomics {
-      val      loci = hammerlab("genomics",      "loci") - guava
-      val     reads = hammerlab("genomics",     "reads")
-      val  readsets = hammerlab("genomics",  "readsets")
-      val reference = hammerlab("genomics", "reference")
-      val     utils = hammerlab("genomics",     "utils")
+    object cli {
+      val  base = lib("cli",  "base")
+      val spark = lib("cli", "spark")
     }
 
-    object hammerlab {
-      val hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
+    object genomics {
+      val      loci = lib("genomics",      "loci") - guava
+      val     reads = lib("genomics",     "reads")
+      val  readsets = lib("genomics",  "readsets")
+      val reference = lib("genomics", "reference")
+      val     utils = lib("genomics",     "utils")
     }
 
     val iterators =
       new Dep("org.hammerlab", "iterator", BinaryJS) {
-        val macros = hammerlab("macros", "iterators")
+        val macros = lib("macros", "iterators")
       }
 
     object math {
-      val    format = hammerlab("math",    "format")
-      val tolerance = hammerlab("math", "tolerance")
-      val     utils = hammerlab("math",     "utils")
+      val    format = lib("math",    "format")
+      val tolerance = lib("math", "tolerance")
+      val     utils = lib("math",     "utils")
     }
 
     val scalatestOnly = addTestLib := false
@@ -80,7 +79,34 @@ object HammerLab
     )
   }
 
-  val addTestLib = settingKey[Boolean]("")
+  object autoImport extends all {
+    val testSuiteVersion = settingKey[String]("Version of org.hammerlab.test:suite test-dep to use")
+    val testUtilsVersion = settingKey[String]("Version of org.hammerlab.test:base test-dep to use")
+
+    object hammerlab extends all {
+
+      def apply(name: String) = lib(name)
+      def apply(subgroup: String, name: String) = lib(subgroup, name)
+
+      val hadoop_bam = ("org.hammerlab" ^ "hadoop-bam") - hadoop
+
+      val io = io_utils
+
+      object test {
+        object suite {
+          val version = testSuiteVersion
+        }
+        implicit def toVersion(t: suite.type): Dep = testSuite
+
+        object base {
+          val version = testUtilsVersion
+        }
+        implicit def toVersion(t: base.type): Dep = testUtils
+      }
+    }
+  }
+
+  val addTestLib = settingKey[Boolean]("When false, skip adding org.hammerlab.test:{base,suite} as a test-dependency (which this plugin otherwise does by default")
 
   import autoImport._
 
@@ -101,7 +127,8 @@ object HammerLab
           )
         ),
 
-      testUtilsVersion := "1.0.0",
+      testSuiteVersion := "1.0.0",
+      testUtilsVersion := "1.0.1",
       addTestLib := true
     )
 
@@ -121,7 +148,7 @@ object HammerLab
       ),
 
       versions ++= Seq(
-        testSuite → testUtilsVersion.value,
+        testSuite → testSuiteVersion.value,
         testUtils → testUtilsVersion.value
       ),
 

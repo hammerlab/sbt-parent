@@ -66,7 +66,7 @@ object Scala
     val skipDoc = publishArtifact in (sbt.Compile, packageDoc) := false
     val emptyDocJar = sources in (sbt.Compile, doc) := Seq()
 
-    val scalameta = Seq(
+    val scalameta: SettingsDefinition = Seq(
       addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full),
       scalacOptions += "-Xplugin-require:macroparadise",
       libraryDependencies += "org.scalameta" %% "scalameta" % "1.8.0" % sbt.Provided,
