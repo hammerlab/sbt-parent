@@ -47,8 +47,7 @@ object Parent
         val core = ("org.bdgenomics.quinine" ^^ "quinine-core") - adam.core
       }
       object utils {
-        val bdgUtilsVersion = settingKey[String]("org.bdgenomics.utils version to use")
-        val version = bdgUtilsVersion
+        val version = SettingKey[String]("bdgUtilsVersion", "org.bdgenomics.utils version to use")
         val intervalrdd = "org.bdgenomics.utils" ^^ "utils-intervalrdd-spark2"
         val          io = "org.bdgenomics.utils" ^^ "utils-io-spark2"
         val     metrics = "org.bdgenomics.utils" ^^ "utils-metrics-spark2"
@@ -60,6 +59,42 @@ object Parent
       val   io =         "commons-io" ^    "commons-io"
       val math = "org.apache.commons" ^ "commons-math3"
     }
+
+    object circe {
+      val version = SettingKey[String]("circeVersion", "Circe JSON library version")
+      def lib(name: String) = "io.circe" ^^ s"circe-$name"
+      val generic = lib("generic")
+      val literal = lib("literal")
+      val    core = lib("core")
+      val  parser = lib("parser")
+
+      val defaultVersions =
+        versions ++=
+          Seq(
+            generic → version.value,
+            literal → version.value,
+               core → version.value,
+             parser → version.value
+          )
+    }
+
+    object http4s {
+      val version = SettingKey[String]("http4sVersion", "HTTP4S version")
+      def lib(name: String) = "org.http4s" ^^ s"http4s-$name"
+      val blaze_server = lib("blaze-server")
+      val blaze_client = lib("blaze-client")
+      val        circe = lib("circe")
+      val          dsl = lib("dsl")
+
+      val defaultVersions =
+        versions ++=
+      Seq(
+         blaze_server → version.value,
+         blaze_client → version.value,
+                circe → version.value,
+                  dsl → version.value
+      )
+    }
   }
 
   import autoImport._
@@ -67,6 +102,8 @@ object Parent
   override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] =
     Seq(
       bdg.utils.version := "0.2.13",
+      circe.version := "0.9.3",
+      http4s.version := "0.18.11",
 
       versions ++= Seq(
         args4j                → "2.33",
@@ -93,6 +130,9 @@ object Parent
         shapeless             → "2.3.3",
         slf4j                 → "1.3.1",
         spire                 → "0.15.0"
-      )
+      ),
+
+      circe.defaultVersions,
+      http4s.defaultVersions
     )
 }
