@@ -25,18 +25,29 @@ object JS
     val scalacss = "com.github.japgolly.scalacss" ^^ "core"
     object scalajs {
 
-      val       dom = "org.scala-js" ^^ "scalajs-dom"
+      val dom = "org.scala-js" ^^ "scalajs-dom"
 
       object react {
-        val dep = "com.github.japgolly.scalajs-react" ^^ "core"
+        val  core = "com.github.japgolly.scalajs-react" ^^  "core"
+        val extra = "com.github.japgolly.scalajs-react" ^^ "extra"
         val version = SettingKey[String]("reactVersion", "Version of react and react-dom for npm dependencies")
+        val defaults =
+          Seq(
+            version := "1.2.0",
+            versions ++=
+              Seq(
+                 core → version.value,
+                extra → version.value
+              )
+          )
+
       }
 
       implicit def reactSettings(r: react.type): Seq[Setting[_]] =
         Seq(
           deps ++= Seq(
             scalacss,
-            r.dep
+            react.core
           ),
           npmDependencies in Compile ++= Seq(
             "react"     → r.version.value,
@@ -67,8 +78,8 @@ object JS
     Seq(
       defaultVersions ++= Seq(
         scalacss              → "0.5.3",
-        scalajs.dom           → "0.9.2",
-        scalajs.react_dep     → "1.1.1"
+        scalajs.dom           → "0.9.2"
       )
-    )
+    ) ++
+    scalajs.react.defaults
 }
