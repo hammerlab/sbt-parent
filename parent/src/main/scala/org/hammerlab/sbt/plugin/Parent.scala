@@ -21,6 +21,8 @@ object Parent
     extends SnapshotOps {
 
     val             args4j =                     "args4j"  ^ "args4j"
+    val           autowire =                "com.lihaoyi" ^^ "autowire"
+    val          boopickle =                  "io.suzaku" ^^ "boopickle"
     val             breeze =               "org.scalanlp" ^^ "breeze"
     val           case_app = "com.github.alexarchambault" ^^ "case-app"
     val               cats =              "org.typelevel" ^^ "cats-core"
@@ -48,16 +50,40 @@ object Parent
       }
       object utils {
         val version = SettingKey[String]("bdgUtilsVersion", "org.bdgenomics.utils version to use")
-        val intervalrdd = "org.bdgenomics.utils" ^^ "utils-intervalrdd-spark2"
-        val          io = "org.bdgenomics.utils" ^^ "utils-io-spark2"
-        val     metrics = "org.bdgenomics.utils" ^^ "utils-metrics-spark2"
-        val        misc = "org.bdgenomics.utils" ^^ "utils-misc-spark2"
+        def lib(name: String) = "org.bdgenomics.utils" ^^ s"utils-$name"
+        val intervalrdd = lib("intervalrdd-spark2")
+        val          io = lib("io-spark2")
+        val     metrics = lib("metrics-spark2")
+        val        misc = lib("misc-spark2")
+        val defaults =
+          Seq(
+            version := "0.2.13",
+            versions ++=
+              Seq(
+                intervalrdd → version.value,
+                         io → version.value,
+                    metrics → version.value,
+                       misc → version.value,
+              )
+          )
       }
+      val defaults =
+        Seq(
+          versions(
+            formats → "0.10.1"
+          )
+        ) ++
+        utils.defaults
     }
 
     object commons {
       val   io =         "commons-io" ^    "commons-io"
       val math = "org.apache.commons" ^ "commons-math3"
+      val defaults =
+        versions(
+            io → "2.5",
+          math → "3.6.1"
+        )
     }
 
     object circe {
@@ -68,14 +94,17 @@ object Parent
       val    core = lib("core")
       val  parser = lib("parser")
 
-      val defaultVersions =
-        versions ++=
-          Seq(
-            generic → version.value,
-            literal → version.value,
-               core → version.value,
-             parser → version.value
-          )
+      val defaults =
+        Seq(
+          version := "0.9.3",
+          versions ++=
+            Seq(
+              generic → version.value,
+              literal → version.value,
+                 core → version.value,
+               parser → version.value
+            )
+        )
     }
 
     object http4s {
@@ -86,53 +115,49 @@ object Parent
       val        circe = lib("circe")
       val          dsl = lib("dsl")
 
-      val defaultVersions =
-        versions ++=
-      Seq(
-         blaze_server → version.value,
-         blaze_client → version.value,
-                circe → version.value,
-                  dsl → version.value
-      )
+      val defaults =
+        Seq(
+          version := "0.18.11",
+          versions ++=
+            Seq(
+              blaze_server → version.value,
+              blaze_client → version.value,
+                     circe → version.value,
+                       dsl → version.value
+            )
+        )
     }
   }
 
   import autoImport._
 
-  override def projectSettings: Seq[_root_.sbt.Def.Setting[_]] =
+  override def projectSettings =
     Seq(
-      bdg.utils.version := "0.2.13",
-      circe.version := "0.9.3",
-      http4s.version := "0.18.11",
-
       versions ++= Seq(
-        args4j                → "2.33",
-        bdg.formats           → "0.10.1",
-        bdg.utils.intervalrdd → bdg.utils.version.value,
-        bdg.utils.io          → bdg.utils.version.value,
-        bdg.utils.metrics     → bdg.utils.version.value,
-        bdg.utils.misc        → bdg.utils.version.value,
-        breeze                → "0.13.2",
-        cats                  → "1.0.1",
-        commons.io            → "2.5",
-        commons.math          → "3.6.1",
-        case_app              → "2.0.0-M3",
-        guava                 → "19.0",
-        htsjdk                → "2.9.1",
-        kittens               → "1.0.0-RC2",
-        log4j                 → "1.7.21",
-        mllib                 → sparkVersion.value,
-        parquet_avro          → "1.8.1",
-        purecsv               → "0.1.1",
-        scalatags             → "0.6.7",
-        scalautils            → "2.1.5",
-        seqdoop_hadoop_bam    → "7.9.0",
-        shapeless             → "2.3.3",
-        slf4j                 → "1.3.1",
-        spire                 → "0.15.0"
+        args4j             → "2.33",
+        autowire           → "0.2.6",
+        boopickle          → "1.3.0",
+        breeze             → "0.13.2",
+        cats               → "1.0.1",
+        case_app           → "2.0.0-M3",
+        guava              → "19.0",
+        htsjdk             → "2.9.1",
+        kittens            → "1.0.0-RC2",
+        log4j              → "1.7.21",
+        mllib              → sparkVersion.value,
+        parquet_avro       → "1.8.1",
+        purecsv            → "0.1.1",
+        scalatags          → "0.6.7",
+        scalautils         → "2.1.5",
+        seqdoop_hadoop_bam → "7.9.0",
+        shapeless          → "2.3.3",
+        slf4j              → "1.3.1",
+        spire              → "0.15.0"
       ),
 
-      circe.defaultVersions,
-      http4s.defaultVersions
-    )
+      commons.defaults
+    ) ++
+    bdg.defaults ++
+    circe.defaults ++
+    http4s.defaults
 }
