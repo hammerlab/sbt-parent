@@ -26,19 +26,24 @@ object JS
     object scalajs {
 
       val       dom = "org.scala-js" ^^ "scalajs-dom"
-      val react_dep = "com.github.japgolly.scalajs-react" ^^ "core"
 
-      val react: Seq[Setting[_]] =
+      object react {
+        val dep = "com.github.japgolly.scalajs-react" ^^ "core"
+        val version = SettingKey[String]("reactVersion", "Version of react and react-dom for npm dependencies")
+      }
+
+      implicit def reactSettings(r: react.type): Seq[Setting[_]] =
         Seq(
           deps ++= Seq(
             scalacss,
-            scalajs.react_dep
+            r.dep
           ),
           npmDependencies in Compile ++= Seq(
-            "react"     → "15.6.1",
-            "react-dom" → "15.6.1"
+            "react"     → r.version.value,
+            "react-dom" → r.version.value
           )
-        ) ++ scalajs
+        ) ++
+        scalajs
 
       val stubs = libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
     }
