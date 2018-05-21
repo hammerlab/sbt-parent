@@ -63,8 +63,22 @@ object JS
         val jsVersion = SettingKey[String]("reactJSVersion", "Version of react JS libraries")
         val webjars =
           jsDependencies ++= Seq(
-            "org.webjars.bower" % "react" % jsVersion.value / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
-            "org.webjars.bower" % "react" % jsVersion.value / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM"
+            "org.webjars.npm" % "react" % react.jsVersion.value
+              /        "umd/react.development.js"
+              minified "umd/react.production.min.js"
+              commonJSName "React",
+
+            "org.webjars.npm" % "react-dom" % react.jsVersion.value
+              /         "umd/react-dom.development.js"
+              minified  "umd/react-dom.production.min.js"
+              dependsOn "umd/react.development.js"
+              commonJSName "ReactDOM",
+
+            "org.webjars.npm" % "react-dom" % react.jsVersion.value
+              /         "umd/react-dom-server.browser.development.js"
+              minified  "umd/react-dom-server.browser.production.min.js"
+              dependsOn "umd/react-dom.development.js"
+              commonJSName "ReactDOMServer"
           )
 
         val defaults =
@@ -89,11 +103,11 @@ object JS
         val react = "io.suzaku" ^^ "diode-react"
         val defaults =
           Seq(
-            version := "1.1.2",
+            version := "1.1.3",
             versions ++=
               Seq(
                  core → version.value,
-                react → version.value
+                react → "1.1.3.120"
               )
           )
       }

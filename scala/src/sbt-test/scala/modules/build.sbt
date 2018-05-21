@@ -4,16 +4,16 @@ build(scala212Only)
 lazy val p1 = project.settings(
   addScala211,
   TaskKey[Unit]("check") := {
-    assert(scalaVersion.value == "2.12.4")
-    assert(crossScalaVersions.value == Seq("2.12.4", "2.11.12"))
+    assert(scalaVersion.value == "2.12.6")
+    assert(crossScalaVersions.value == Seq("2.12.6", "2.11.12"))
     ()
   }
 )
 
 lazy val p2 = project.settings(
   TaskKey[Unit]("check") := {
-    assert(scalaVersion.value == "2.12.4")
-    assert(crossScalaVersions.value == Seq("2.12.4"))
+    assert(scalaVersion.value == "2.12.6")
+    assert(crossScalaVersions.value == Seq("2.12.6"))
     ()
   }
 )
