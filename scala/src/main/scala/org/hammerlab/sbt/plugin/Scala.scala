@@ -101,7 +101,7 @@ object Scala
 
       scala210Version  := "2.10.7",
       scala211Version  := "2.11.12",
-      scala212Version  := "2.12.4",
+      scala212Version  := "2.12.6",
 
       versions ++= Seq(
         scala_lang    → scalaVersion.value,
