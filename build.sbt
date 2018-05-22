@@ -27,7 +27,7 @@ lazy val lib = project.settings(
 )
 
 lazy val assembly = project.settings(
-  v"4.4.2",
+  v"4.5.0",
   sbtAssembly,
   sbtScalaJS
 ).dependsOn(
@@ -73,7 +73,7 @@ lazy val root = project.settings(
 )
 
 lazy val scala = project.settings(
-  v"4.4.2"
+  v"4.5.0"
 ).dependsOn(
   deps,
   lib,
@@ -81,7 +81,7 @@ lazy val scala = project.settings(
 )
 
 lazy val spark = project.settings(
-  v"4.4.3"
+  v"4.5.0"
 ).dependsOn(
   deps,
   lib,
@@ -99,7 +99,7 @@ lazy val test = project.settings(
 )
 
 lazy val travis = project.settings(
-  v"4.4.2",
+  v"4.5.0",
   scoverage,
   coveralls
 ).dependsOn(
@@ -116,7 +116,7 @@ lazy val versions = project.settings(
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
-  v"4.4.3",
+  v"4.5.0",
   coursier
 ).dependsOn(
   assembly,
