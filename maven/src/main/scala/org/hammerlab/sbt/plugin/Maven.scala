@@ -12,8 +12,33 @@ object Maven
   override def requires = Sonatype
   object autoImport {
     val mavenLocal = TaskKey[Unit]("maven-local", "Wrapper for publishM2 which skips non-SNAPSHOT modules")
+    val sonatypeStagingPrefix = settingKey[Option[String]]("ID to find nexus-staging Sonatype repositories under; typically the `organization` with dots removed, which then gets an integer appended to it, e.g. orghammerlab-XXXX")
+
+    def sonatypeStage (ids:     Int*) = sonatypeStages(ids)
+    def sonatypeStages(ids: Seq[Int]) =
+      resolvers ++=
+        sonatypeStagingPrefix
+          .value
+          .fold {
+            throw new IllegalStateException(
+              s"sonatypeStagingPrefix not set!"
+            )
+          } {
+            prefix ⇒
+              ids.map {
+                id ⇒
+                  sonatypeRepo(s"$prefix-$id")
+              }
+          }
   }
-  override def projectSettings: Seq[Def.Setting[_]] =
+  import autoImport.sonatypeStagingPrefix
+
+  override def globalSettings =
+    Seq(
+      sonatypeStagingPrefix := None
+    )
+
+  override def projectSettings =
     Seq(
       publishTo := {
         val nexus = "https://oss.sonatype.org/"

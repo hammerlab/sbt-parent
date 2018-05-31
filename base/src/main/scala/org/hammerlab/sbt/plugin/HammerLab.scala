@@ -2,10 +2,11 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
-import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.GitHub.autoImport._
-import org.hammerlab.sbt.plugin.Parent.autoImport._
-import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
+import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
+import org.hammerlab.sbt.plugin.  GitHub.autoImport._
+import org.hammerlab.sbt.plugin.   Maven.autoImport._
+import org.hammerlab.sbt.plugin.  Parent.autoImport._
+import org.hammerlab.sbt.plugin.   Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
@@ -113,6 +114,8 @@ object HammerLab
   override def globalSettings =
     Seq(
       organization := "org.hammerlab",
+      sonatypeStagingPrefix := Some("orghammerlab"),
+
       apache2,
 
       githubUser := Some("hammerlab"),
@@ -127,7 +130,7 @@ object HammerLab
           )
         ),
 
-      testSuiteVersion := "1.0.0",
+      testSuiteVersion := "1.0.1",
       testUtilsVersion := "1.0.1",
       addTestLib := true
     )

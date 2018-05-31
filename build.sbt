@@ -57,14 +57,14 @@ lazy val js = project.settings(
 )
 
 lazy val maven = project.settings(
-  r"4.1.0",
+  v"4.2.0",
   sonatype
 ).dependsOn(
   lib
 )
 
 lazy val root = project.settings(
-  r"4.4.1",
+  v"4.5.0",
   scoverage
 ).dependsOn(
   github,
