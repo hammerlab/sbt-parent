@@ -14,35 +14,49 @@ object Root
     ScoverageSbtPlugin
   ) {
   object autoImport {
-    val root = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
+    val isRoot = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
 
-    val rootSettings: Seq[Def.Setting[_]] =
-      Seq(
-          root := true,
+    object root {
+      def apply(
+        modules: ProjectReference*
+      )(
+        implicit
+        name: sourcecode.Name
+      ):
+        Project = {
+        val file = new File(".")
+        Project(name.value, file)
+          .settings(
+            settings,
+            github.repo(name.value)
+          )
+          .aggregate(modules: _*)
+      }
+
+      val settings =
+        Seq(
+          isRoot := true,
           mavenLocal := {}
-      ) ++
-      noopSettings
-
-    def rootProject(name: String,
-                    modules: ProjectReference*): Project = {
-      val file = new File(".")
-      Project(name, file)
-        .settings(
-          rootSettings,
-          github.repo(name)
-        )
-        .aggregate(modules: _*)
+        ) ++
+        noopSettings
     }
 
-    def rootProject(modules: ProjectReference*): Project = {
-      val file = new File(".")
-      val name = file.getCanonicalFile.getName
-      Project(name, file)
-        .settings(
-          rootSettings,
-          github.repo(name)
-        )
-        .aggregate(modules: _*)
+    object parent {
+      def apply(
+        modules: ProjectReference*
+      )(
+        implicit
+        name: sourcecode.Name
+      ):
+        Project = {
+        val file = new File(s"./${name.value}")
+        Project(name.value, file)
+          .settings(
+            root.settings,
+            github.repo(name.value)
+          )
+          .aggregate(modules: _*)
+      }
     }
 
     /**
@@ -56,6 +70,6 @@ object Root
 
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
-      root := false
+      isRoot := false
     )
 }

@@ -65,7 +65,10 @@ lazy val maven = project.settings(
 
 lazy val root = project.settings(
   v"4.5.0",
-  scoverage
+  scoverage,
+  dep(
+    "com.lihaoyi" ^^ "sourcecode" ^ "0.1.4"
+  )
 ).dependsOn(
   github,
   maven,

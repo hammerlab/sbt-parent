@@ -1,5 +1,5 @@
 
-val root = rootProject("foo", p1, p2)
+val foo = root(p1, p2)
 
 val scm =
   Some(

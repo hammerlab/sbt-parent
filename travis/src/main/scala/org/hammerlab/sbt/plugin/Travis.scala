@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.plugin.Root.autoImport.root
+import org.hammerlab.sbt.plugin.Root.autoImport.isRoot
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
@@ -94,7 +94,7 @@ object Travis
           }
         },
         Def.taskDyn[Unit] {
-          if (coverageEnabled.value && root.value) {
+          if (coverageEnabled.value && isRoot.value) {
             streams.value.log.info("Aggregating coverage reports")
             coverageAggregate
           } else {
