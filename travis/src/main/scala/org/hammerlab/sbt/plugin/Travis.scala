@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.plugin.Root.autoImport.root
+import org.hammerlab.sbt.plugin.Root.autoImport.isRoot
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
@@ -16,9 +16,12 @@ object Travis
 
   noopSettings += (coverageReport := {})
 
+  val travisScalaEnv = "TRAVIS_SCALA_VERSION"
+  def travisScalaVersion = System.getenv(travisScalaEnv)
+
   object autoImport {
-    val travisCoverageScalaVersion = settingKey[String]("Scala version to measure/report test-coverage for")
-    val coverageTest = taskKey[Unit]("Wrapper for test and, if $TRAVIS_SCALA_VERSION matches travisCoverageScalaVersion, coverageReport")
+    val travisCoverageScalaVersion = settingKey[Option[String]]("Scala version to measure/report test-coverage for")
+    val coverageTest = taskKey[Unit](s"Wrapper for test and, if $travisScalaEnv matches travisCoverageScalaVersion, coverageReport")
   }
 
   import autoImport._
@@ -29,7 +32,7 @@ object Travis
    * Command for building and submitting a coverage report in Travis, *only* for the build corresponding to a specific
    * Scala version (indicated by travisCoverageScalaVersion).
    */
-  val travisReport = taskKey[Unit]("Wrapper for coverageAggregate and coveralls, iff TRAVIS_SCALA_VERSION matches `travisCoverageScalaVersion`")
+  val travisReport = taskKey[Unit](s"Wrapper for coverageAggregate and coveralls, iff $travisScalaEnv matches `travisCoverageScalaVersion`")
 
   def travisReportTask = Def.taskDyn {
     val log = streams.value.log
@@ -37,30 +40,23 @@ object Travis
     implicit val pr = extracted.currentRef
     implicit val bs = extracted.structure
 
-    val actualTravisScalaVersion = System.getenv("TRAVIS_SCALA_VERSION")
     val tcsv = travisCoverageScalaVersion.value
 
     if (disableCoverallsEnv) {
       log.info(s"Coveralls reporting disabled by -Dcoveralls.disable")
       Def.task {}
-    } else if (actualTravisScalaVersion == tcsv) {
-
-      if (root.value) {
-        log.info("Aggregating coverage from submodules")
-        coverageAggregate.value
-      }
-
+    } else if (coverageEnabled.value) {
       log.info(s"Running coveralls")
       coveralls
     } else {
       log.info(
-        s"Skipping coverage reporting for scala version '${Option(actualTravisScalaVersion).getOrElse("")}' (env var: TRAVIS_SCALA_VERSION); reporting enabled for $tcsv (sbt key: travisCoverageScalaVersion)"
+        s"Skipping coverage reporting for scala version '${Option(travisScalaVersion).getOrElse("")}' (env var: $travisScalaEnv); reporting enabled for $tcsv (sbt key: travisCoverageScalaVersion)"
       )
       Def.task {}
     }
   }
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings =
     Seq(
       travisCoverageScalaVersion :=
         crossScalaVersions
@@ -84,16 +80,25 @@ object Travis
                   l.length < r.length
                 )
           }
-          .last,
+          .lastOption,
 
       coverageTest := Def.sequential(
-        (test in sbt.Test),
+        test in sbt.Test,
         Def.taskDyn[Unit] {
           if (coverageEnabled.value) {
-            streams.value.log.debug("Generating coverage reports")
+            streams.value.log.info("Generating coverage reports")
             coverageReport
           } else {
             streams.value.log.debug("Skipping coverageReport generation")
+            Def.task {}
+          }
+        },
+        Def.taskDyn[Unit] {
+          if (coverageEnabled.value && isRoot.value) {
+            streams.value.log.info("Aggregating coverage reports")
+            coverageAggregate
+          } else {
+            streams.value.log.debug("Skipping coverageReport aggregation")
             Def.task {}
           }
         }
@@ -101,12 +106,11 @@ object Travis
 
       travisReport := travisReportTask.value,
 
-      // Enable coverage-measurement if the TRAVIS_SCALA_VERSION env var matches the corresponding plugin setting.
       coverageEnabled := (
-        if (System.getenv("TRAVIS_SCALA_VERSION") == travisCoverageScalaVersion.value && !disableCoverallsEnv)
+        if (travisCoverageScalaVersion.value.contains(travisScalaVersion) && !disableCoverallsEnv)
           true
         else
           coverageEnabled.value
-        )
-    )
+      )
+  )
 }

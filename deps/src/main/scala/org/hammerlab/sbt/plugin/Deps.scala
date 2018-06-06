@@ -11,6 +11,12 @@ object Deps
     Versions
   ) {
 
+  sealed abstract class DepArg(val deps: Seq[Dep])
+  object DepArg {
+    implicit class SingleDep(dep: Dep) extends DepArg(Seq(dep))
+    implicit class MultiDep(_deps: Seq[Dep]) extends DepArg(_deps)
+  }
+
   object autoImport {
     val               deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
     val           testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies")
@@ -30,9 +36,21 @@ object Deps
     /**
      * Short-hand for declaring a sequence of dependencies
      */
-    def dep(ds: Dep*) = deps ++= ds
+    def dep(ds: DepArg*) = deps ++= ds.flatMap(_.deps)
 
-    def group(name: String) = organization := name
+    def group(org: String) = organization := org
+    def group(org: String, artifact: String) =
+      Seq(
+        organization := org,
+        name := artifact
+      )
+
+    def subgroup(org: String) = organization := s"${organization.value}.$org"
+    def subgroup(org: String, artifact: String) =
+      Seq(
+        organization := s"${organization.value}.$org",
+        name := artifact
+      )
 
     val    tests = Configuration.Test
     val testtest = Configuration.TestTest

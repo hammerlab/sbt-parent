@@ -1,7 +1,7 @@
 
 build(
   enableMacroParadise,
-  scala211Only
+  `2.11`.only
 )
 
 TaskKey[Unit]("check") := {

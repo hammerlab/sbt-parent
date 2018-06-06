@@ -31,7 +31,7 @@ object Spark
      * Add Spark dependencies and set the Scala version to 2.11.x
      */
     val addSparkDeps: SettingsDefinition =
-      scala211Only ++
+      `2.11`.only ++
       Seq(
         deps ++=
           Seq(

@@ -11,14 +11,16 @@ default(
 
   excludes += "b1" ^^ "b2",
 
-  providedDeps += "c1" ^ "c2" ^ "c3"
+  providedDeps += "c1" ^ "c2" ^ "c3",
+
+  scalaVersion := "2.12.6"
 )
 
 TaskKey[Unit]("check") := {
   assert(
     libraryDependencies.value ==
       Seq(
-        "org.scala-lang" % "scala-library" % "2.12.4",
+        "org.scala-lang" % "scala-library" % "2.12.6",
         "a1" %% "a2" % "a3" % "test",
         "c1"  % "c2" % "c3" % "provided"
       )
@@ -45,10 +47,11 @@ lazy val a = project.settings(
     assert(
       libraryDependencies.value ==
         Seq(
-          "org.scala-lang" % "scala-library" % "2.12.4",
+          "org.scala-lang" % "scala-library" % "2.12.6",
           "a1" %% "a2" % "a3" % "test",
           "c1"  % "c2" % "c3" % "provided"
-        )
+        ),
+      s"${libraryDependencies.value}"
     )
 
     assert(
@@ -61,7 +64,8 @@ lazy val a = project.settings(
             Vector(),
             CrossVersion.Binary()
           )
-        )
+        ),
+      s"${excludeDependencies.value}"
     )
     ()
   }

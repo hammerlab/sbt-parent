@@ -19,15 +19,15 @@ val     sbtScalaJS = addSbtPlugin("org.scala-js"    % "sbt-scalajs"         % "0
 val scalaJSBundler = addSbtPlugin("ch.epfl.scala"   % "sbt-scalajs-bundler" % "0.10.0")
 
 lazy val lib = project.settings(
+  r"4.1.0",
   sbtPlugin := false,
   resolvers += Resolver.url("sbt-plugins", "https://dl.bintray.com/scala-js/scala-js-releases/")(Resolver.ivyStylePatterns),
   providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
-  sbtScalaJS,
-  r"4.1.0"
+  sbtScalaJS
 )
 
 lazy val assembly = project.settings(
-  r"4.4.1",
+  v"4.5.0",
   sbtAssembly,
   sbtScalaJS
 ).dependsOn(
@@ -38,7 +38,7 @@ lazy val assembly = project.settings(
 )
 
 lazy val deps = project.settings(
-  r"4.4.1",
+  v"4.4.2",
   sbtScalaJS
 ).dependsOn(
   lib,
@@ -48,7 +48,7 @@ lazy val deps = project.settings(
 lazy val github = project.settings(r"4.1.0")
 
 lazy val js = project.settings(
-  r"1.1.1",
+  v"1.1.2",
   sbtScalaJS,
   scalaJSBundler
 ).dependsOn(
@@ -57,15 +57,18 @@ lazy val js = project.settings(
 )
 
 lazy val maven = project.settings(
-  r"4.1.0",
+  v"4.2.0",
   sonatype
 ).dependsOn(
   lib
 )
 
 lazy val root = project.settings(
-  r"4.4.1",
-  scoverage
+  v"4.5.0",
+  scoverage,
+  dep(
+    "com.lihaoyi" ^^ "sourcecode" ^ "0.1.4"
+  )
 ).dependsOn(
   github,
   maven,
@@ -73,7 +76,7 @@ lazy val root = project.settings(
 )
 
 lazy val scala = project.settings(
-  r"4.4.1"
+  v"4.5.0"
 ).dependsOn(
   deps,
   lib,
@@ -81,7 +84,7 @@ lazy val scala = project.settings(
 )
 
 lazy val spark = project.settings(
-  v"4.4.2"
+  v"4.5.0"
 ).dependsOn(
   deps,
   lib,
@@ -91,7 +94,7 @@ lazy val spark = project.settings(
 )
 
 lazy val test = project.settings(
-  r"4.4.1"
+  v"4.4.2"
 ).dependsOn(
   deps,
   lib,
@@ -99,7 +102,7 @@ lazy val test = project.settings(
 )
 
 lazy val travis = project.settings(
-  r"4.4.1",
+  v"4.5.0",
   scoverage,
   coveralls
 ).dependsOn(
@@ -116,7 +119,7 @@ lazy val versions = project.settings(
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
-  v"4.4.2",
+  v"4.5.0",
   coursier
 ).dependsOn(
   assembly,
@@ -135,7 +138,7 @@ lazy val parent = project.settings(
 
 // All-purpose hammerlab-specific plugin
 lazy val base = project.settings(
-  v"4.4.2",
+  v"4.5.0",
 ).dependsOn(
   parent
 )
