@@ -4,4 +4,4 @@ sys.props.get("plugin.version") match {
                         |Specify this property using the scriptedLaunchOpts -D.""".stripMargin)
 }
 
-addSbtPlugin("org.hammerlab.sbt" % "root" % "4.1.0")
+addSbtPlugin("org.hammerlab.sbt" % "root" % "4.5.0")
