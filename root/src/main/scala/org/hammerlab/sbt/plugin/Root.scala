@@ -52,8 +52,7 @@ object Root
         val file = new File(s"./${name.value}")
         Project(name.value, file)
           .settings(
-            root.settings,
-            github.repo(name.value)
+            root.settings
           )
           .aggregate(modules: _*)
       }

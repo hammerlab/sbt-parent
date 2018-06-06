@@ -2,7 +2,7 @@
 import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ gh }
 
 default(
-  scala212Only,
+  `2.12` only,
   group("org.hammerlab.sbt"),
   clearTestDeps,
   sbtPlugin := true
@@ -27,7 +27,7 @@ lazy val lib = project.settings(
 )
 
 lazy val assembly = project.settings(
-  v"4.5.0",
+  r"4.5.0",
   sbtAssembly,
   sbtScalaJS
 ).dependsOn(
@@ -38,7 +38,7 @@ lazy val assembly = project.settings(
 )
 
 lazy val deps = project.settings(
-  v"4.4.2",
+  r"4.4.2",
   sbtScalaJS
 ).dependsOn(
   lib,
@@ -48,7 +48,7 @@ lazy val deps = project.settings(
 lazy val github = project.settings(r"4.1.0")
 
 lazy val js = project.settings(
-  v"1.1.2",
+  r"1.1.2",
   sbtScalaJS,
   scalaJSBundler
 ).dependsOn(
@@ -57,14 +57,14 @@ lazy val js = project.settings(
 )
 
 lazy val maven = project.settings(
-  v"4.2.0",
+  r"4.2.0",
   sonatype
 ).dependsOn(
   lib
 )
 
 lazy val root = project.settings(
-  v"4.5.0",
+  v"4.5.1",
   scoverage,
   dep(
     "com.lihaoyi" ^^ "sourcecode" ^ "0.1.4"
@@ -76,7 +76,7 @@ lazy val root = project.settings(
 )
 
 lazy val scala = project.settings(
-  v"4.5.0"
+  r"4.5.0"
 ).dependsOn(
   deps,
   lib,
@@ -84,7 +84,7 @@ lazy val scala = project.settings(
 )
 
 lazy val spark = project.settings(
-  v"4.5.0"
+  r"4.5.0"
 ).dependsOn(
   deps,
   lib,
@@ -94,7 +94,7 @@ lazy val spark = project.settings(
 )
 
 lazy val test = project.settings(
-  v"4.4.2"
+  r"4.4.2"
 ).dependsOn(
   deps,
   lib,
@@ -102,7 +102,7 @@ lazy val test = project.settings(
 )
 
 lazy val travis = project.settings(
-  v"4.5.0",
+  v"4.5.1",
   scoverage,
   coveralls
 ).dependsOn(
@@ -119,7 +119,7 @@ lazy val versions = project.settings(
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
-  v"4.5.0",
+  v"4.5.1",
   coursier
 ).dependsOn(
   assembly,
@@ -138,13 +138,12 @@ lazy val parent = project.settings(
 
 // All-purpose hammerlab-specific plugin
 lazy val base = project.settings(
-  v"4.5.0",
+  v"4.5.1",
 ).dependsOn(
   parent
 )
 
-lazy val sbt_parent = rootProject(
-  "sbt-parent",
+lazy val `sbt-parent` = Root.autoImport.root(
   assembly,
   base,
   deps,
