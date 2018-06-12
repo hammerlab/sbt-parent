@@ -92,8 +92,8 @@ object HammerLab
       val io = io_utils
 
       object test {
-        object suite extends dsl.Dep(lib("test", "suite"))
-        object  base extends dsl.Dep(lib("test",  "base"))
+        object suite extends dsl.Lib(lib("test", "suite"))
+        object  base extends dsl.Lib(lib("test",  "base"))
       }
     }
   }

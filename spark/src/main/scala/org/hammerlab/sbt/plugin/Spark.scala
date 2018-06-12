@@ -1,8 +1,8 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.dsl.Dep
+import org.hammerlab.sbt.deps.Dep
+import org.hammerlab.sbt.dsl.{ Lib, Libs }
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Scala.autoImport._
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.DefaultVersion
@@ -22,41 +22,40 @@ object Spark
   val core = lib
 
   object autoImport {
-    object spark extends Dep(core ^ "2.2.1") {
+    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.2.1") - scalatest) {
       /**
        * Add Spark dependencies and set the spark version
        */
       def apply(v: String): SettingsDefinition = Seq(version := v) ++ settings
       def apply(): SettingsDefinition = settings
 
-      val   core = dep
+      val   core = lib
       val graphx = lib
       val  mllib = lib
       val    sql = lib
 
-      object tests extends Dep(("org.hammerlab" ^^ "spark-tests" ^ "2.3.1") - hadoop)
+      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.1") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
        */
       override val settings: SettingsDefinition =
         `2.11`.only ++
-          Seq(
-            deps ++=
-              Seq(
-                spark.core provided,
-                spark.tests.dep tests,
-                hadoop.dep provided,
-                kryo.dep
-              ),
+        Seq(
+          Deps.autoImport.dep(
+            spark.core provided,
+            spark.tests tests,
+            hadoop provided,
+            kryo
+          ),
 
-            // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
-            excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
-          )
+          // This trans-dep creates a mess in Spark+Hadoop land; just exclude it everywhere by default.
+          excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
+        )
     }
 
-    object hadoop extends Dep("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3")
-    object   kryo extends Dep("com.esotericsoftware.kryo" ^ "kryo" ^ "2.24.0")
+    object hadoop extends Lib("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3")
+    object   kryo extends Lib("com.esotericsoftware.kryo" ^ "kryo" ^ "2.24.0")
   }
 
   private val computedSparkVersion  = settingKey[String]( "Spark version to use, taking in to account 'spark.version' system property")
@@ -68,11 +67,11 @@ object Spark
     Seq(
 
       versions ++= Seq[DefaultVersion](
-        spark.  core → computedSparkVersion .value,
-        spark.graphx → computedSparkVersion .value,
-        spark. mllib → computedSparkVersion .value,
-        spark.   sql → computedSparkVersion .value,
-        spark. tests → spark.tests. version .value
+        spark.  core → computedSparkVersion.value,
+        spark.graphx → computedSparkVersion.value,
+        spark. mllib → computedSparkVersion.value,
+        spark.   sql → computedSparkVersion.value,
+        spark. tests → spark.tests. version.value
       ),
 
       computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),

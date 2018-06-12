@@ -1,10 +1,9 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.{ Group, SnapshotOps }
-import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, spark }
-import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
+import org.hammerlab.sbt.dsl.Libs
+import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
-import sbt._
 
 object Parent
   extends Plugin(
@@ -48,24 +47,16 @@ object Parent
       object quinine {
         val core = ("org.bdgenomics.quinine" ^^ "quinine-core") - adam.core
       }
-      object utils {
-        val version = SettingKey[String]("bdgUtilsVersion", "org.bdgenomics.utils version to use")
-        def lib(name: String) = "org.bdgenomics.utils" ^^ s"utils-$name"
-        val intervalrdd = lib("intervalrdd-spark2")
-        val          io = lib("io-spark2")
-        val     metrics = lib("metrics-spark2")
-        val        misc = lib("misc-spark2")
-        val defaults =
-          Seq(
-            version := "0.2.13",
-            versions ++=
-              Seq(
-                intervalrdd → version.value,
-                         io → version.value,
-                    metrics → version.value,
-                       misc → version.value,
-              )
-          )
+      object utils
+        extends Libs(
+          "org.bdgenomics.utils" ^^ "utils" ^ "0.2.13",
+          (prefix, name) ⇒ s"$prefix-$name-spark2"
+        )
+      {
+        val intervalrdd = lib
+        val          io = lib
+        val     metrics = lib
+        val        misc = lib
       }
       val defaults =
         Seq(
@@ -86,46 +77,18 @@ object Parent
         )
     }
 
-    object circe {
-      val version = SettingKey[String]("circeVersion", "Circe JSON library version")
-      def lib(name: String) = "io.circe" ^^ s"circe-$name"
-      val generic = lib("generic")
-      val literal = lib("literal")
-      val    core = lib("core")
-      val  parser = lib("parser")
-
-      val defaults =
-        Seq(
-          version := "0.9.3",
-          versions ++=
-            Seq(
-              generic → version.value,
-              literal → version.value,
-                 core → version.value,
-               parser → version.value
-            )
-        )
+    object circe extends Libs("io.circe" ^^ "circe" ^ "0.9.3") {
+      val generic = lib
+      val literal = lib
+      val    core = lib
+      val  parser = lib
     }
 
-    object http4s {
-      val version = SettingKey[String]("http4sVersion", "HTTP4S version")
-      def lib(name: String) = "org.http4s" ^^ s"http4s-$name"
-      val blaze_server = lib("blaze-server")
-      val blaze_client = lib("blaze-client")
-      val        circe = lib("circe")
-      val          dsl = lib("dsl")
-
-      val defaults =
-        Seq(
-          version := "0.18.11",
-          versions ++=
-            Seq(
-              blaze_server → version.value,
-              blaze_client → version.value,
-                     circe → version.value,
-                       dsl → version.value
-            )
-        )
+    object http4s extends Libs("org.http4s" ^^ "http4s" ^ "0.18.11") {
+      val `blaze-server` = lib
+      val `blaze-client` = lib
+      val         circe  = lib
+      val           dsl  = lib
     }
   }
 

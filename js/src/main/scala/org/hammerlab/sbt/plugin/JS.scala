@@ -25,7 +25,7 @@ object JS
 
     object scalajs {
 
-      object css extends dsl.Dep("com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3") {
+      object css extends dsl.Lib("com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3") {
         val  core = dep
         val react = group ^^ "ext-react"
         override val defaults: SettingsDefinition =
@@ -38,7 +38,7 @@ object JS
 
       val dom = "org.scala-js" ^^ "scalajs-dom"
 
-      object react extends dsl.Dep("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.2.0") {
+      object react extends dsl.Lib("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.2.0") {
         val  core = dep
         val extra = group ^^ "extra"
         val jsVersion = SettingKey[String]("reactJSVersion", "Version of react JS libraries")
@@ -87,7 +87,7 @@ object JS
           )
       }
 
-      object diode extends dsl.Dep("io.suzaku" ^^ "diode" ^ "1.1.3") {
+      object diode extends dsl.Lib("io.suzaku" ^^ "diode" ^ "1.1.3") {
         val core = dep
         val react = group ^^ "diode-react"
         override val defaults: SettingsDefinition =
