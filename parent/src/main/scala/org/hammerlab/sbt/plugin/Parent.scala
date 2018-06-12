@@ -1,7 +1,7 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.{ Group, SnapshotOps }
-import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, sparkVersion }
+import org.hammerlab.sbt.plugin.Spark.autoImport.{ hadoop, spark }
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt._
@@ -31,7 +31,6 @@ object Parent
     val             htsjdk =       ("com.github.samtools"  ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
     val            kittens =              "org.typelevel" ^^ "kittens"
     val              log4j =                  "org.slf4j"  ^ "slf4j-log4j12"
-    val              mllib =          ("org.apache.spark" ^^ "spark-mllib") - scalatest
     val       parquet_avro =         "org.apache.parquet"  ^ "parquet-avro"
     val            purecsv =         "com.github.melrief" ^^ "purecsv"
     val          scalatags =                "com.lihaoyi" ^^ "scalatags"
@@ -144,7 +143,6 @@ object Parent
         htsjdk             → "2.9.1",
         kittens            → "1.0.0-RC2",
         log4j              → "1.7.21",
-        mllib              → sparkVersion.value,
         parquet_avro       → "1.8.1",
         purecsv            → "0.1.1",
         scalatags          → "0.6.7",

@@ -1,6 +1,6 @@
 import sbt.librarymanagement.InclExclRule
 
-addSparkDeps
+spark
 
 versions(
   spark → "2.1.1"
