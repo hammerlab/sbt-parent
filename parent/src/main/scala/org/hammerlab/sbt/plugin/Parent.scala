@@ -37,6 +37,7 @@ object Parent
     val         scalautils =             "org.scalautils" ^^ "scalautils"
     val          shapeless =                "com.chuusai" ^^ "shapeless"
     val              slf4j =                "org.clapper" ^^ "grizzled-slf4j"
+    val         sourcecode =                "com.lihaoyi" ^^ "sourcecode"
     val              spire =              "org.typelevel" ^^ "spire"
 
     object bdg {
@@ -150,6 +151,7 @@ object Parent
         seqdoop_hadoop_bam → "7.9.0",
         shapeless          → "2.3.3",
         slf4j              → "1.3.1",
+        sourcecode         → "0.1.4",
         spire              → "0.15.0"
       ),
 

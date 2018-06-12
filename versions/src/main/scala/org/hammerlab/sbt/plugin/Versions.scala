@@ -26,7 +26,7 @@ object Versions
   case class DefaultVersion(groupArtifact: GroupArtifact, version: String)
   object DefaultVersion {
     implicit def fromTuple(t: (Dep, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
-    implicit def fromDslDep(t: (dsl.Dep, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
+    implicit def fromDslDepTuple(t: (dsl.Dep, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
   }
 
   /**

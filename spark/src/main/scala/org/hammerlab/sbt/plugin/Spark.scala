@@ -1,7 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.dsl
-import org.hammerlab.sbt.deps.Dep
+import org.hammerlab.sbt.dsl.Dep
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Scala.autoImport._
@@ -19,31 +18,28 @@ object Spark
     Versions
   ) {
 
+  private def lib(implicit name: sourcecode.Name) = ("org.apache.spark" ^^ s"spark-${name.value}") - scalatest
+  val core = lib
+
   object autoImport {
-    object spark extends dsl.Dep(spark.core) {
+    object spark extends Dep(core ^ "2.2.1") {
       /**
        * Add Spark dependencies and set the spark version
        */
       def apply(v: String): SettingsDefinition = Seq(version := v) ++ settings
       def apply(): SettingsDefinition = settings
 
-      def lib(name: String) = ("org.apache.spark" ^^ s"spark-$name") - scalatest
+      val   core = dep
+      val graphx = lib
+      val  mllib = lib
+      val    sql = lib
 
-      val   core = lib(  "core")
-      val graphx = lib("graphx")
-      val  mllib = lib( "mllib")
-      val    sql = lib(   "sql")
-
-      object tests {
-        val dep = ("org.hammerlab" ^^ "spark-tests") - hadoop
-        val version = SettingKey[String]("sparkTestsVersion", "Version of org.hammerlab::spark-tests to use")
-      }
-      implicit def testsDep(t: tests.type): Dep = t.dep
+      object tests extends Dep(("org.hammerlab" ^^ "spark-tests" ^ "2.3.1") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
        */
-      val settings: SettingsDefinition =
+      override val settings: SettingsDefinition =
         `2.11`.only ++
           Seq(
             deps ++=
@@ -58,24 +54,13 @@ object Spark
             excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
           )
     }
-    implicit def sparkDep(s: spark.type): Dep = spark.core
-    implicit def sparkSettings(s: spark.type): SettingsDefinition = spark.settings
 
-    object hadoop {
-      val dep = "org.apache.hadoop" ^ "hadoop-client"
-      val version = SettingKey[String]("hadoopVersion", "Hadoop version to use")
-    }
-    implicit def hadoopDep(h: hadoop.type): Dep = h.dep
-
-    object kryo {
-      val dep = "com.esotericsoftware.kryo" ^ "kryo"
-      val version = SettingKey[String]("kryoVersion", "Version of kryo to use")
-    }
-    implicit def kryoDep(k: kryo.type): Dep = k.dep
+    object hadoop extends Dep("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3")
+    object   kryo extends Dep("com.esotericsoftware.kryo" ^ "kryo" ^ "2.24.0")
   }
 
-  private val computedSparkVersion = settingKey[String]("Spark version to use, taking in to account 'spark.version' and 'spark1' env vars")
-  private val computedHadoopVersion = settingKey[String]("Hadoop version to use, taking in to account the 'hadoop.version' env var")
+  private val computedSparkVersion  = settingKey[String]( "Spark version to use, taking in to account 'spark.version' system property")
+  private val computedHadoopVersion = settingKey[String]("Hadoop version to use, taking in to account the 'hadoop.version' system property")
 
   import autoImport._
 
@@ -83,25 +68,22 @@ object Spark
     Seq(
 
       versions ++= Seq[DefaultVersion](
-          hadoop.   dep → computedHadoopVersion.value,
-            kryo.   dep → kryo.version         .value,
-        spark.  core    → computedSparkVersion .value,
-        spark.graphx    → computedSparkVersion .value,
-        spark. mllib    → computedSparkVersion .value,
-        spark.   sql    → computedSparkVersion .value,
-        spark.tests.dep → spark.tests.version  .value
+        spark.  core → computedSparkVersion .value,
+        spark.graphx → computedSparkVersion .value,
+        spark. mllib → computedSparkVersion .value,
+        spark.   sql → computedSparkVersion .value,
+        spark. tests → spark.tests. version .value
       ),
 
-      kryo.version := "2.24.0",
-      spark.tests.version := "2.3.1",
-
-      hadoop.version := "2.7.3",
       computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
 
-      spark.version := "2.2.1",
       computedSparkVersion := System.getProperty("spark.version", spark.version.value),
 
       // SparkContexts play poorly with parallel test-execution
       parallelExecution in sbt.Test := false
-    )
+    ) ++
+    kryo.defaults ++
+    spark.tests.defaults ++
+    hadoop.defaults ++
+    spark.defaults
 }

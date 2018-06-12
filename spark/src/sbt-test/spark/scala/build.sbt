@@ -10,6 +10,9 @@ TaskKey[Unit]("check") := {
   assert(scalaVersion.value == "2.11.12")
   assert(crossScalaVersions.value == Seq("2.11.12"))
 
+  // spark.version has
+  assert(spark.version.value == "2.2.1", spark.version)
+
   /**
    * Reproduce the Spark dependency, with ScalaTest excluded, that we expect to find in [[libraryDependencies]]
    *
