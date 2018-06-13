@@ -2,10 +2,10 @@ package org.hammerlab.sbt.dsl
 
 import hammerlab.show._
 import org.hammerlab.sbt.deps.{ CrossVersion, Dep, Group }
-import org.hammerlab.sbt.plugin.Versions.autoImport.{ defaultVersions, versions }
-import sbt.{ SettingKey, SettingsDefinition }
+import org.hammerlab.sbt.dsl.Base.showDep
+import org.hammerlab.sbt.plugin.Versions.autoImport.defaultVersions
 import sbt.internal.DslEntry
-import Base.showDep
+import sbt.{ SettingKey, SettingsDefinition }
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -13,6 +13,11 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
   def group: Group
   def version: SettingKey[String]
 
+  /**
+   * An input [[Dep]], or [[Dep]]-template, used to set a default [[Group]] and [[version]], though not necessarily a
+   * valid [[Dep]] itself (see [[Libs]], where [[base]] is a ctor argument providing a template from which to construct
+   * module-[[Dep]]s)
+   */
   protected def base: Dep
   def global: SettingsDefinition =
     base
@@ -20,10 +25,20 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
       .map { version := _ }
       .toSeq
 
+  /**
+   * Settings that this [[Base]] will implicitly convert to, where necessary
+   */
   def settings: SettingsDefinition = Seq()
 
+  /**
+   * Default [[Dep]] to implicitly unroll this [[Base]] as; see [[Base.toDep]]
+   */
   def dep: Dep
-  def deps: Seq[Dep]
+
+  /**
+   * Hook for letting a [[Base]] decide how it should be unrolled to one or more [[Dep]]s
+   */
+  def deps: Seq[Dep] = Seq(dep)
 
   val name = {
     val names =
@@ -67,7 +82,6 @@ extends Base {
 
   /** if a version is passed in, send it through [[org.hammerlab.sbt.plugin.Versions.autoImport.versions]] */
   val dep: Dep = base.copy(version = None)
-  val deps = Seq(dep)
 
   val group = dep.group
   val version =
@@ -96,15 +110,16 @@ class Libs(
       show"Version of ${base.copy(artifact = s"${artifact("*")}")} to use"
     )
 
-  def dep: Dep = deps.head
-  val deps = ArrayBuffer[Dep]()
+  def dep: Dep = libs.head
+
+  protected val libs = ArrayBuffer[Dep]()
   def lib(implicit name: sourcecode.Name) = {
     val dep =
       base.copy(
         artifact = artifact(name.value),
          version = None
       )
-    deps += dep
+    libs += dep
     dep
   }
 }
