@@ -13,7 +13,8 @@ object Test
   object autoImport {
     val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
 
-    val publishTestJar = publishArtifact in sbt.Test := true
+    val publishTestJar =
+        publishArtifact in sbt.Test := publishArtifact.value
 
     val scalatest = "org.scalatest" ^^ "scalatest"
   }
