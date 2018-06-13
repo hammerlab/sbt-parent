@@ -31,7 +31,7 @@ object Spark
       val  mllib = lib
       val    sql = lib
 
-      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.1") - hadoop)
+      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.2") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
