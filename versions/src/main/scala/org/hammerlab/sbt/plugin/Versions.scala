@@ -155,7 +155,8 @@ object Versions
           defaultVersions
             .value
             .map { d ⇒ d.groupArtifact → d.version }
-            .toMap
+            .groupBy(_._1)
+            .mapValues(_.last._2)
         )
     )
 }

@@ -64,7 +64,7 @@ object Parent
             formats → "0.10.1"
           )
         ) ++
-        utils.defaults
+        utils.global
     }
 
     object commons {
@@ -94,9 +94,13 @@ object Parent
 
   import autoImport._
 
+  override def globalSettings =
+    circe.global ++
+    http4s.global
+
   override def projectSettings =
     Seq(
-      versions ++= Seq(
+      versions(
         args4j             → "2.33",
         autowire           → "0.2.6",
         boopickle          → "1.3.0",
@@ -121,6 +125,6 @@ object Parent
       commons.defaults
     ) ++
     bdg.defaults ++
-    circe.defaults ++
-    http4s.defaults
+    circe.project ++
+    http4s.project
 }

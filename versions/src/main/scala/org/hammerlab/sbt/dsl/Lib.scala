@@ -2,7 +2,7 @@ package org.hammerlab.sbt.dsl
 
 import hammerlab.show._
 import org.hammerlab.sbt.deps.{ CrossVersion, Dep, Group }
-import org.hammerlab.sbt.plugin.Versions.autoImport.versions
+import org.hammerlab.sbt.plugin.Versions.autoImport.{ defaultVersions, versions }
 import sbt.{ SettingKey, SettingsDefinition }
 import sbt.internal.DslEntry
 import Base.showDep
@@ -12,8 +12,15 @@ import scala.collection.mutable.ArrayBuffer
 sealed abstract class Base(implicit fullname: sourcecode.FullName) {
   def group: Group
   def version: SettingKey[String]
-  def defaults: SettingsDefinition
-  def settings: SettingsDefinition
+
+  protected def base: Dep
+  def global: SettingsDefinition =
+    base
+      .version
+      .map { version := _ }
+      .toSeq
+
+  def settings: SettingsDefinition = Seq()
 
   def dep: Dep
   def deps: Seq[Dep]
@@ -33,10 +40,15 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
         )
       }
   }
+
+  def project: SettingsDefinition =
+    Seq(
+      versions ++= deps.map(_ → version.value)
+    )
 }
 
 class Lib(
-  d: Dep
+  protected val base: Dep
 )(
   implicit
   fullname: sourcecode.FullName
@@ -44,7 +56,7 @@ class Lib(
 extends Base {
 
   /** if a version is passed in, send it through [[org.hammerlab.sbt.plugin.Versions.autoImport.versions]] */
-  val dep: Dep = d.copy(version = None)
+  val dep: Dep = base.copy(version = None)
   val deps = Seq(dep)
 
   val group = dep.group
@@ -53,60 +65,38 @@ extends Base {
       s"$name-version",
       show"Version of $dep to use"
     )
-
-  def defaults: SettingsDefinition =
-    Seq(
-      versions += dep → version.value
-    ) ++
-    d
-      .version
-      .map { version := _ }
-      .toSeq
-
-  def settings: SettingsDefinition = Seq()
 }
 
 class Libs(
-  d: Dep,
+  protected val base: Dep,
   artifactFn: (String, String) ⇒ String = (prefix, name) ⇒ s"$prefix-$name"
 )(
   implicit
   fullname: sourcecode.FullName
 )
   extends Base {
-  val group = d.group
-  val artifactPrefix = d.artifact.value
+  val group = base.group
+  val artifactPrefix = base.artifact.value
 
   def artifact(name: String) = artifactFn(artifactPrefix, name)
 
   val version =
     SettingKey[String](
       s"$name-version",
-      show"Version of ${d.copy(artifact = s"${artifact("*")}")} to use"
+      show"Version of ${base.copy(artifact = s"${artifact("*")}")} to use"
     )
 
   def dep: Dep = deps.head
   val deps = ArrayBuffer[Dep]()
   def lib(implicit name: sourcecode.Name) = {
     val dep =
-      d.copy(
+      base.copy(
         artifact = artifact(name.value),
          version = None
       )
     deps += dep
     dep
   }
-
-  def defaults: SettingsDefinition =
-    Seq(
-      versions ++= deps.map(_ → version.value)
-    ) ++
-    d
-      .version
-      .map { version := _ }
-      .toSeq
-
-  def settings: SettingsDefinition = Seq()
 }
 
 object Base {

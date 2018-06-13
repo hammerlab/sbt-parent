@@ -28,8 +28,8 @@ object JS
       object css extends dsl.Lib("com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3") {
         val  core = dep
         val react = group ^^ "ext-react"
-        override val defaults: SettingsDefinition =
-          super.defaults ++
+        override val global: SettingsDefinition =
+          super.global ++
           Seq(
             versions +=
               react → version.value
@@ -62,8 +62,8 @@ object JS
               commonJSName "ReactDOMServer"
           )
 
-        override val defaults: SettingsDefinition =
-          super.defaults ++
+        override val global: SettingsDefinition =
+          super.global ++
           Seq(
             jsVersion := "16.2.0",
             versions +=
@@ -90,8 +90,8 @@ object JS
       object diode extends dsl.Lib("io.suzaku" ^^ "diode" ^ "1.1.3") {
         val core = dep
         val react = group ^^ "diode-react"
-        override val defaults: SettingsDefinition =
-          super.defaults ++
+        override val global: SettingsDefinition =
+          super.global ++
           Seq(
             versions +=
                 react → "1.1.3.120"
@@ -116,13 +116,18 @@ object JS
 
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def globalSettings =
+    scalajs.react.global ++
+    scalajs.diode.global ++
+    scalajs.  css.global
+
+  override def projectSettings =
     Seq(
       versions(
         scalajs.dom → "0.9.3"
       )
     ) ++
-    scalajs.react.defaults ++
-    scalajs.diode.defaults ++
-    scalajs.css.defaults
+    scalajs.react.project ++
+    scalajs.diode.project ++
+    scalajs.  css.project
 }

@@ -18,9 +18,6 @@ object Spark
     Versions
   ) {
 
-  private def lib(implicit name: sourcecode.Name) = ("org.apache.spark" ^^ s"spark-${name.value}") - scalatest
-  val core = lib
-
   object autoImport {
     object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.2.1") - scalatest) {
       /**
@@ -70,19 +67,23 @@ object Spark
         spark.  core → computedSparkVersion.value,
         spark.graphx → computedSparkVersion.value,
         spark. mllib → computedSparkVersion.value,
-        spark.   sql → computedSparkVersion.value,
-        spark. tests → spark.tests. version.value
+        spark.   sql → computedSparkVersion.value
       ),
 
       computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
-
-      computedSparkVersion := System.getProperty("spark.version", spark.version.value),
+      computedSparkVersion  := System.getProperty( "spark.version",  spark.version.value),
 
       // SparkContexts play poorly with parallel test-execution
       parallelExecution in sbt.Test := false
     ) ++
-    kryo.defaults ++
-    spark.tests.defaults ++
-    hadoop.defaults ++
-    spark.defaults
+           kryo.global ++
+    spark.tests.global ++
+         hadoop.global ++
+          spark.global
+
+  override def projectSettings =
+           kryo.project ++
+    spark.tests.project ++
+         hadoop.project ++
+          spark.project
 }
