@@ -1,3 +1,4 @@
+import org.hammerlab.sbt.deps.Dep
 
 default(
   clearTestDeps,
@@ -26,7 +27,7 @@ lazy val a = project.settings(
 lazy val b = project.settings(
   testDeps += scalatest,
   TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq(scalatest))
+    assert(testDeps.value == Seq[Dep](scalatest))
     ()
   }
 )
@@ -34,7 +35,7 @@ lazy val b = project.settings(
 lazy val c = crossProject.settings(
   testDeps += scalatest,
   TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq(scalatest))
+    assert(testDeps.value == Seq[Dep](scalatest), s"${testDeps.value} $scalatest")
     ()
   }
 )

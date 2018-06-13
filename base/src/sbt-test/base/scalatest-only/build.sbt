@@ -1,3 +1,4 @@
+import org.hammerlab.sbt.deps.Dep
 
 default(
   scalatestOnly
@@ -6,13 +7,13 @@ default(
 lazy val a = crossProject
 lazy val aJS  = a.js.settings(
   TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq(scalatest))
+    assert(testDeps.value == Seq[Dep](scalatest))
     ()
   }
 )
 lazy val aJVM = a.jvm.settings(
   TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq(scalatest))
+    assert(testDeps.value == Seq[Dep](scalatest))
     ()
   }
 )
