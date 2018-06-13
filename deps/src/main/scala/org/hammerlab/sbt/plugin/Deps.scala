@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.dsl
 import org.hammerlab.sbt.deps.{ Configuration, Dep, Group, CrossVersion }
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
@@ -15,6 +16,7 @@ object Deps
   object DepArg {
     implicit class SingleDep(dep: Dep) extends DepArg(Seq(dep))
     implicit class MultiDep(_deps: Seq[Dep]) extends DepArg(_deps)
+    implicit class DslDep(dep: dsl.Base) extends DepArg(dep.deps)
   }
 
   object autoImport {

@@ -2,6 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
+import org.hammerlab.sbt.dsl
 import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.  GitHub.autoImport._
 import org.hammerlab.sbt.plugin.   Maven.autoImport._
@@ -81,9 +82,6 @@ object HammerLab
   }
 
   object autoImport extends all {
-    val testSuiteVersion = settingKey[String]("Version of org.hammerlab.test:suite test-dep to use")
-    val testUtilsVersion = settingKey[String]("Version of org.hammerlab.test:base test-dep to use")
-
     object hammerlab extends all {
 
       def apply(name: String) = lib(name)
@@ -94,15 +92,8 @@ object HammerLab
       val io = io_utils
 
       object test {
-        object suite {
-          val version = testSuiteVersion
-        }
-        implicit def toVersion(t: suite.type): Dep = testSuite
-
-        object base {
-          val version = testUtilsVersion
-        }
-        implicit def toVersion(t: base.type): Dep = testUtils
+        object suite extends dsl.Lib(lib("test", "suite"))
+        object  base extends dsl.Lib(lib("test",  "base"))
       }
     }
   }
@@ -130,8 +121,9 @@ object HammerLab
           )
         ),
 
-      testSuiteVersion := "1.0.1",
-      testUtilsVersion := "1.0.1",
+      hammerlab.test.suite.version := "1.0.1",
+      hammerlab.test. base.version := "1.0.1",
+
       addTestLib := true
     )
 
@@ -151,8 +143,8 @@ object HammerLab
       ),
 
       versions ++= Seq(
-        testSuite → testSuiteVersion.value,
-        testUtils → testUtilsVersion.value
+        hammerlab.test.suite → hammerlab.test.suite.version.value,
+        hammerlab.test. base → hammerlab.test. base.version.value
       ),
 
       /**
