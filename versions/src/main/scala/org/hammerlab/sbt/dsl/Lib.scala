@@ -43,7 +43,17 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
 
   def project: SettingsDefinition =
     Seq(
-      versions ++= deps.map(_ → version.value)
+      defaultVersions ++=
+        deps
+          .filterNot {
+            dep ⇒
+              defaultVersions
+                .value
+                .exists(
+                  _.groupArtifact == dep.groupArtifact
+                )
+          }
+          .map { _ → version.value }
     )
 }
 

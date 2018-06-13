@@ -1,31 +1,26 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.dsl.Lib
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.Versions.autoImport._
 import sbt.Keys._
 import sbt.TestFrameworks.ScalaTest
 import sbt._
 
 object Test
-  extends Plugin(Deps, Versions) {
+  extends Plugin(Deps) {
 
   object autoImport {
-    val scalatestVersion = settingKey[String]("Version of scalatest test-dep to use")
+    val publishTestJar =
+        publishArtifact in sbt.Test := publishArtifact.value
 
-    val publishTestJar = publishArtifact in sbt.Test := true
-
-    val scalatest = "org.scalatest" ^^ "scalatest"
+    object scalatest extends Lib("org.scalatest" ^^ "scalatest" ^ "3.0.4")
   }
 
   import autoImport._
 
   override def globalSettings =
     Seq(
-      defaultVersions += scalatest → scalatestVersion.value,
-
-      scalatestVersion := "3.0.4",
-
       // Output full stack-traces
       testOptions in sbt.Test += Tests.Argument(ScalaTest, "-oF"),
 
@@ -35,5 +30,9 @@ object Test
 
       // Add scalatest as a test-dep by default.
       testDeps += scalatest
-    )
+    ) ++
+    scalatest.global
+
+  override def projectSettings =
+    scalatest.project
 }

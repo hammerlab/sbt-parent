@@ -85,7 +85,7 @@ object Versions
     /**
      * Allow appends to [[versions]] to delegate to [[defaultVersions]]
      */
-    implicit def versionsAlias(v: versions.type): defaultVersions.type = defaultVersions
+    implicit def versionsAlias(v: versions.type): SettingKey[Seq[DefaultVersion]] = defaultVersions
 
     val revision = settingKey[Option[String]]("Implementation of `version` setting that automatically appends '-SNAPSHOT', unless `snapshot` is false")
 
