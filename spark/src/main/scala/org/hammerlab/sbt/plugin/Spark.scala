@@ -28,10 +28,10 @@ object Spark
 
       val   core = lib
       val graphx = lib
-      val  mllib = lib - ("org.spire-math" ^^ "spire")
+      val  mllib = lib
       val    sql = lib
 
-      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.2") - hadoop)
+      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.3") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x

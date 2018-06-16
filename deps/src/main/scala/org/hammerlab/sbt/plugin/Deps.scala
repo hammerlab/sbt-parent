@@ -16,7 +16,7 @@ object Deps
   object DepArg {
     implicit class SingleDep(dep: Dep) extends DepArg(Seq(dep))
     implicit class MultiDep(_deps: Seq[Dep]) extends DepArg(_deps)
-    implicit class DslDep(dep: dsl.Base) extends DepArg(dep.deps)
+    implicit class DslDep(dep: dsl.Base) extends DepArg(dep.asDeps)
   }
 
   object autoImport {

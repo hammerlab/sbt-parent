@@ -36,9 +36,15 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
   def dep: Dep
 
   /**
+   * Full list of [[Dep]]s contained in this [[Base]], for setting
+   * [[org.hammerlab.sbt.plugin.Versions.DefaultVersion default versions]] [[project below]]
+   */
+  def deps: Seq[Dep]
+
+  /**
    * Hook for letting a [[Base]] decide how it should be unrolled to one or more [[Dep]]s
    */
-  def deps: Seq[Dep] = Seq(dep)
+  def asDeps: Seq[Dep] = Seq(dep)
 
   val name = {
     val names =
@@ -82,6 +88,7 @@ extends Base {
 
   /** if a version is passed in, send it through [[org.hammerlab.sbt.plugin.Versions.autoImport.versions]] */
   val dep: Dep = base.copy(version = None)
+  def deps = Seq(dep)
 
   val group = dep.group
   val version =
@@ -89,6 +96,14 @@ extends Base {
       s"$name-version",
       show"Version of $dep to use"
     )
+}
+
+abstract class Name(override val toString: String)
+object Name {
+  implicit def sourceMacro(implicit name: sourcecode.Name) = new Name(name.value) {}
+  implicit def fromString(name: String): Name = new Name(name) {}
+  implicit def fromSymbol(name: Symbol): Name = new Name(name.name) {}
+  implicit def unwrap(name: Name): String = name.toString
 }
 
 class Libs(
@@ -111,12 +126,13 @@ class Libs(
     )
 
   def dep: Dep = libs.head
+  def deps = libs
 
   protected val libs = ArrayBuffer[Dep]()
-  def lib(implicit name: sourcecode.Name) = {
+  def lib(implicit name: Name) = {
     val dep =
       base.copy(
-        artifact = artifact(name.value),
+        artifact = artifact(name),
          version = None
       )
     libs += dep

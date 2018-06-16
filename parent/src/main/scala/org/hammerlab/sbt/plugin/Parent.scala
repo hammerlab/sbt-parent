@@ -1,7 +1,7 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.{ Group, SnapshotOps }
-import org.hammerlab.sbt.dsl.Libs
+import org.hammerlab.sbt.dsl.{ Lib, Libs }
 import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 
@@ -40,31 +40,32 @@ object Parent
     val              spire =              "org.typelevel" ^^ "spire"
 
     object bdg {
-      object adam {
-        val core = "org.bdgenomics.adam" ^^ "adam-core"
+      val artifactFn = (prefix: String, name: String) ⇒ s"$prefix-$name-spark2"
+      object adam
+        extends Libs(
+          "org.bdgenomics.adam" ^^ "adam" ^ "0.24.0",
+          artifactFn
+        ) {
+        val core = lib
       }
-      val formats = "org.bdgenomics.bdg-formats" ^ "bdg-formats"
-      object quinine {
-        val core = ("org.bdgenomics.quinine" ^^ "quinine-core") - adam.core
+      object formats extends Lib("org.bdgenomics.bdg-formats" ^ "bdg-formats" ^ "0.10.1")
+      object quinine extends Libs(("org.bdgenomics.quinine" ^^ "quinine" ^ "0.0.2") - adam.core) {
+        val core = lib
       }
       object utils
         extends Libs(
           "org.bdgenomics.utils" ^^ "utils" ^ "0.2.13",
-          (prefix, name) ⇒ s"$prefix-$name-spark2"
+          artifactFn
         )
       {
+        val         cli = lib
         val intervalrdd = lib
         val          io = lib
         val     metrics = lib
         val        misc = lib
       }
-      val defaults =
-        Seq(
-          versions(
-            formats → "0.10.1"
-          )
-        ) ++
-        utils.global
+      def global = Seq(adam, formats, quinine, utils).flatMap(_.global)
+      def project = Seq(adam, formats, quinine, utils).flatMap(_.project)
     }
 
     object commons {
@@ -96,7 +97,8 @@ object Parent
 
   override def globalSettings =
     circe.global ++
-    http4s.global
+    http4s.global ++
+    bdg.global
 
   override def projectSettings =
     Seq(
@@ -124,7 +126,7 @@ object Parent
 
       commons.defaults
     ) ++
-    bdg.defaults ++
+    bdg.project ++
     circe.project ++
     http4s.project
 }
