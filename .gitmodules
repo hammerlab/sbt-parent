@@ -1,0 +1,6 @@
+[submodule "g8/parent"]
+	path = g8/parent
+	url = git@github.com:hammerlab/sbt-parent.g8.git
+[submodule "g8/base"]
+	path = g8/base
+	url = git@github.com:hammerlab/sbt-base.g8.git
