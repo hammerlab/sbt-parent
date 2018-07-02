@@ -6,6 +6,12 @@ scala: 2.12.4
 env:
   - SBT_OPTS="-Xmx2G"
 
+git:
+  submodules: false
+before_install:
+  - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+  - git submodule update --init --recursive
+
 script: sbt scripted
 
 cache:
