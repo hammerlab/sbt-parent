@@ -85,7 +85,7 @@ object Parent
       val  parser = lib
     }
 
-    object http4s extends Libs("org.http4s" ^^ "http4s" ^ "0.18.11") {
+    object http4s extends Libs("org.http4s" ^^ "http4s" ^ "0.18.13") {
       val `blaze-server` = lib
       val `blaze-client` = lib
       val         circe  = lib
