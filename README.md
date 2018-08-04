@@ -1,32 +1,85 @@
 # sbt-parent
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.2.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
 [![](https://travis-ci.org/hammerlab/sbt-parent.svg?branch=master)](https://travis-ci.org/hammerlab/sbt-parent)
 
-[SBT](http://www.scala-sbt.org/) plugins reducing boilerplate for a variety of commmon tasks:
-- [`assembly`](assembly): building+publishing thin shaded JARs
-- [`deps`](deps): dependency-management DSL and helpers
-- [`maven`](maven): publishing to Maven Central, filling POM fields, adding resolvers
-- [`github`](github): filling in `scmInfo` information (and populating relevant POM fields)
-- [`parent`](parent): wrapper for all the plugins here, including aliases for common dependencies
-- [`root`](root): configuring multi-module projects
-- [`scala`](scala): managing/setting Scala versions
-- [`spark`](spark): configuring projects that use [Apache Spark](http://spark.apache.org/)
-- [`test`](test): using [ScalaTest](http://www.scalatest.org/), publishing `-tests` JARs
-- [`travis`](travis): interfacing with [Coveralls](https://coveralls.io/) and [TravisCI](https://travis-ci.org/)
-- [`versions`](versions): managing dependency-versions
+[SBT](http://www.scala-sbt.org/) plugins reducing boilerplate for a variety of commmon tasks
 
-To depend on all of them, add to `project/plugins.sbt`:
+## Modules
+
+### [`assembly`](assembly) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+- `sbt-assembly` wrapper
+- building+publishing thin shaded JARs
+
+### [`base`] [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+- wraps all modules in this project
+- adds many [hammerlab](https://github.com/hammerlab/) library-aliases default configs
+
+### [`deps`](deps) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Dependency-management DSL and helpers
+
+### [`maven`](maven) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Publish to Maven Central, fill POM fields, add default resolvers
+
+### [`github`](github) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Fill in `scmInfo` information, populate other relevant POM fields
+
+### [`parent`] [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+- wrapper for all the plugins here
+- includes aliases for common dependencies
+
+### [`root`](root) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Configure multi-module projects
+
+### [`scala`](scala) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+DSL and settings for managing Scala versions
+
+### [`spark`](spark) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Configure projects that use [Apache Spark](http://spark.apache.org/)
+
+### [`test`](test) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Use [ScalaTest](http://www.scalatest.org/), publish `-tests` JARs
+
+### [`travis`](travis) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Interface with [Coveralls](https://coveralls.io/) and [TravisCI](https://travis-ci.org/)
+
+### [`versions`](versions) [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+
+Manage dependency-versions
+
+## Usage
+
+### All modules: [`parent`]/[`base`]
+
+To depend on all the modules above, add the `parent` plugin to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.2.0")
+addSbtPlugin("org.hammerlab.sbt" % "parent" % "4.6.3")
 ```
 
-They are also available individually:
+The `base` module also wraps that and adds many [hammerlab](https://github.com/hammerlab/) library-aliases:
+
+```scala
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.3")
+```
+
+### Individual modules
+
+The modules above are also all available individually:
 
 ```scala
 // Settings for publishing to Maven Central 
-addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.0.0")
+addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.2.0")
 
 // Adding GitHub-repo info
 addSbtPlugin("org.hammerlab.sbt" % "github" % "4.1.0")
@@ -35,8 +88,6 @@ addSbtPlugin("org.hammerlab.sbt" % "github" % "4.1.0")
 ```
 
 Subprojects' READMEs contain more info about their functionality.
-
-A derivative of [`parent`](parent) with hammerlab-specific configs can also be found in [the `base` module](base).
 
 ## Examples
 
@@ -68,3 +119,7 @@ g8 hammerlab/sbt-parent.g8
 ```
 
 (This template lives at [hammerlab/sbt-parent.g8](https://github.com/hammerlab/sbt-parent.g8))
+
+
+[`parent`]: parent
+[`base`]: base
