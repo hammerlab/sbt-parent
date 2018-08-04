@@ -78,14 +78,20 @@ object Parent
         )
     }
 
-    object circe extends Libs("io.circe" ^^ "circe" ^ "0.9.3") {
+    object circe
+      extends Libs(
+        "io.circe" ^^ "circe" ^ "0.9.3"
+      ) {
+      val    core = lib
       val generic = lib
       val literal = lib
-      val    core = lib
       val  parser = lib
     }
 
-    object http4s extends Libs("org.http4s" ^^ "http4s" ^ "0.18.13") {
+    object http4s
+      extends Libs(
+        "org.http4s" ^^ "http4s" ^ "0.18.13"
+      ) {
       val `blaze-server` = lib
       val `blaze-client` = lib
       val         circe  = lib

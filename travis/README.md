@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:travis
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.2.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%travis%22)
+[![org.hammerlab.sbt:travis](https://img.shields.io/badge/org.hammerlab.sbt:travis-4.6.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22travis%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "travis" % "4.2.0")
+addSbtPlugin("org.hammerlab.sbt" % "travis" % "4.6.2")
 ```
 
 SBT settings for interfacing with Coveralls and TravisCI:
@@ -14,4 +14,4 @@ SBT settings for interfacing with Coveralls and TravisCI:
 	- if coverage is enabled, send report to Coveralls
 	- if this is a multi-module project, run `coverageAggregate` first 
 
-See [hammerlab/math-utils](https://github.com/hammerlab/math-utils/blob/stats-1.1.1/.travis.yml) for an example.
+See [hammerlab/math-utils](https://github.com/hammerlab/math-utils/blob/stats-1.3.2/.travis.yml#L13-L14) for an example.

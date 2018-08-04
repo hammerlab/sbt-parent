@@ -1,11 +1,11 @@
 # org.hammerlab.sbt:deps
 
-[![Maven Central](https://img.shields.io/badge/maven%20central-4.2.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%deps%22)
+[![org.hammerlab.sbt:deps](https://img.shields.io/badge/org.hammerlab.sbt:deps-4.5.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22deps%22)
 
 SBT plugin providing dependency-management helpers:
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "deps" % "4.2.0")
+addSbtPlugin("org.hammerlab.sbt" % "deps" % "4.5.2")
 ``` 
 
 ## Dependency-DSL

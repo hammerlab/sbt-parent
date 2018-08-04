@@ -122,7 +122,7 @@ lazy val versions = project.settings(
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
-  v"4.6.2",
+  v"4.6.3",
   coursier
 ).dependsOn(
   assembly,
@@ -141,7 +141,7 @@ lazy val parent = project.settings(
 
 // All-purpose hammerlab-specific plugin
 lazy val base = project.settings(
-  v"4.6.2",
+  v"4.6.3",
 ).dependsOn(
   parent
 )
