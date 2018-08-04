@@ -121,8 +121,8 @@ object HammerLab
           )
         ),
 
-      hammerlab.test.suite.version := "1.0.1",
-      hammerlab.test. base.version := "1.0.1",
+      hammerlab.test.suite.version := "1.0.2",
+      hammerlab.test. base.version := "1.0.2",
 
       addTestLib := true
     )
