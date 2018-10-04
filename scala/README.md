@@ -25,7 +25,7 @@ Minor-version get/set DSL:
 
 `2.10`.version = "2.10.5"
 `2.11`.version = "2.11.12"
-`2.12`.version = "2.12.6"
+`2.12`.version = "2.12.7"
 ```
 
 Restrict a project to one Scala major version:

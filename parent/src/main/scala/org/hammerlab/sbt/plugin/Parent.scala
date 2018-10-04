@@ -102,9 +102,9 @@ object Parent
   import autoImport._
 
   override def globalSettings =
-    circe.global ++
+     circe.global ++
     http4s.global ++
-    bdg.global
+       bdg.global
 
   override def projectSettings =
     Seq(
@@ -132,7 +132,7 @@ object Parent
 
       commons.defaults
     ) ++
-    bdg.project ++
-    circe.project ++
+       bdg.project ++
+     circe.project ++
     http4s.project
 }

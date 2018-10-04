@@ -1,6 +1,8 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.deps.{ Dep, IsScalaJS }
 import org.hammerlab.sbt.deps.Group._
+import org.hammerlab.sbt.dsl
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
@@ -27,6 +29,18 @@ object Scala
     // Macros and doc-generation have many rough edges, so this is frequently useful
     val skipDoc = publishArtifact in (sbt.Compile, packageDoc) := false
     val emptyDocJar = sources in (sbt.Compile, doc) := Seq()
+
+    val partialUnification = scalacOptions += "-Ypartial-unification"
+
+    object kindProjector
+      extends dsl.Lib(
+        "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
+      ) {
+      override val settings =
+        base.toModuleIDs(IsScalaJS.no) match {
+          case Seq(dep) ⇒ addCompilerPlugin(dep)
+        }
+    }
 
     val scalameta: SettingsDefinition = Seq(
       addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full),
@@ -66,7 +80,7 @@ object Scala
     }
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")
-    case object `2.12` extends ScalaMajorVersion("2.12", "2.12.6")
+    case object `2.12` extends ScalaMajorVersion("2.12", "2.12.7")
 
     object ScalaVersion {
       val default = SettingKey[ScalaMajorVersion]("defaultScalaVersion", "Default scala major version; wrapper for scalaVersion")
@@ -93,6 +107,7 @@ object Scala
           `2.12`
         )
     ) ++
+    kindProjector.global ++
     ScalaVersion.defaults
 
   override def projectSettings =
@@ -131,5 +146,6 @@ object Scala
 
       consoleImports := Nil,
       initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
-    )
+    ) ++
+    kindProjector.project
 }

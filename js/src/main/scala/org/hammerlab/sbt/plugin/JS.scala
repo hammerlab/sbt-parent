@@ -1,8 +1,8 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.dsl
-import org.hammerlab.sbt.plugin.Deps.autoImport.{ dep, _ }
-import org.hammerlab.sbt.plugin.JS.autoImport.scalajs.{ css, diode, react }
+import org.hammerlab.sbt.plugin.Deps.autoImport._
+import org.hammerlab.sbt.plugin.JS.autoImport.scalajs.css
 import org.hammerlab.sbt.plugin.Versions.autoImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
@@ -10,11 +10,13 @@ import org.scalajs.sbtplugin.cross._
 import sbt.Keys._
 import sbt._
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.npmDependencies
+import scalajscrossproject.ScalaJSCrossPlugin
 
 object JS
   extends Plugin(
     Deps,
     ScalaJSPlugin,
+    ScalaJSCrossPlugin,
     Versions
   ) {
 
