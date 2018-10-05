@@ -5,4 +5,4 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.2")
 
 // Bootstrap ourselves; this is a useful plugin for publishing plugins!
-addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.3")
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.4-SNAPSHOT")

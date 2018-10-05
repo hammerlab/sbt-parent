@@ -30,7 +30,7 @@ lazy val lib = project.settings(
   sbtScalaJS
 )
 
-lazy val assembly = project.settings(
+lazy val assembly = plugin.settings(
   v"4.6.3",
   sbtAssembly,
   sbtScalaJS
@@ -40,20 +40,18 @@ lazy val assembly = project.settings(
   scala,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val deps = project.settings(
+lazy val deps = plugin.settings(
   v"4.5.3",
   sbtScalaJS
 ).dependsOn(
   lib,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val github = project.settings(r"4.1.0").enablePlugins(SbtPlugin)
+lazy val github = plugin.settings(r"4.1.0")
 
-lazy val js = project.settings(
+lazy val js = plugin.settings(
   v"1.3.0",
   sbtScalaJS,
   scalaJSBundler,
@@ -62,17 +60,15 @@ lazy val js = project.settings(
   deps,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val maven = project.settings(
+lazy val maven = plugin.settings(
   r"4.2.0",
   sonatype
 ).dependsOn(
   lib
 )
-.enablePlugins(SbtPlugin)
 
-lazy val root = project.settings(
+lazy val root = plugin.settings(
   v"4.6.3",
   scoverage,
   dep(sourcecode)
@@ -81,18 +77,16 @@ lazy val root = project.settings(
   maven,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val scala = project.settings(
+lazy val scala = plugin.settings(
   v"4.6.3"
 ).dependsOn(
   deps,
   lib,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val spark = project.settings(
+lazy val spark = plugin.settings(
   v"4.6.3",
   dep(sourcecode)
 ).dependsOn(
@@ -102,18 +96,16 @@ lazy val spark = project.settings(
   test,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val test = project.settings(
+lazy val test = plugin.settings(
   v"4.5.3"
 ).dependsOn(
   deps,
   lib,
   versions
 )
-.enablePlugins(SbtPlugin)
 
-lazy val travis = project.settings(
+lazy val travis = plugin.settings(
   v"4.6.3",
   scoverage,
   coveralls
@@ -123,7 +115,7 @@ lazy val travis = project.settings(
 )
 .enablePlugins(SbtPlugin)
 
-lazy val versions = project.settings(
+lazy val versions = plugin.settings(
   v"4.5.3",
   pgp,
   dep(
@@ -133,10 +125,9 @@ lazy val versions = project.settings(
 ).dependsOn(
   lib
 )
-.enablePlugins(SbtPlugin)
 
 // Plugin exposing all non-hammerlab-specific functionality
-lazy val parent = project.settings(
+lazy val parent = plugin.settings(
   v"4.6.4",
   coursier,
   scalaCrossProject,
@@ -157,15 +148,13 @@ lazy val parent = project.settings(
   travis,
   versions
 )
-.enablePlugins(SbtPlugin)
 
 // All-purpose hammerlab-specific plugin
-lazy val base = project.settings(
+lazy val base = plugin.settings(
   v"4.6.4"
 ).dependsOn(
   parent
 )
-.enablePlugins(SbtPlugin)
 
 lazy val `sbt-parent` = Root.autoImport.root(
   assembly,
