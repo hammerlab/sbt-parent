@@ -6,9 +6,9 @@ import org.hammerlab.sbt.plugin.JS.autoImport.scalajs.css
 import org.hammerlab.sbt.plugin.Versions.autoImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import org.scalajs.sbtplugin.cross._
 import sbt.Keys._
 import sbt._
+import sbtcrossproject.{ CrossClasspathDependency, CrossProject }
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.npmDependencies
 import scalajscrossproject.ScalaJSCrossPlugin
 
