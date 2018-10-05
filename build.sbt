@@ -15,15 +15,16 @@ default(
 
 
 // external-plugin short-hands
-val       sbtAssembly = addSbtPlugin(   "com.eed3si9n"    % "sbt-assembly"             % "0.14.6")
-val          sonatype = addSbtPlugin(   "org.xerial.sbt"  % "sbt-sonatype"             % "2.0"   )
-val         scoverage = addSbtPlugin(   "org.scoverage"   % "sbt-scoverage"            % "1.5.1" )
-val         coveralls = addSbtPlugin(   "org.hammerlab"   % "sbt-coveralls"            % "1.2.3" )
-val               pgp = addSbtPlugin(   "com.jsuereth"    % "sbt-pgp"                  % "1.1.1" )
-val          coursier = addSbtPlugin(   "io.get-coursier" % "sbt-coursier"             % "1.0.2" )
-val        sbtScalaJS = addSbtPlugin(   "org.scala-js"    % "sbt-scalajs"              % "0.6.25")
-val    scalaJSBundler = addSbtPlugin(   "ch.epfl.scala"   % "sbt-scalajs-bundler"      % "0.13.1")
-val scalaCrossProject = addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0" )
+val         sbtAssembly = addSbtPlugin(   "com.eed3si9n"    % "sbt-assembly"             % "0.14.6")
+val            sonatype = addSbtPlugin(   "org.xerial.sbt"  % "sbt-sonatype"             % "2.0"   )
+val           scoverage = addSbtPlugin(   "org.scoverage"   % "sbt-scoverage"            % "1.5.1" )
+val           coveralls = addSbtPlugin(   "org.hammerlab"   % "sbt-coveralls"            % "1.2.3" )
+val                 pgp = addSbtPlugin(   "com.jsuereth"    % "sbt-pgp"                  % "1.1.1" )
+val            coursier = addSbtPlugin(   "io.get-coursier" % "sbt-coursier"             % "1.0.2" )
+val          sbtScalaJS = addSbtPlugin(   "org.scala-js"    % "sbt-scalajs"              % "0.6.25")
+val      scalaJSBundler = addSbtPlugin(   "ch.epfl.scala"   % "sbt-scalajs-bundler"      % "0.13.1")
+val   scalaCrossProject = addSbtPlugin("org.portable-scala" % "sbt-crossproject"         % "0.6.0" )
+val scalaJSCrossProject = addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0" )
 
 lazy val lib = project.settings(
   v"4.2.0",
@@ -57,7 +58,7 @@ lazy val js = project.settings(
   v"1.3.0",
   sbtScalaJS,
   scalaJSBundler,
-  scalaCrossProject
+  scalaJSCrossProject
 ).dependsOn(
   deps,
   versions
@@ -130,7 +131,11 @@ lazy val versions = project.settings(
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
   v"4.6.4",
-  coursier
+  coursier,
+  scalaCrossProject,
+  dep(
+    "org.scala-sbt" ^^ "main" ^ "1.2.3"
+  )
 ).dependsOn(
   assembly,
   deps,
