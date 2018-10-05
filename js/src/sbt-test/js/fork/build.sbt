@@ -1,5 +1,5 @@
 
-lazy val a = crossProject.jvmSettings(
+lazy val a = cross.jvmSettings(
   TaskKey[Unit]("check") := {
     assert(fork.value == true)
     ()
@@ -10,10 +10,9 @@ lazy val a = crossProject.jvmSettings(
     ()
   }
 )
-lazy val aJS = a.js
-lazy val aJVM = a.jvm
+lazy val ax = a.x
 
-lazy val b = crossProject.jvmSettings(
+lazy val b = cross.jvmSettings(
   forkJVM := false,
   TaskKey[Unit]("check") := {
     assert(fork.value == false)
@@ -25,8 +24,7 @@ lazy val b = crossProject.jvmSettings(
     ()
   }
 )
-lazy val bJS = b.js
-lazy val bJVM = b.jvm
+lazy val bx = parent(b.jvm, b.js)
 
 lazy val c = project.settings(
   TaskKey[Unit]("check") := {

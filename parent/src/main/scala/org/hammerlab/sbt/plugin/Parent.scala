@@ -1,23 +1,60 @@
 package org.hammerlab.sbt.plugin
 
+import java.io.File
+
 import org.hammerlab.sbt.deps.{ Group, SnapshotOps }
 import org.hammerlab.sbt.dsl.{ Lib, Libs }
+import org.hammerlab.sbt.plugin.Root.autoImport.parent
 import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
+import sbt.ProjectReference
+import sbtcrossproject.{ CrossPlugin, CrossProject, JVMPlatform, Platform }
+import scalajscrossproject.JSPlatform
+import sourcecode.Name
 
 object Parent
   extends Plugin(
     Deps,
     GitHub,
     Maven,
+    CrossPlugin,
     Spark,
     Versions
   ) {
 
   import Group._
 
+  trait platform {
+    val  js =  JSPlatform
+    val jvm = JVMPlatform
+  }
+
   object autoImport
-    extends SnapshotOps {
+    extends SnapshotOps
+       with platform {
+
+    def cross                      (implicit name: Name): CrossProject.Builder = cross(jvm, js)(name)
+    def cross(platforms: Platform*)(implicit name: Name): CrossProject.Builder =
+      CrossProject(
+        name.value,
+        new File(name.value)
+      )(
+        platforms: _*
+      )
+
+    object platform extends platform
+
+    implicit class CrossProjectXOps(val cp: CrossProject) extends AnyVal {
+      def x(implicit name: Name) =
+        parent(
+          cp
+            .componentProjects
+            .map {
+              p ⇒ p: ProjectReference
+            }
+            : _ *
+        )
+    }
 
     val             args4j =                     "args4j"  ^ "args4j"
     val           autowire =                "com.lihaoyi" ^^ "autowire"
@@ -102,9 +139,9 @@ object Parent
   import autoImport._
 
   override def globalSettings =
-    circe.global ++
+     circe.global ++
     http4s.global ++
-    bdg.global
+       bdg.global
 
   override def projectSettings =
     Seq(
@@ -132,7 +169,7 @@ object Parent
 
       commons.defaults
     ) ++
-    bdg.project ++
-    circe.project ++
+       bdg.project ++
+     circe.project ++
     http4s.project
 }

@@ -32,12 +32,10 @@ lazy val b = project.settings(
   }
 )
 
-lazy val c = crossProject.settings(
+lazy val c = cross.settings(
   testDeps += scalatest,
   TaskKey[Unit]("check") := {
     assert(testDeps.value == Seq[Dep](scalatest), s"${testDeps.value} $scalatest")
     ()
   }
 )
-lazy val cJS  = c.js
-lazy val cJVM = c.jvm

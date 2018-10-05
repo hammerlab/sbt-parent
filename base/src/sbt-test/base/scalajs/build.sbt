@@ -1,6 +1,6 @@
 import org.hammerlab.sbt.deps.Dep
 
-lazy val a = crossProject
+lazy val a = cross
 lazy val aJS  = a.js.settings(
   TaskKey[Unit]("check") := {
     assert(testDeps.value == Seq[Dep](scalatest, hammerlab.test.suite))

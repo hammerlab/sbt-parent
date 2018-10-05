@@ -30,48 +30,48 @@ object HammerLab
     def lib(name: String) = "org.hammerlab" ^^ name
     def lib(subgroup: String, name: String) = s"org.hammerlab.$subgroup" ^^ name
 
-    val            adam = lib("adam", "core")
-    val      args4j_cli = lib("cli", "args4j")
-    val          args4s = lib("args4s")
-    val   bdg_utils_cli = lib("bdg-utils", "cli")
-    val           bytes = lib("bytes")
-    val        case_cli = lib("cli", "case-app")
-    val         channel = lib("channel")
-    val        io_utils = lib("io")
+    implicit def symbolToString(symbol: Symbol): String = symbol.name
+
+    val            adam = lib('adam, 'core)
+    val      args4j_cli = lib('cli, 'args4j)
+    val          args4s = lib('args4s)
+    val   bdg_utils_cli = lib("bdg-utils", 'cli)
+    val           bytes = lib('bytes)
+    val        case_cli = lib('cli, "case-app")
+    val         channel = lib('channel)
+    val        io_utils = lib('io)
     val      magic_rdds = lib("magic-rdds")
-    val        parallel = lib("parallel")
-    val           paths = lib("paths")
+    val        parallel = lib('parallel)
+    val           paths = lib('paths)
     val shapeless_utils = lib("shapeless-utils")
-    val       spark_bam = lib("bam", "load")
+    val       spark_bam = lib('bam, 'load)
     val      spark_util = lib("spark-util")
-    val           stats = lib("math", "stats")
+    val           stats = lib('math, 'stats)
     val    string_utils = lib("string-utils")
-    val       testSuite = lib("test", "suite")
-    val       testUtils = lib("test", "base")
-    val           types = lib("types")
+    val           types = lib('types)
 
     object cli {
-      val  base = lib("cli",  "base")
-      val spark = lib("cli", "spark")
+      val  base = lib('cli,  'base)
+      val spark = lib('cli, 'spark)
     }
 
     object genomics {
-      val      loci = lib("genomics",      "loci") - guava
-      val     reads = lib("genomics",     "reads")
-      val  readsets = lib("genomics",  "readsets")
-      val reference = lib("genomics", "reference")
-      val     utils = lib("genomics",     "utils")
+      val      loci = lib('genomics,      'loci) - guava
+      val     reads = lib('genomics,     'reads)
+      val  readsets = lib('genomics,  'readsets)
+      val reference = lib('genomics, 'reference)
+      val     utils = lib('genomics,     'utils)
     }
 
     val iterators =
       new Dep("org.hammerlab", "iterator", BinaryJS) {
-        val macros = lib("macros", "iterators")
+        val macros = lib('macros, 'iterators)
       }
 
     object math {
-      val    format = lib("math",    "format")
-      val tolerance = lib("math", "tolerance")
-      val     utils = lib("math",     "utils")
+      val    format = lib('math,    'format)
+      val tolerance = lib('math, 'tolerance)
+      val     utils = lib('math,     'utils)
     }
 
     val scalatestOnly = addTestLib := false
@@ -92,8 +92,8 @@ object HammerLab
       val io = io_utils
 
       object test {
-        object suite extends dsl.Lib(lib("test", "suite"))
-        object  base extends dsl.Lib(lib("test",  "base"))
+        object suite extends dsl.Lib(lib('test, 'suite) ^ "1.0.3")
+        object  base extends dsl.Lib(lib('test,  'base) ^ "1.0.3")
       }
     }
   }
@@ -121,11 +121,10 @@ object HammerLab
           )
         ),
 
-      hammerlab.test.suite.version := "1.0.2",
-      hammerlab.test. base.version := "1.0.2",
-
       addTestLib := true
-    )
+    ) ++
+    hammerlab.test.suite.global ++
+    hammerlab.test. base.global
 
   override def projectSettings =
     Seq(
@@ -142,11 +141,6 @@ object HammerLab
           sonatypeProfileName.value
       ),
 
-      versions ++= Seq(
-        hammerlab.test.suite → hammerlab.test.suite.version.value,
-        hammerlab.test. base → hammerlab.test. base.version.value
-      ),
-
       /**
        * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
        *
@@ -161,12 +155,14 @@ object HammerLab
         if (addTestLib.value)
           Seq(
             if (isScalaJSProject.value)
-              testSuite
+              hammerlab.test.suite
             else
-              testUtils
+              hammerlab.test.base
           )
         else
           Nil
       )
-    )
+    ) ++
+    hammerlab.test.suite.project ++
+    hammerlab.test. base.project
 }
