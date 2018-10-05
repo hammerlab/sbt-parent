@@ -6,7 +6,6 @@ default(
   `2.12` only,
   subgroup("sbt"),
   clearTestDeps,
-  sbtPlugin := true,
   resolvers ++= Seq(
     bintrayIvyRepo("portable-scala", "sbt-plugins"),
     bintrayIvyRepo("scala-js", "scala-js-releases")
@@ -43,6 +42,7 @@ lazy val assembly = project.settings(
   scala,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 lazy val deps = project.settings(
   v"4.5.3",
@@ -51,8 +51,9 @@ lazy val deps = project.settings(
   lib,
   versions
 )
+.enablePlugins(SbtPlugin)
 
-lazy val github = project.settings(r"4.1.0")
+lazy val github = project.settings(r"4.1.0").enablePlugins(SbtPlugin)
 
 lazy val js = project.settings(
   v"1.3.0",
@@ -63,6 +64,7 @@ lazy val js = project.settings(
   deps,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 lazy val maven = project.settings(
   r"4.2.0",
@@ -70,6 +72,7 @@ lazy val maven = project.settings(
 ).dependsOn(
   lib
 )
+.enablePlugins(SbtPlugin)
 
 lazy val root = project.settings(
   v"4.6.3",
@@ -80,6 +83,7 @@ lazy val root = project.settings(
   maven,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 lazy val scala = project.settings(
   v"4.6.3"
@@ -88,6 +92,7 @@ lazy val scala = project.settings(
   lib,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 lazy val spark = project.settings(
   v"4.6.3",
@@ -99,6 +104,7 @@ lazy val spark = project.settings(
   test,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 lazy val test = project.settings(
   v"4.5.3"
@@ -107,6 +113,7 @@ lazy val test = project.settings(
   lib,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 lazy val travis = project.settings(
   v"4.6.3",
@@ -116,6 +123,7 @@ lazy val travis = project.settings(
   root,
   scala
 )
+.enablePlugins(SbtPlugin)
 
 lazy val versions = project.settings(
   v"4.5.3",
@@ -127,6 +135,7 @@ lazy val versions = project.settings(
 ).dependsOn(
   lib
 )
+.enablePlugins(SbtPlugin)
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = project.settings(
@@ -150,6 +159,7 @@ lazy val parent = project.settings(
   travis,
   versions
 )
+.enablePlugins(SbtPlugin)
 
 // All-purpose hammerlab-specific plugin
 lazy val base = project.settings(
@@ -157,6 +167,7 @@ lazy val base = project.settings(
 ).dependsOn(
   parent
 )
+.enablePlugins(SbtPlugin)
 
 lazy val `sbt-parent` = Root.autoImport.root(
   assembly,

@@ -7,6 +7,8 @@ import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
 import sbt._
+import sbt.plugins.SbtPlugin
+import sourcecode.Name
 
 object Scala
   extends Plugin(
@@ -17,6 +19,15 @@ object Scala
   object autoImport {
     val scala_lang    = "org.scala-lang" ^ "scala-library"
     val scala_reflect = "org.scala-lang" ^ "scala-reflect"
+
+    def plugin(implicit name: Name): Project =
+      Project(
+                 name.value,
+        new File(name.value)
+      )
+      .enablePlugins(
+        SbtPlugin
+      )
 
     val enableMacroParadise =
       Seq(
