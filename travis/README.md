@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:travis
 
-[![org.hammerlab.sbt:travis](https://img.shields.io/badge/org.hammerlab.sbt:travis-4.6.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22travis%22)
+[![org.hammerlab.sbt:travis](https://img.shields.io/badge/org.hammerlab.sbt:travis-4.6.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22travis%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "travis" % "4.6.2")
+addSbtPlugin("org.hammerlab.sbt" % "travis" % "4.6.3")
 ```
 
 SBT settings for interfacing with Coveralls and TravisCI:
