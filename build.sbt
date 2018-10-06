@@ -25,7 +25,7 @@ val   scalaCrossProject = addSbtPlugin("org.portable-scala" % "sbt-crossproject"
 val scalaJSCrossProject = addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0" )
 
 lazy val lib = project.settings(
-  v"4.2.0",
+  r"4.2.0",
   providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
   sbtScalaJS
 )
