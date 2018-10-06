@@ -2,11 +2,11 @@ import org.hammerlab.sbt.deps.Dep
 
 default(
   clearTestDeps,
-  github.repo("foo"),
-  r"1.2.3"
+  github.repo("foo")
 )
 
 lazy val a = project.settings(
+  r"1.2.3",
   TaskKey[Unit]("check") := {
     assert(testDeps.value == Nil)
     assert(
@@ -25,6 +25,7 @@ lazy val a = project.settings(
 )
 
 lazy val b = project.settings(
+  r"1.2.3",
   testDeps += scalatest,
   TaskKey[Unit]("check") := {
     assert(testDeps.value == Seq[Dep](scalatest))
