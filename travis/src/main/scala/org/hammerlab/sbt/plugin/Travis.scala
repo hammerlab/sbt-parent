@@ -31,12 +31,12 @@ object Travis
       coverageReport :=
         Def.taskDyn[Unit] {
           val default = coverageReport.taskValue
-          if (travis_? && isRoot.value) {
+          if (travis_? && !isRoot.value) {
             streams.value.log.info(s"${name.value}: running coverageReport")
             Def.task(default.value)
           } else
             Def.task {
-              streams.value.log.info(s"${name.value}: skipping coverageReport")
+              streams.value.log.info(s"${name.value}: skipping coverageReport (travis: ${travis_?}, root: ${isRoot.value})")
 
               ()
             }
