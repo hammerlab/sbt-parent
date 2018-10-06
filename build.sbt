@@ -31,7 +31,7 @@ lazy val lib = project.settings(
 )
 
 lazy val assembly = plugin.settings(
-  v"4.6.3",
+  v"4.6.4",
   sbtAssembly,
   sbtScalaJS
 ).dependsOn(
@@ -42,7 +42,7 @@ lazy val assembly = plugin.settings(
 )
 
 lazy val deps = plugin.settings(
-  v"4.5.3",
+  v"4.5.4",
   sbtScalaJS
 ).dependsOn(
   lib,
@@ -52,7 +52,7 @@ lazy val deps = plugin.settings(
 lazy val github = plugin.settings(r"4.1.0")
 
 lazy val js = plugin.settings(
-  v"1.3.0",
+  v"1.3.1",
   sbtScalaJS,
   scalaJSBundler,
   scalaJSCrossProject
@@ -69,17 +69,18 @@ lazy val maven = plugin.settings(
 )
 
 lazy val root = plugin.settings(
-  v"4.6.3",
+  v"4.6.4",
   scoverage,
   dep(sourcecode)
 ).dependsOn(
   github,
   maven,
+  test,
   versions
 )
 
 lazy val scala = plugin.settings(
-  v"4.6.3"
+  v"4.6.4"
 ).dependsOn(
   deps,
   lib,
@@ -87,7 +88,7 @@ lazy val scala = plugin.settings(
 )
 
 lazy val spark = plugin.settings(
-  v"4.6.3",
+  v"4.6.4",
   dep(sourcecode)
 ).dependsOn(
   deps,
@@ -98,7 +99,7 @@ lazy val spark = plugin.settings(
 )
 
 lazy val test = plugin.settings(
-  v"4.5.3"
+  v"4.5.4"
 ).dependsOn(
   deps,
   lib,
@@ -106,17 +107,18 @@ lazy val test = plugin.settings(
 )
 
 lazy val travis = plugin.settings(
-  v"4.6.3",
+  v"4.6.4",
   scoverage,
   coveralls
 ).dependsOn(
   root,
-  scala
+  scala,
+  test
 )
 .enablePlugins(SbtPlugin)
 
 lazy val versions = plugin.settings(
-  v"4.5.3",
+  v"4.5.4",
   pgp,
   dep(
     sourcecode,
@@ -128,7 +130,7 @@ lazy val versions = plugin.settings(
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = plugin.settings(
-  v"4.6.4",
+  v"4.6.5",
   coursier,
   scalaCrossProject,
   dep(
@@ -151,7 +153,7 @@ lazy val parent = plugin.settings(
 
 // All-purpose hammerlab-specific plugin
 lazy val base = plugin.settings(
-  v"4.6.4"
+  v"4.6.5"
 ).dependsOn(
   parent
 )

@@ -3,21 +3,31 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.dsl.Lib
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
+import org.hammerlab.sbt.plugin.Versions.autoImport.fixed
+import org.hammerlab.sbt.plugin.Versions.noopSettings
 import sbt.Keys._
 import sbt.TestFrameworks.ScalaTest
 import sbt._
 
 object Test
-  extends Plugin(Deps) {
+  extends Plugin(
+    Deps,
+    Versions
+  ) {
 
   object autoImport {
     val publishTestJar =
         publishArtifact in sbt.Test := publishArtifact.value
 
+    val test_? = TaskKey[Boolean]("test_q", "Set to false to disable tests")
+    val disableTests = test_? := false
+
     object scalatest extends Lib("org.scalatest" ^^ "scalatest" ^ "3.0.4")
   }
 
   import autoImport._
+
+  noopSettings += disableTests
 
   override def globalSettings =
     Seq(
@@ -29,10 +39,27 @@ object Test
       testFrameworks := Seq(ScalaTest),
 
       // Add scalatest as a test-dep by default.
-      testDeps += scalatest
+      testDeps += scalatest,
+      test_? := (
+        if (fixed.value)
+          false
+        else
+          true
+      )
     ) ++
     scalatest.global
 
   override def projectSettings =
-    scalatest.project
+    scalatest.project ++
+    Seq(
+      test in sbt.Test :=
+        Def.taskDyn[Unit] {
+          val default = (test in sbt.Test).taskValue
+          if (test_?.value)
+            Def.task(default.value)
+          else
+            Def.task(())
+        }
+        .value
+    )
 }

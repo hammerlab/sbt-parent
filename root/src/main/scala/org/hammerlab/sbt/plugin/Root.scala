@@ -2,6 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Maven.autoImport._
+import org.hammerlab.sbt.plugin.Test.autoImport.disableTests
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import sbt._
 import scoverage.ScoverageSbtPlugin
@@ -10,6 +11,7 @@ object Root
   extends Plugin(
     GitHub,
     Maven,
+    Test,
     Versions,
     ScoverageSbtPlugin
   ) {
@@ -36,7 +38,8 @@ object Root
       val settings =
         Seq(
           isRoot := true,
-          mavenLocal := {}
+          mavenLocal := {},
+          disableTests
         ) ++
         noopSettings
     }

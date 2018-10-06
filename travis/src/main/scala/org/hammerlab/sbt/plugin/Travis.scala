@@ -1,23 +1,39 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.Root.autoImport.isRoot
+import org.hammerlab.sbt.plugin.Test.autoImport.test_?
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys._
+import System.getenv
 
 object Travis
   extends Plugin(
     Root,
     Scala,
+    Test,
     Versions
   ) {
 
   noopSettings += (coverageReport := {})
 
+  noopSettings += {
+    test_? :=
+      Def.taskDyn[Boolean] {
+        val default = test_?.taskValue
+        if (travis_? && !isRoot.value)
+          Def.task(true)
+        else
+          Def.task(default.value)
+      }
+      .value
+  }
+
   val travisScalaEnv = "TRAVIS_SCALA_VERSION"
-  def travisScalaVersion = System.getenv(travisScalaEnv)
+  def travisScalaVersion = getenv(travisScalaEnv)
+  def travis_? = getenv("TRAVIS") != null
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[Option[String]]("Scala version to measure/report test-coverage for")
