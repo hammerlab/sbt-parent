@@ -2,14 +2,17 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Maven.autoImport._
+import org.hammerlab.sbt.plugin.Test.autoImport.disableTests
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import sbt._
 import scoverage.ScoverageSbtPlugin
+import sourcecode.Name
 
 object Root
   extends Plugin(
     GitHub,
     Maven,
+    Test,
     Versions,
     ScoverageSbtPlugin
   ) {
@@ -21,7 +24,7 @@ object Root
         modules: ProjectReference*
       )(
         implicit
-        name: sourcecode.Name
+        name: Name
       ):
         Project = {
         val file = new File(".")
@@ -36,7 +39,8 @@ object Root
       val settings =
         Seq(
           isRoot := true,
-          mavenLocal := {}
+          mavenLocal := {},
+          disableTests
         ) ++
         noopSettings
     }
@@ -67,7 +71,7 @@ object Root
 
   import autoImport._
 
-  override def projectSettings: Seq[Def.Setting[_]] =
+  override def projectSettings =
     Seq(
       isRoot := false
     )

@@ -1,23 +1,52 @@
 package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.plugin.Root.autoImport.isRoot
+import org.hammerlab.sbt.plugin.Test.autoImport.test_?
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys._
+import System.getenv
 
 object Travis
   extends Plugin(
     Root,
     Scala,
+    Test,
     Versions
   ) {
 
-  noopSettings += (coverageReport := {})
+  noopSettings ++=
+    Seq(
+      test_? :=
+        Def.taskDyn[Boolean] {
+          val default = test_?.taskValue
+          if (travis_? && !isRoot.value)
+            Def.task(true)
+          else
+            Def.task(default.value)
+        }
+        .value,
+      coverageReport :=
+        Def.taskDyn[Unit] {
+          val default = coverageReport.taskValue
+          if (travis_? && !isRoot.value) {
+            streams.value.log.info(s"${name.value}: running coverageReport")
+            Def.task(default.value)
+          } else
+            Def.task {
+              streams.value.log.info(s"${name.value}: skipping coverageReport (travis: ${travis_?}, root: ${isRoot.value})")
+
+              ()
+            }
+        }
+        .value
+    )
 
   val travisScalaEnv = "TRAVIS_SCALA_VERSION"
-  def travisScalaVersion = System.getenv(travisScalaEnv)
+  def travisScalaVersion = getenv(travisScalaEnv)
+  def travis_? = getenv("TRAVIS") != null
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[Option[String]]("Scala version to measure/report test-coverage for")
@@ -86,19 +115,19 @@ object Travis
         test in sbt.Test,
         Def.taskDyn[Unit] {
           if (coverageEnabled.value) {
-            streams.value.log.info("Generating coverage reports")
+            streams.value.log.info(s"${name.value}: generating coverage reports")
             coverageReport
           } else {
-            streams.value.log.debug("Skipping coverageReport generation")
+            streams.value.log.debug(s"${name.value}: skipping coverageReport generation")
             Def.task {}
           }
         },
         Def.taskDyn[Unit] {
           if (coverageEnabled.value && isRoot.value) {
-            streams.value.log.info("Aggregating coverage reports")
+            streams.value.log.info(s"${name.value}: aggregating coverage reports")
             coverageAggregate
           } else {
-            streams.value.log.debug("Skipping coverageReport aggregation")
+            streams.value.log.debug(s"${name.value}: skipping coverageReport aggregation")
             Def.task {}
           }
         }

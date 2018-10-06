@@ -40,13 +40,13 @@ object Versions
     publishLocal     :=    {},
     publishArtifact  := false,
     publish          :=    {},
-    publishM2        :=    {},
-    test in sbt.Test :=    {}
+    publishM2        :=    {}
   )
 
   object autoImport {
     val defaultVersions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
     val snapshot = settingKey[Boolean]("When true, versions set via `v\"x.y.z\"` shorthands will have '-SNAPSHOT' appended, and snapshots repository will be used")
+    val fixed = settingKey[Boolean]("Whether this project has its version 'fixed' (pinned to a release), and should be bypassed during various aggregate task runs, e.g. publishing")
 
     val unsnap =
       command("unsnap") {
@@ -67,9 +67,10 @@ object Versions
      * pinned at its most recent release value, for other modules (which have changed and need a fresh release) to
      * depend on
      */
-    def fixed(v: String) =
+    def fix(v: String) =
       Seq(
-        version := v
+        version := v,
+        fixed := true
       ) ++
       noopSettings
 
@@ -106,7 +107,7 @@ object Versions
      */
     implicit class VersionContext(val sc: StringContext) extends AnyVal {
       def v() = autoImport.v(sc.parts.head)
-      def r() = fixed(sc.parts.head)
+      def r() = fix(sc.parts.head)
     }
   }
 
@@ -116,7 +117,8 @@ object Versions
     Seq(
       defaultVersions :=   Nil,
              revision :=  None,
-             snapshot :=  true
+             snapshot :=  true,
+                fixed := false
     )
 
   override def projectSettings =
