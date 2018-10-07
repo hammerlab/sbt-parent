@@ -23,6 +23,10 @@ object Test
     val disableTests = test_? := false
 
     object scalatest extends Lib("org.scalatest" ^^ "scalatest" ^ "3.0.4")
+
+    // "Hidden" test-resources (resources whose basenames start with ".") are not moved into target/ dirs (and therefore
+    // not present on tests' classpath) by default; this setting overrides that behavior to include them
+    val includeHiddenTestResources = excludeFilter in sbt.Test := NothingFilter
   }
 
   import autoImport._
