@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:base
 
-[![org.hammerlab.sbt:base](https://img.shields.io/badge/org.hammerlab.sbt:base-4.6.4-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22base%22)
+[![org.hammerlab.sbt:base](https://img.shields.io/badge/org.hammerlab.sbt:base-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22base%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.4")
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.6")
 ```
 
 Inherits all plugins in this repo (via [`parent`](../parent)), and adds hammerlab-specific configs:

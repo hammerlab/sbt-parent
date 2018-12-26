@@ -91,7 +91,7 @@ object Scala
     }
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")
-    case object `2.12` extends ScalaMajorVersion("2.12", "2.12.7")
+    case object `2.12` extends ScalaMajorVersion("2.12", "2.12.8")
 
     object ScalaVersion {
       val default = SettingKey[ScalaMajorVersion]("defaultScalaVersion", "Default scala major version; wrapper for scalaVersion")
