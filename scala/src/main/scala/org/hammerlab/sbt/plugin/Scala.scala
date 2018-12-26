@@ -111,10 +111,9 @@ object Scala
       // Primary Build is for Scala 2.12 by default
       ScalaVersion.default := `2.12`,
 
-      // Build for Scala 2.11 and 2.12 by default
+      // Build for Scala 2.12 only, by default
       scalaVersions :=
         Seq(
-          `2.11`,
           `2.12`
         )
     ) ++

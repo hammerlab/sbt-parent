@@ -19,7 +19,7 @@ object Spark
   ) {
 
   object autoImport {
-    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.2.1") - scalatest) {
+    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.4.0") - scalatest) {
       /**
        * Add Spark dependencies and set the spark version
        */
@@ -37,7 +37,7 @@ object Spark
        * Add Spark dependencies and set the Scala version to 2.11.x
        */
       override val settings: SettingsDefinition =
-        `2.11`.only ++
+        `2.11`.add ++
         Seq(
           Deps.autoImport.dep(
             spark.core provided,
