@@ -13,14 +13,14 @@ default(
 
   providedDeps += "c1" ^ "c2" ^ "c3",
 
-  scalaVersion := "2.12.7"
+  scalaVersion := "2.12.8"
 )
 
 TaskKey[Unit]("check") := {
   assert(
     libraryDependencies.value ==
       Seq(
-        "org.scala-lang" % "scala-library" % "2.12.7",
+        "org.scala-lang" % "scala-library" % "2.12.8",
         "a1" %% "a2" % "a3" % "test",
         "c1"  % "c2" % "c3" % "provided"
       )
@@ -47,7 +47,7 @@ lazy val a = project.settings(
     assert(
       libraryDependencies.value ==
         Seq(
-          "org.scala-lang" % "scala-library" % "2.12.7",
+          "org.scala-lang" % "scala-library" % "2.12.8",
           "a1" %% "a2" % "a3" % "test",
           "c1"  % "c2" % "c3" % "provided"
         ),

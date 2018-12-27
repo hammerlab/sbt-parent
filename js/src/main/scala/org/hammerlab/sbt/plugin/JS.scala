@@ -40,7 +40,7 @@ object JS
 
       val dom = "org.scala-js" ^^ "scalajs-dom"
 
-      object react extends dsl.Lib("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.2.0") {
+      object react extends dsl.Lib("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.3.1") {
         val  core = dep
         val extra = group ^^ "extra"
         val jsVersion = SettingKey[String]("reactJSVersion", "Version of react JS libraries")
@@ -67,7 +67,7 @@ object JS
         override val global: SettingsDefinition =
           super.global ++
           Seq(
-            jsVersion := "16.2.0",
+            jsVersion := "16.5.1",
             versions +=
               extra → version.value
           )
@@ -126,7 +126,7 @@ object JS
   override def projectSettings =
     Seq(
       versions(
-        scalajs.dom → "0.9.3"
+        scalajs.dom → "0.9.6"
       )
     ) ++
     scalajs.react.project ++

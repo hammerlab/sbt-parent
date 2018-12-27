@@ -1,5 +1,7 @@
 package org.hammerlab.sbt.plugin
 
+import hammerlab.bytes
+import hammerlab.bytes._
 import org.hammerlab.sbt.deps.{ Dep, IsScalaJS }
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.dsl
@@ -16,7 +18,9 @@ object Scala
     Versions
   ) {
 
-  object autoImport {
+  object autoImport
+    extends bytes.syntax {
+
     val scala_lang    = "org.scala-lang" ^ "scala-library"
     val scala_reflect = "org.scala-lang" ^ "scala-reflect"
 
@@ -91,7 +95,12 @@ object Scala
     }
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")
-    case object `2.12` extends ScalaMajorVersion("2.12", "2.12.7")
+    case object `2.12` extends ScalaMajorVersion("2.12", "2.12.8")
+
+    object scalac {
+      def xms(bytes: Bytes) = scalacOptions += s"-J-Xms${bytes.toString.filter(_ != 'B').toLowerCase}"
+      def xmx(bytes: Bytes) = scalacOptions += s"-J-Xmx${bytes.toString.filter(_ != 'B').toLowerCase}"
+    }
 
     object ScalaVersion {
       val default = SettingKey[ScalaMajorVersion]("defaultScalaVersion", "Default scala major version; wrapper for scalaVersion")
@@ -111,10 +120,9 @@ object Scala
       // Primary Build is for Scala 2.12 by default
       ScalaVersion.default := `2.12`,
 
-      // Build for Scala 2.11 and 2.12 by default
+      // Build for Scala 2.12 only, by default
       scalaVersions :=
         Seq(
-          `2.11`,
           `2.12`
         )
     ) ++

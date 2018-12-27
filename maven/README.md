@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:maven
 
-[![org.hammerlab.sbt:maven](https://img.shields.io/badge/org.hammerlab.sbt:maven-4.2.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22maven%22)
+[![org.hammerlab.sbt:maven](https://img.shields.io/badge/org.hammerlab.sbt:maven-4.2.1-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22maven%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.2.0")
+addSbtPlugin("org.hammerlab.sbt" % "maven" % "4.2.1")
 ```
 
 [Settings for publishing to Maven repositories (especially Maven Central)](src/main/scala/org/hammerlab/sbt/plugin/Maven.scala):

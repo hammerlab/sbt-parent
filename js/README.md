@@ -1,6 +1,6 @@
 # org.hammerlab.sbt:js
 
-[![org.hammerlab.sbt:github](https://img.shields.io/badge/org.hammerlab.sbt:js-1.3.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22js%22)
+[![org.hammerlab.sbt:js](https://img.shields.io/badge/org.hammerlab.sbt:js-1.3.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22js%22)
 
 Shorthands and dependency-aliases for [ScalaJS](https://www.scala-js.org/) projects
 
