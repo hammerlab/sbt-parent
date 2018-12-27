@@ -124,7 +124,7 @@ object Parent
       }
       object utils
         extends Libs(
-          "org.bdgenomics.utils" ^^ "utils" ^ "0.2.13",
+          "org.bdgenomics.utils" ^^ "utils" ^ "0.2.14",
           artifactFn
         )
       {

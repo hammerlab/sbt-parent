@@ -97,25 +97,15 @@ object Assembly
           newName
         },
 
-        // Add a classifier to the default (unshaded) JAR.
+        // Add a classifier to the default (unshaded) JAR, so that it is not the default artifact at this coordinate.
         artifactClassifier in (Compile, packageBin) := Some("unshaded"),
 
-        // Don't add "unshaded" classifier to -tests JAR.
+        // The "-tests" JAR doesn't need the "unshaded" classifier
         artifactClassifier in (sbt.Test, packageBin) := None,
 
-        artifact in (Compile, assembly) := {
-          // Make the assembly JAR the unclassified artifact.
-          (artifact in (Compile, assembly)).value.withClassifier(None)
-        },
+        // Make the assembly JAR the unclassified artifact.
+        artifact in (Compile, assembly) := (artifact in (Compile, assembly)).value.withClassifier(None),
 
-        packagedArtifacts := {
-          // Don't publish the unshaded JAR.
-          val newArtifacts = packagedArtifacts.value.filterKeys(!_.classifier.exists(_ == "unshaded"))
-          streams.value.log.debug(
-            s"packagedArtifacts, after removing unshaded JAR:\n${newArtifacts.mkString("\t", "\n\t", "")}"
-          )
-          newArtifacts
-        }
       ) ++
         addArtifact(artifact in (Compile, assembly), assembly)  // Publish the assembly JAR.
 
