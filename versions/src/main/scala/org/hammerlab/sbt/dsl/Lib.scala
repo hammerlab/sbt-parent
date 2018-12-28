@@ -9,6 +9,8 @@ import sbt.{ SettingKey, SettingsDefinition }
 
 import scala.collection.mutable.ArrayBuffer
 
+// TODO: separate this out to a non-plugin build target
+// TOOD: add string-interpolator macro a la mill ivy"…"
 sealed abstract class Base(implicit fullname: sourcecode.FullName) {
   def group: Group
   def version: SettingKey[String]

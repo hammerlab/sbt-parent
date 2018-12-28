@@ -88,6 +88,7 @@ object Parent
         )
     }
 
+    // TODO: move these to a non-plugin library, for re-use
     val             args4j =                     "args4j"  ^ "args4j"
     val           autowire =                "com.lihaoyi" ^^ "autowire"
     val          boopickle =                  "io.suzaku" ^^ "boopickle"

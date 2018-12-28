@@ -17,7 +17,7 @@ object Spark
   ) {
 
   object autoImport {
-    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.4.0") - scalatest) {
+    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.4.0") - scalatest - ("org.slf4j"  ^ "slf4j-log4j12")) {
       /**
        * Add Spark dependencies and set the spark version
        */
