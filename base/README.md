@@ -13,8 +13,11 @@ Inherits all plugins in this repo (via [`parent`](../parent)), and adds hammerla
   - `org.hammerlab.test:::base:1.0.3` in JVM projects
   - versions configurable like:
     ```scala
-    hammerlab.test.suite.version := "1.0.4".snapshot,
-    hammerlab.test. base.version := "1.0.4".snapshot
+    hammerlab.test.suite.version := "1.1.0".snapshot
+    hammerlab.test. base.version := "1.1.0".snapshot
+
+    // subsumes both of the above
+    hammerlab.test.version := "1.1.0".snapshot
     ```
   - also picks up ScalaTest `3.0.4` from [`test` plugin](../test)
 - [aliases for common `org.hammerlab` deps](src/main/scala/org/hammerlab/sbt/plugin/HammerLab.scala#L29)

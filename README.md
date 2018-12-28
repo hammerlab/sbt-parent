@@ -6,7 +6,7 @@
 
 ## Modules
 
-### [`assembly`](assembly) [![org.hammerlab.sbt:assembly](https://img.shields.io/badge/org.hammerlab.sbt:assembly-4.6.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22assembly%22)
+### [`assembly`](assembly) [![org.hammerlab.sbt:assembly](https://img.shields.io/badge/org.hammerlab.sbt:assembly-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22assembly%22)
 
 - `sbt-assembly` wrapper
 - building+publishing thin shaded JARs
@@ -16,7 +16,7 @@
 - wraps all modules in this project
 - adds many [hammerlab](https://github.com/hammerlab/) library-aliases default configs
 
-### [`deps`](deps) [![org.hammerlab.sbt:deps](https://img.shields.io/badge/org.hammerlab.sbt:deps-4.5.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22deps%22)
+### [`deps`](deps) [![org.hammerlab.sbt:deps](https://img.shields.io/badge/org.hammerlab.sbt:deps-4.5.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22deps%22)
 
 Dependency-management DSL and helpers
 
@@ -24,7 +24,7 @@ Dependency-management DSL and helpers
 
 Fill in `scmInfo` information, populate other relevant POM fields
 
-### [`js`](js) [![org.hammerlab.sbt:github](https://img.shields.io/badge/org.hammerlab.sbt:js-1.3.2-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22js%22)
+### [`js`](js) [![org.hammerlab.sbt:github](https://img.shields.io/badge/org.hammerlab.sbt:js-1.3.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22js%22)
 
 Shorthands and dependency-aliases for [ScalaJS](https://www.scala-js.org/) projects
 
@@ -37,11 +37,11 @@ Publish to Maven Central, fill POM fields, add default resolvers
 - wrapper for all the plugins here
 - includes aliases for common dependencies
 
-### [`root`](root) [![org.hammerlab.sbt:root](https://img.shields.io/badge/org.hammerlab.sbt:root-4.6.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22root%22)
+### [`root`](root) [![org.hammerlab.sbt:root](https://img.shields.io/badge/org.hammerlab.sbt:root-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22root%22)
 
 Configure multi-module projects
 
-### [`scala`](scala) [![org.hammerlab.sbt:scala](https://img.shields.io/badge/org.hammerlab.sbt:scala-4.6.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22scala%22)
+### [`scala`](scala) [![org.hammerlab.sbt:scala](https://img.shields.io/badge/org.hammerlab.sbt:scala-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22scala%22)
 
 DSL and settings for managing Scala versions
 
@@ -49,15 +49,15 @@ DSL and settings for managing Scala versions
 
 Configure projects that use [Apache Spark](http://spark.apache.org/)
 
-### [`test`](test) [![org.hammerlab.sbt:test](https://img.shields.io/badge/org.hammerlab.sbt:test-4.5.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22test%22)
+### [`test`](test) [![org.hammerlab.sbt:test](https://img.shields.io/badge/org.hammerlab.sbt:test-4.5.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22test%22)
 
 Use [ScalaTest](http://www.scalatest.org/), publish `-tests` JARs
 
-### [`travis`](travis) [![org.hammerlab.sbt:travis](https://img.shields.io/badge/org.hammerlab.sbt:travis-4.6.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22travis%22)
+### [`travis`](travis) [![org.hammerlab.sbt:travis](https://img.shields.io/badge/org.hammerlab.sbt:travis-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22travis%22)
 
 Interface with [Coveralls](https://coveralls.io/) and [TravisCI](https://travis-ci.org/)
 
-### [`versions`](versions) [![org.hammerlab.sbt:versions](https://img.shields.io/badge/org.hammerlab.sbt:versions-4.5.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22versions%22)
+### [`versions`](versions) [![org.hammerlab.sbt:versions](https://img.shields.io/badge/org.hammerlab.sbt:versions-4.5.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22versions%22)
 
 Manage dependency-versions
 

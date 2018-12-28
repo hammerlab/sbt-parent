@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.dsl
 
+import hammerlab.deps.syntax._
 import hammerlab.show._
 import org.hammerlab.sbt.deps.{ CrossVersion, Dep, Group }
 import org.hammerlab.sbt.dsl.Base.showDep
@@ -82,6 +83,8 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
           }
           .map { _ → version.value }
     )
+
+  def snapshot: SettingsDefinition = version := version.value.snapshot
 }
 
 class Lib(

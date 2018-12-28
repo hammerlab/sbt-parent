@@ -26,13 +26,13 @@ val   scalaCrossProject = addSbtPlugin("org.portable-scala" % "sbt-crossproject"
 val scalaJSCrossProject = addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0" )
 
 lazy val lib = project.settings(
-  v"4.2.1",
+  v"4.3.0",
   providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
   sbtScalaJS
 )
 
 lazy val assembly = plugin.settings(
-  v"4.6.5",
+  v"4.6.6",
   sbtAssembly,
   sbtScalaJS
 ).dependsOn(
@@ -43,7 +43,7 @@ lazy val assembly = plugin.settings(
 )
 
 lazy val deps = plugin.settings(
-  v"4.5.5",
+  v"4.5.6",
   sbtScalaJS
 ).dependsOn(
   lib,
@@ -53,7 +53,7 @@ lazy val deps = plugin.settings(
 lazy val github = plugin.settings(r"4.1.0")
 
 lazy val js = plugin.settings(
-  v"1.3.2",
+  v"1.3.3",
   sbtScalaJS,
   scalaJSBundler,
   scalaJSCrossProject
@@ -63,14 +63,14 @@ lazy val js = plugin.settings(
 )
 
 lazy val maven = plugin.settings(
-  v"4.2.1",
+  v"4.2.2",
   sonatype
 ).dependsOn(
   lib
 )
 
 lazy val root = plugin.settings(
-  v"4.6.5",
+  v"4.6.6",
   scoverage,
   dep(sourcecode)
 ).dependsOn(
@@ -81,7 +81,7 @@ lazy val root = plugin.settings(
 )
 
 lazy val scala = plugin.settings(
-  v"4.6.5",
+  v"4.6.6",
   dep(
     hammerlab.bytes % "1.3.0"
   )
@@ -103,7 +103,7 @@ lazy val spark = plugin.settings(
 )
 
 lazy val test = plugin.settings(
-  v"4.5.5"
+  v"4.5.6"
 ).dependsOn(
   deps,
   lib,
@@ -111,7 +111,7 @@ lazy val test = plugin.settings(
 )
 
 lazy val travis = plugin.settings(
-  v"4.6.5",
+  v"4.6.6",
   scoverage,
   coveralls
 ).dependsOn(
@@ -122,7 +122,7 @@ lazy val travis = plugin.settings(
 .enablePlugins(SbtPlugin)
 
 lazy val versions = plugin.settings(
-  v"4.5.5",
+  v"4.5.6",
   pgp,
   dep(
     sourcecode,
