@@ -56,7 +56,7 @@ object Spark
         )
     }
 
-    object hadoop extends Lib("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3")
+    object hadoop extends Lib(("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3") - ("org.slf4j" ^ "slf4j-log4j12"))
     object   kryo extends Lib("com.esotericsoftware.kryo" ^ "kryo" ^ "2.24.0")
   }
 
