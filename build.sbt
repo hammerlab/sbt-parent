@@ -1,9 +1,8 @@
 // upstream setting conflicts with module name in this project
-import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ gh }
+import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ _ }
 import Resolver.bintrayIvyRepo
 
 default(
-  `2.12` only,
   subgroup("sbt"),
   clearTestDeps,
   resolvers ++= Seq(
@@ -28,6 +27,10 @@ val scalaJSCrossProject = addSbtPlugin("org.portable-scala" % "sbt-scalajs-cross
 lazy val lib = project.settings(
   v"4.3.0",
   providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
+  dep(
+    sourcecode,
+    hammerlab.io % "5.2.1"
+  ),
   sbtScalaJS
 )
 
@@ -124,11 +127,7 @@ lazy val travis = plugin.settings(
 
 lazy val versions = plugin.settings(
   v"4.5.6",
-  pgp,
-  dep(
-    sourcecode,
-    hammerlab.io % "5.1.0"
-  )
+  pgp
 ).dependsOn(
   lib
 )

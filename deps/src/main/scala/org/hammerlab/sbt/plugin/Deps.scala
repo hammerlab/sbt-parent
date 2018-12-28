@@ -1,7 +1,7 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.dsl
-import org.hammerlab.sbt.deps.{ Configuration, Dep, Group, CrossVersion }
+import org.hammerlab.sbt.Base
+import org.hammerlab.sbt.deps.{ Configuration, CrossVersion, Dep, Group }
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
@@ -16,10 +16,11 @@ object Deps
   object DepArg {
     implicit class SingleDep(dep: Dep) extends DepArg(Seq(dep))
     implicit class MultiDep(_deps: Seq[Dep]) extends DepArg(_deps)
-    implicit class DslDep(dep: dsl.Base) extends DepArg(dep.asDeps)
+    implicit class DslDep(dep: Base) extends DepArg(dep.asDeps)
   }
 
   object autoImport {
+
     val               deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
     val           testDeps = settingKey[Seq[Dep]]("Test-scoped dependencies")
     val       providedDeps = settingKey[Seq[Dep]]("Provided-scoped dependencies")
@@ -126,7 +127,7 @@ object Deps
        * Work-around for https://github.com/sbt/sbt/issues/3709: `dependsOn(foo % "test->test")` does not get correctly
        * translated into a test-scoped dependency on foo's "-tests" JAR in the depending project's POM
        */
-      projectDependencies := (
+      projectDependencies :=
         projectDependencies
           .value
           .flatMap {
@@ -152,6 +153,5 @@ object Deps
               else
                 Seq(dep)
           }
-      )
     )
 }

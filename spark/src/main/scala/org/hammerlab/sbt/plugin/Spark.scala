@@ -1,7 +1,7 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.{ Lib, Libs, aliases }
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.dsl.{ Lib, Libs }
 import org.hammerlab.sbt.plugin.Scala.autoImport.`2.11`
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.DefaultVersion
@@ -15,14 +15,15 @@ object Spark
     Deps,
     Scala,
     Versions
-  ) {
+  )
+  with aliases {
 
   object autoImport {
     object spark
       extends Libs(
         ("org.apache.spark" ^^ "spark" ^ "2.4.0")
         - scalatest
-        - ("org.slf4j"  ^ "slf4j-log4j12")
+        - log4j
       )
     {
       /**
@@ -55,9 +56,6 @@ object Spark
           excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
         )
     }
-
-    object hadoop extends Lib(("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3") - ("org.slf4j" ^ "slf4j-log4j12"))
-    object   kryo extends Lib("com.esotericsoftware.kryo" ^ "kryo" ^ "2.24.0")
   }
 
   private val computedSparkVersion  = settingKey[String]( "Spark version to use, taking in to account 'spark.version' system property")

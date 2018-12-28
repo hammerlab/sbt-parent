@@ -3,14 +3,14 @@ package org.hammerlab.sbt.plugin
 import hammerlab.bytes
 import hammerlab.bytes._
 import hammerlab.show._
-import org.hammerlab.sbt.deps.{ Dep, IsScalaJS }
+import org.hammerlab.sbt.Lib
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.dsl
+import org.hammerlab.sbt.deps.IsScalaJS
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
-import sbt. { Show ⇒ _, _ }
 import sbt.plugins.SbtPlugin
+import sbt.{ Show ⇒ _, _ }
 import sourcecode.Name
 
 object Scala
@@ -49,7 +49,7 @@ object Scala
     val partialUnification = scalacOptions += "-Ypartial-unification"
 
     object kindProjector
-      extends dsl.Lib(
+      extends Lib(
         "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
       ) {
       override val settings =

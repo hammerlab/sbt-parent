@@ -1,14 +1,13 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.Libs
+import org.hammerlab.sbt.Libs.disablePrepend
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
-import org.hammerlab.sbt.dsl.Libs
-import org.hammerlab.sbt.dsl.Libs.disablePrepend
 import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.  GitHub.autoImport._
 import org.hammerlab.sbt.plugin.   Maven.autoImport._
 import org.hammerlab.sbt.plugin.  Parent.autoImport._
-import org.hammerlab.sbt.plugin.   Spark.autoImport.hadoop
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._

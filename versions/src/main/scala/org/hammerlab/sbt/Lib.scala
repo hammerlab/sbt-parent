@@ -1,9 +1,9 @@
-package org.hammerlab.sbt.dsl
+package org.hammerlab.sbt
 
 import hammerlab.deps.syntax._
 import hammerlab.show._
+import org.hammerlab.sbt.Base.showDep
 import org.hammerlab.sbt.deps.{ CrossVersion, Dep, Group }
-import org.hammerlab.sbt.dsl.Base.showDep
 import org.hammerlab.sbt.plugin.Versions.autoImport.defaultVersions
 import sbt.internal.DslEntry
 import sbt.{ SettingKey, SettingsDefinition }
@@ -58,15 +58,13 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
       fullname
         .value
         .split("\\.")
-        .iterator
+
+    // Attempt to abbreviate the name by dropping common prefixes
     names
-      .find(_ == "autoImport")
-      .map { _ ⇒ names.mkString("-") }
-      .getOrElse {
-        throw new IllegalStateException(
-          s"Couldn't find `autoImport` in full-name of Dep: ${fullname.value}"
-        )
-      }
+      .reverse
+      .takeWhile { name ⇒ name != "autoImport" && name != "sbt" }
+      .reverse
+      .mkString("-")
   }
 
   def project: SettingsDefinition =

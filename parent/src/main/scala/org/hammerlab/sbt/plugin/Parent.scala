@@ -2,15 +2,14 @@ package org.hammerlab.sbt.plugin
 
 import java.io.File
 
-import org.hammerlab.sbt.deps.{ Group, SnapshotOps }
-import org.hammerlab.sbt.dsl.{ Lib, Libs }
+import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Root.autoImport.parent
-import org.hammerlab.sbt.plugin.Spark.autoImport.hadoop
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
-import sbt._
+import org.hammerlab.sbt.{ Lib, Libs, aliases }
 import sbt.Keys._
+import sbt._
+import sbtbuildinfo.BuildInfoKeys._
 import sbtbuildinfo._
-import BuildInfoKeys._
 import sbtcrossproject.{ CrossPlugin, CrossProject, CrossType, JVMPlatform, Platform }
 import scalajscrossproject.JSPlatform
 import sourcecode.Name
@@ -28,12 +27,13 @@ object Parent
   import Group._
 
   trait platform {
-    val  js =  JSPlatform
+    val js  =  JSPlatform
     val jvm = JVMPlatform
   }
 
   object autoImport
-    extends SnapshotOps
+    extends hammerlab.deps.syntax
+       with aliases
        with platform {
 
     def cross                      (implicit name: Name, crossType: CrossType = CrossType.Full): CrossProject = cross(jvm, js)(name, crossType)
@@ -98,7 +98,6 @@ object Parent
     val seqdoop_hadoop_bam =               ("org.seqdoop"  ^ "hadoop-bam") - hadoop
     val             htsjdk =       ("com.github.samtools"  ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
     val            kittens =              "org.typelevel" ^^ "kittens"
-    val              log4j =                  "org.slf4j"  ^ "slf4j-log4j12"
     val           magnolia =             "com.propensive" ^^ "magnolia"
     val       parquet_avro =         "org.apache.parquet"  ^ "parquet-avro"
     val            purecsv =         "com.github.melrief" ^^ "purecsv"
@@ -204,53 +203,57 @@ object Parent
       val                   hot  = lib
       val `scalajsreact-interop` = lib
 
-      import sbt._, Keys._
+      import sbt._
+      import Keys._
       override def settings: SettingsDefinition = scalacOptions += "-P:scalajs:sjsDefinedByDefault"
     }
   }
 
   import autoImport._
 
-  override def globalSettings =
-       bdg.global ++
-      cats.global ++
-     circe.global ++
-       fs2.global ++
-    http4s.global ++
-    slinky.global ++
+  val wrappers = Seq(
+    cats,
+    circe,
+    fs2,
+    http4s,
+    slinky
+  )
+
+  override def globalSettings = (
     Seq(
       versions(
-        args4j             → "2.33",
-        autowire           → "0.2.6",
-        boopickle          → "1.3.0",
-        breeze             → "0.13.2",
-        case_app           → "2.0.0-M5",
-        guava              → "19.0",
-        htsjdk             → "2.9.1",
-        kittens            → "1.2.0",
-        log4j              → "1.7.21",
-        magnolia           → "0.10.0",
-        parquet_avro       → "1.8.1",
-        purecsv            → "0.1.1",
-        scalatags          → "0.6.7",
-        scalautils         → "2.1.5",
-        seqdoop_hadoop_bam → "7.9.0",
-        shapeless          → "2.3.3",
-        slf4j              → "1.3.1",
-        sourcecode         → "0.1.4",
-        spire              → "0.15.0",
-        sttp               → "1.3.9"
+        args4j             → "2.33"     ,
+        autowire           → "0.2.6"    ,
+        boopickle          → "1.3.0"    ,
+        breeze             → "0.13.2"   ,
+        case_app           → "2.0.0-M5" ,
+        guava              → "19.0"     ,
+        htsjdk             → "2.9.1"    ,
+        kittens            → "1.2.0"    ,
+        log4j              → "1.7.21"   ,
+        magnolia           → "0.10.0"   ,
+        parquet_avro       → "1.8.1"    ,
+        purecsv            → "0.1.1"    ,
+        scalatags          → "0.6.7"    ,
+        scalautils         → "2.1.5"    ,
+        seqdoop_hadoop_bam → "7.9.0"    ,
+        shapeless          → "2.3.3"    ,
+        slf4j              → "1.3.1"    ,
+        sourcecode         → "0.1.4"    ,
+        spire              → "0.15.0"   ,
+        sttp               → "1.3.9"    ,
+        test_logging       → "1.1.0"    ,
       )
     )
+    ++ bdg.global
+    ++ wrappers.flatMap(_.global)
+  )
 
-  override def projectSettings =
+  override def projectSettings = (
     Seq(
       commons.defaults
-    ) ++
-       bdg.project ++
-      cats.project ++
-     circe.project ++
-       fs2.project ++
-    http4s.project ++
-    slinky.project
+    )
+    ++ bdg.project
+    ++ wrappers.flatMap(_.project)
+  )
 }

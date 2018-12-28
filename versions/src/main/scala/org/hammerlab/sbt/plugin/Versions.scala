@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.dsl
+import org.hammerlab.sbt.Base
 import org.hammerlab.sbt.deps.VersionOps._
 import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, Snapshot, VersionsMap }
 import sbt.Defaults.artifactPathSetting
@@ -26,7 +26,7 @@ object Versions
   case class DefaultVersion(groupArtifact: GroupArtifact, version: String)
   object DefaultVersion {
     implicit def fromTuple(t: (Dep, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
-    implicit def fromDslDepTuple(t: (dsl.Base, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
+    implicit def fromDslDepTuple(t: (Base, String)): DefaultVersion = DefaultVersion(t._1.groupArtifact, t._2)
   }
 
   /**
