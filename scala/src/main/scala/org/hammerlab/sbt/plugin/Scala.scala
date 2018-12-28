@@ -52,7 +52,7 @@ object Scala
         "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
       ) {
       override val settings =
-        base.toModuleIDs(IsScalaJS.no) match {
+        _base.toModuleIDs(IsScalaJS.no) match {
           case Seq(dep) ⇒ addCompilerPlugin(dep)
         }
     }
