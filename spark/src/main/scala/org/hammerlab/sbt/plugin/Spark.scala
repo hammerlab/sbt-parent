@@ -23,7 +23,6 @@ object Spark
       extends Libs(
         ("org.apache.spark" ^^ "spark" ^ "2.4.0")
         - scalatest
-        - log4j
       )
     {
       /**

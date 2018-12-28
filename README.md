@@ -11,7 +11,7 @@
 - `sbt-assembly` wrapper
 - building+publishing thin shaded JARs
 
-### [`base`] [![org.hammerlab.sbt:base](https://img.shields.io/badge/org.hammerlab.sbt:base-4.6.7-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22base%22)
+### [`base`] [![org.hammerlab.sbt:base](https://img.shields.io/badge/org.hammerlab.sbt:base-4.6.8-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22base%22)
 
 - wraps all modules in this project
 - adds many [hammerlab](https://github.com/hammerlab/) library-aliases default configs
@@ -32,7 +32,7 @@ Shorthands and dependency-aliases for [ScalaJS](https://www.scala-js.org/) proje
 
 Publish to Maven Central, fill POM fields, add default resolvers
 
-### [`parent`] [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.7-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
+### [`parent`] [![org.hammerlab.sbt:parent](https://img.shields.io/badge/org.hammerlab.sbt:parent-4.6.8-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22parent%22)
 
 - wrapper for all the plugins here
 - includes aliases for common dependencies
@@ -45,7 +45,7 @@ Configure multi-module projects
 
 DSL and settings for managing Scala versions
 
-### [`spark`](spark) [![org.hammerlab.sbt:spark](https://img.shields.io/badge/org.hammerlab.sbt:spark-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22spark%22)
+### [`spark`](spark) [![org.hammerlab.sbt:spark](https://img.shields.io/badge/org.hammerlab.sbt:spark-4.6.7-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22spark%22)
 
 Configure projects that use [Apache Spark](http://spark.apache.org/)
 
