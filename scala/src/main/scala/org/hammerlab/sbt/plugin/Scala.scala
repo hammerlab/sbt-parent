@@ -87,12 +87,16 @@ object Scala
           scalaVersions := Seq(this)
         )
       lazy val  add = scalaVersions +=     this
+      def unary_+() = add
 
       val defaults =
         Seq(
           version := default,
           ? := scalaBinaryVersion.value == v
         )
+    }
+    object ScalaMajorVersion {
+      implicit def toSettings(s: ScalaMajorVersion): SettingsDefinition = s.only
     }
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")

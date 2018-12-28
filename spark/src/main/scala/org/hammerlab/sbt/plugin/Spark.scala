@@ -2,6 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.dsl.{ Lib, Libs }
+import org.hammerlab.sbt.plugin.Scala.autoImport.`2.11`
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.DefaultVersion
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
@@ -17,7 +18,13 @@ object Spark
   ) {
 
   object autoImport {
-    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.4.0") - scalatest - ("org.slf4j"  ^ "slf4j-log4j12")) {
+    object spark
+      extends Libs(
+        ("org.apache.spark" ^^ "spark" ^ "2.4.0")
+        - scalatest
+        - ("org.slf4j"  ^ "slf4j-log4j12")
+      )
+    {
       /**
        * Add Spark dependencies and set the spark version
        */
@@ -29,13 +36,14 @@ object Spark
       val  mllib = lib
       val    sql = lib
 
-      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.4") - hadoop)
+      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.4.0") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
        */
       override val settings: SettingsDefinition =
         Seq(
+          +`2.11`,
           Deps.autoImport.dep(
             spark.core provided,
             spark.tests tests,

@@ -82,6 +82,7 @@ object HammerLab
   }
 
   object autoImport extends all {
+    val hl = hammerlab
     object hammerlab extends all {
 
       def apply(name: String) = lib(name)
