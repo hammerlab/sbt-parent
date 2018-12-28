@@ -83,7 +83,8 @@ lazy val root = plugin.settings(
 lazy val scala = plugin.settings(
   v"4.6.6",
   dep(
-    hammerlab.bytes % "1.3.0"
+    hammerlab.bytes % "1.3.0",
+    hammerlab.io % "5.2.1"
   )
 ).dependsOn(
   deps,

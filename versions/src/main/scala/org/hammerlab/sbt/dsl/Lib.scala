@@ -117,7 +117,7 @@ object Name {
 
 class Libs(
   protected val _base: Dep,
-  artifactFn: (String, String) ⇒ String = (prefix, name) ⇒ s"$prefix-$name"
+  artifactFn: (String, String) ⇒ String = Libs.prepend
 )(
   implicit
   fullname: sourcecode.FullName
@@ -147,6 +147,10 @@ class Libs(
     libs += dep
     dep
   }
+}
+object Libs {
+  val prepend: (String, String) ⇒ String = (prefix, name) ⇒ s"$prefix-$name"
+  val disablePrepend: (String, String) ⇒ String = (_, name) ⇒ name
 }
 
 object Base {

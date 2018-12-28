@@ -3,6 +3,7 @@ package org.hammerlab.sbt.plugin
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
 import org.hammerlab.sbt.dsl.Libs
+import org.hammerlab.sbt.dsl.Libs.disablePrepend
 import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.  GitHub.autoImport._
 import org.hammerlab.sbt.plugin.   Maven.autoImport._
@@ -90,7 +91,11 @@ object HammerLab
 
       val io = io_utils
 
-      object test extends Libs(lib('test, 'suite) ^ "1.0.4") {
+      object test
+        extends Libs(
+          lib('test, 'suite) ^ "1.1.0",
+          disablePrepend
+        ) {
         val base = lib
         // the `base` module mostly includes local-filesystem / Path-related helpers which are not implemented for
         // scala.js
@@ -157,7 +162,7 @@ object HammerLab
         if (addTestLib.value)
           Seq(
             if (isScalaJSProject.value)
-              hammerlab.test
+              hammerlab.test.suite
             else
               hammerlab.test.base
           )

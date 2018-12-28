@@ -2,13 +2,14 @@ package org.hammerlab.sbt.plugin
 
 import hammerlab.bytes
 import hammerlab.bytes._
+import hammerlab.show._
 import org.hammerlab.sbt.deps.{ Dep, IsScalaJS }
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.dsl
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
-import sbt._
+import sbt. { Show ⇒ _, _ }
 import sbt.plugins.SbtPlugin
 import sourcecode.Name
 
@@ -98,8 +99,9 @@ object Scala
     case object `2.12` extends ScalaMajorVersion("2.12", "2.12.8")
 
     object scalac {
-      def xms(bytes: Bytes) = scalacOptions += s"-J-Xms${bytes.toString.filter(_ != 'B').toLowerCase}"
-      def xmx(bytes: Bytes) = scalacOptions += s"-J-Xmx${bytes.toString.filter(_ != 'B').toLowerCase}"
+      implicit val showBytes: Show[Bytes] = { _.toString.filter(_ != 'B').toLowerCase }
+      def xms(bytes: Bytes) = scalacOptions += show"-J-Xms$bytes"
+      def xmx(bytes: Bytes) = scalacOptions += show"-J-Xmx$bytes"
     }
 
     object ScalaVersion {
