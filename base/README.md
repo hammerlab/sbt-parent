@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:base
 
-[![org.hammerlab.sbt:base](https://img.shields.io/badge/org.hammerlab.sbt:base-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22base%22)
+[![org.hammerlab.sbt:base](https://img.shields.io/badge/org.hammerlab.sbt:base-4.6.7-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22base%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.6")
+addSbtPlugin("org.hammerlab.sbt" % "base" % "4.6.7")
 ```
 
 Inherits all plugins in this repo (via [`parent`](../parent)), and adds hammerlab-specific configs:
@@ -13,8 +13,11 @@ Inherits all plugins in this repo (via [`parent`](../parent)), and adds hammerla
   - `org.hammerlab.test:::base:1.0.3` in JVM projects
   - versions configurable like:
     ```scala
-    hammerlab.test.suite.version := "1.0.4".snapshot,
-    hammerlab.test. base.version := "1.0.4".snapshot
+    hammerlab.test.suite.version := "1.1.0".snapshot
+    hammerlab.test. base.version := "1.1.0".snapshot
+
+    // subsumes both of the above
+    hammerlab.test.version := "1.1.0".snapshot
     ```
   - also picks up ScalaTest `3.0.4` from [`test` plugin](../test)
 - [aliases for common `org.hammerlab` deps](src/main/scala/org/hammerlab/sbt/plugin/HammerLab.scala#L29)

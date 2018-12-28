@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:root
 
-[![org.hammerlab.sbt:root](https://img.shields.io/badge/org.hammerlab.sbt:root-4.6.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22root%22)
+[![org.hammerlab.sbt:root](https://img.shields.io/badge/org.hammerlab.sbt:root-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22root%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "root" % "4.6.5")
+addSbtPlugin("org.hammerlab.sbt" % "root" % "4.6.6")
 ```
 
 ## `root`: top-level no-op aggregator project

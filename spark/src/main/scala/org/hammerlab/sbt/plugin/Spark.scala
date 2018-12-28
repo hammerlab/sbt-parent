@@ -1,7 +1,8 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.{ Lib, Libs, aliases }
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.dsl.{ Lib, Libs }
+import org.hammerlab.sbt.plugin.Scala.autoImport.`2.11`
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.DefaultVersion
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
@@ -14,10 +15,17 @@ object Spark
     Deps,
     Scala,
     Versions
-  ) {
+  )
+  with aliases {
 
   object autoImport {
-    object spark extends Libs(("org.apache.spark" ^^ "spark" ^ "2.4.0") - scalatest) {
+    object spark
+      extends Libs(
+        ("org.apache.spark" ^^ "spark" ^ "2.4.0")
+        - scalatest
+        - log4j
+      )
+    {
       /**
        * Add Spark dependencies and set the spark version
        */
@@ -29,13 +37,14 @@ object Spark
       val  mllib = lib
       val    sql = lib
 
-      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.3.4") - hadoop)
+      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.4.0") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
        */
       override val settings: SettingsDefinition =
         Seq(
+          +`2.11`,
           Deps.autoImport.dep(
             spark.core provided,
             spark.tests tests,
@@ -47,9 +56,6 @@ object Spark
           excludeDependencies += ExclusionRule("javax.servlet", "servlet-api")
         )
     }
-
-    object hadoop extends Lib("org.apache.hadoop" ^ "hadoop-client" ^ "2.7.3")
-    object   kryo extends Lib("com.esotericsoftware.kryo" ^ "kryo" ^ "2.24.0")
   }
 
   private val computedSparkVersion  = settingKey[String]( "Spark version to use, taking in to account 'spark.version' system property")

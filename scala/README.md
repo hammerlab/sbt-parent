@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:scala
 
-[![org.hammerlab.sbt:scala](https://img.shields.io/badge/org.hammerlab.sbt:scala-4.6.5-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22scala%22)
+[![org.hammerlab.sbt:scala](https://img.shields.io/badge/org.hammerlab.sbt:scala-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22scala%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "scala" % "4.6.5")
+addSbtPlugin("org.hammerlab.sbt" % "scala" % "4.6.6")
 ```
 
 [Scala-library and -version settings](src/main/scala/org/hammerlab/sbt/plugin/Scala.scala):

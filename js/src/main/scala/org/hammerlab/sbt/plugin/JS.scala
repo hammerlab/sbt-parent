@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.dsl
+import org.hammerlab.sbt.Lib
 import org.hammerlab.sbt.plugin.Deps.autoImport._
 import org.hammerlab.sbt.plugin.JS.autoImport.scalajs.css
 import org.hammerlab.sbt.plugin.Versions.autoImport._
@@ -27,7 +27,7 @@ object JS
 
     object scalajs {
 
-      object css extends dsl.Lib("com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3") {
+      object css extends Lib("com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3") {
         val  core = dep
         val react = group ^^ "ext-react"
         override val global: SettingsDefinition =
@@ -40,7 +40,7 @@ object JS
 
       val dom = "org.scala-js" ^^ "scalajs-dom"
 
-      object react extends dsl.Lib("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.3.1") {
+      object react extends Lib("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.3.1") {
         val  core = dep
         val extra = group ^^ "extra"
         val jsVersion = SettingKey[String]("reactJSVersion", "Version of react JS libraries")
@@ -89,7 +89,7 @@ object JS
           )
       }
 
-      object diode extends dsl.Lib("io.suzaku" ^^ "diode" ^ "1.1.3") {
+      object diode extends Lib("io.suzaku" ^^ "diode" ^ "1.1.3") {
         val core = dep
         val react = group ^^ "diode-react"
         override val global: SettingsDefinition =

@@ -1,7 +1,7 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.Lib
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.dsl.Lib
 import org.hammerlab.sbt.plugin.Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.Versions.autoImport.fixed
 import org.hammerlab.sbt.plugin.Versions.noopSettings

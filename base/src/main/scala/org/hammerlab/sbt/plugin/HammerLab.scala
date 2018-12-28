@@ -1,14 +1,13 @@
 package org.hammerlab.sbt.plugin
 
+import org.hammerlab.sbt.Libs
+import org.hammerlab.sbt.Libs.disablePrepend
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
-import org.hammerlab.sbt.dsl
 import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
 import org.hammerlab.sbt.plugin.  GitHub.autoImport._
 import org.hammerlab.sbt.plugin.   Maven.autoImport._
 import org.hammerlab.sbt.plugin.  Parent.autoImport._
-import org.hammerlab.sbt.plugin.   Spark.autoImport.hadoop
-import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
@@ -82,6 +81,7 @@ object HammerLab
   }
 
   object autoImport extends all {
+    val hl = hammerlab
     object hammerlab extends all {
 
       def apply(name: String) = lib(name)
@@ -91,9 +91,17 @@ object HammerLab
 
       val io = io_utils
 
-      object test {
-        object suite extends dsl.Lib(lib('test, 'suite) ^ "1.0.3")
-        object  base extends dsl.Lib(lib('test,  'base) ^ "1.0.3")
+      object test
+        extends Libs(
+          lib('test, 'suite) ^ "1.1.0",
+          disablePrepend
+        ) {
+        val base = lib
+        // the `base` module mostly includes local-filesystem / Path-related helpers which are not implemented for
+        // scala.js
+        val jvm = base
+
+        val suite = _base
       }
     }
   }
@@ -123,8 +131,7 @@ object HammerLab
 
       addTestLib := true
     ) ++
-    hammerlab.test.suite.global ++
-    hammerlab.test. base.global
+    hammerlab.test.global
 
   override def projectSettings =
     Seq(
@@ -163,6 +170,5 @@ object HammerLab
           Nil
       )
     ) ++
-    hammerlab.test.suite.project ++
-    hammerlab.test. base.project
+    hammerlab.test.project
 }

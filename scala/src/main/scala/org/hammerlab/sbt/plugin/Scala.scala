@@ -2,14 +2,15 @@ package org.hammerlab.sbt.plugin
 
 import hammerlab.bytes
 import hammerlab.bytes._
-import org.hammerlab.sbt.deps.{ Dep, IsScalaJS }
+import hammerlab.show._
+import org.hammerlab.sbt.Lib
 import org.hammerlab.sbt.deps.Group._
-import org.hammerlab.sbt.dsl
+import org.hammerlab.sbt.deps.IsScalaJS
 import org.hammerlab.sbt.plugin.Deps.autoImport.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
-import sbt._
 import sbt.plugins.SbtPlugin
+import sbt.{ Show ⇒ _, _ }
 import sourcecode.Name
 
 object Scala
@@ -48,11 +49,11 @@ object Scala
     val partialUnification = scalacOptions += "-Ypartial-unification"
 
     object kindProjector
-      extends dsl.Lib(
+      extends Lib(
         "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
       ) {
       override val settings =
-        base.toModuleIDs(IsScalaJS.no) match {
+        _base.toModuleIDs(IsScalaJS.no) match {
           case Seq(dep) ⇒ addCompilerPlugin(dep)
         }
     }
@@ -86,6 +87,7 @@ object Scala
           scalaVersions := Seq(this)
         )
       lazy val  add = scalaVersions +=     this
+      def unary_+() = add
 
       val defaults =
         Seq(
@@ -93,13 +95,17 @@ object Scala
           ? := scalaBinaryVersion.value == v
         )
     }
+    object ScalaMajorVersion {
+      implicit def toSettings(s: ScalaMajorVersion): SettingsDefinition = s.only
+    }
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")
     case object `2.12` extends ScalaMajorVersion("2.12", "2.12.8")
 
     object scalac {
-      def xms(bytes: Bytes) = scalacOptions += s"-J-Xms${bytes.toString.filter(_ != 'B').toLowerCase}"
-      def xmx(bytes: Bytes) = scalacOptions += s"-J-Xmx${bytes.toString.filter(_ != 'B').toLowerCase}"
+      implicit val showBytes: Show[Bytes] = { _.toString.filter(_ != 'B').toLowerCase }
+      def xms(bytes: Bytes) = scalacOptions += show"-J-Xms$bytes"
+      def xmx(bytes: Bytes) = scalacOptions += show"-J-Xmx$bytes"
     }
 
     object ScalaVersion {

@@ -1,26 +1,33 @@
-package org.hammerlab.sbt.dsl
+package org.hammerlab.sbt
 
+import hammerlab.deps.syntax._
 import hammerlab.show._
+import org.hammerlab.sbt.Base.showDep
 import org.hammerlab.sbt.deps.{ CrossVersion, Dep, Group }
-import org.hammerlab.sbt.dsl.Base.showDep
 import org.hammerlab.sbt.plugin.Versions.autoImport.defaultVersions
 import sbt.internal.DslEntry
 import sbt.{ SettingKey, SettingsDefinition }
 
 import scala.collection.mutable.ArrayBuffer
 
+// TODO: separate this out to a non-plugin build target
+// TOOD: add string-interpolator macro a la mill ivy"…"
+/**
+ * Wrapper for [[Lib one]] or [[Libs more]] Maven coordinates, along with default versions and hooks for global- and
+ * project-level settings to use when passing the wrapper as a top-level [[SettingsDefinition SBT setting]].
+ */
 sealed abstract class Base(implicit fullname: sourcecode.FullName) {
   def group: Group
   def version: SettingKey[String]
 
   /**
    * An input [[Dep]], or [[Dep]]-template, used to set a default [[Group]] and [[version]], though not necessarily a
-   * valid [[Dep]] itself (see [[Libs]], where [[base]] is a ctor argument providing a template from which to construct
+   * valid [[Dep]] itself (see [[Libs]], where [[_base]] is a ctor argument providing a template from which to construct
    * module-[[Dep]]s)
    */
-  protected def base: Dep
+  protected def _base: Dep
   def global: SettingsDefinition =
-    base
+    _base
       .version
       .map { version := _ }
       .toSeq
@@ -51,15 +58,13 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
       fullname
         .value
         .split("\\.")
-        .iterator
+
+    // Attempt to abbreviate the name by dropping common prefixes
     names
-      .find(_ == "autoImport")
-      .map { _ ⇒ names.mkString("-") }
-      .getOrElse {
-        throw new IllegalStateException(
-          s"Couldn't find `autoImport` in full-name of Dep: ${fullname.value}"
-        )
-      }
+      .reverse
+      .takeWhile { name ⇒ name != "autoImport" && name != "sbt" }
+      .reverse
+      .mkString("-")
   }
 
   def project: SettingsDefinition =
@@ -76,10 +81,12 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
           }
           .map { _ → version.value }
     )
+
+  def snapshot: SettingsDefinition = version := version.value.snapshot
 }
 
 class Lib(
-  protected val base: Dep
+  protected val _base: Dep
 )(
   implicit
   fullname: sourcecode.FullName
@@ -87,7 +94,7 @@ class Lib(
 extends Base {
 
   /** if a version is passed in, send it through [[org.hammerlab.sbt.plugin.Versions.autoImport.versions]] */
-  val dep: Dep = base.copy(version = None)
+  val dep: Dep = _base.copy(version = None)
   def deps = Seq(dep)
 
   val group = dep.group
@@ -107,22 +114,22 @@ object Name {
 }
 
 class Libs(
-  protected val base: Dep,
-  artifactFn: (String, String) ⇒ String = (prefix, name) ⇒ s"$prefix-$name"
+  protected val _base: Dep,
+  artifactFn: (String, String) ⇒ String = Libs.prepend
 )(
   implicit
   fullname: sourcecode.FullName
 )
   extends Base {
-  val group = base.group
-  val artifactPrefix = base.artifact.value
+  val group = _base.group
+  val artifactPrefix = _base.artifact.value
 
   def artifact(name: String) = artifactFn(artifactPrefix, name)
 
   val version =
     SettingKey[String](
       s"$name-version",
-      show"Version of ${base.copy(artifact = s"${artifact("*")}")} to use"
+      show"Version of ${_base.copy(artifact = s"${artifact("*")}")} to use"
     )
 
   def dep: Dep = libs.head
@@ -131,13 +138,17 @@ class Libs(
   protected val libs = ArrayBuffer[Dep]()
   def lib(implicit name: Name) = {
     val dep =
-      base.copy(
+      _base.copy(
         artifact = artifact(name),
          version = None
       )
     libs += dep
     dep
   }
+}
+object Libs {
+  val prepend: (String, String) ⇒ String = (prefix, name) ⇒ s"$prefix-$name"
+  val disablePrepend: (String, String) ⇒ String = (_, name) ⇒ name
 }
 
 object Base {
