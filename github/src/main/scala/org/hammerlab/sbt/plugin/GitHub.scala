@@ -19,18 +19,16 @@ object GitHub
   }
 
   object autoImport {
-    val githubUser = settingKey[Option[String]]("Github user/org")
-    val githubRepo = settingKey[Option[String]]("Github repository basename")
-
     object github {
-      def apply(org: String, repo: String) =
+      def apply(user: String, repo: String) =
         Seq(
-          githubUser in ThisBuild := Some( org),
-          githubRepo in ThisBuild := Some(repo)
+          this.user := Some(user),
+          this.repo := Some(repo)
         )
 
-      def user(name: String) = githubUser in ThisBuild := Some(name)
-      def repo(name: String) = githubRepo in ThisBuild := Some(name)
+      val user = settingKey[Option[String]]("Github user/org")
+      val repo = settingKey[Option[String]]("Github repository basename")
+      val  org = user
     }
 
     val apache2License = ("Apache 2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0"))
@@ -43,18 +41,18 @@ object GitHub
 
   override def globalSettings =
     Seq(
-      githubUser := None,
-      githubRepo := None
+      github.user := None,
+      github.repo := None
     )
 
   override def projectSettings =
     Seq(
-      scmInfo := (
-        githubUser
+      scmInfo :=
+        github.user
           .value
           .map {
             user ⇒
-              val repo = githubRepo.value.getOrElse(name.value)
+              val repo = github.repo.value.getOrElse(name.value)
               val url = s"https://github.com/$user/$repo"
               val connection = s"scm:git:git@github.com:$user/$repo.git"
               ScmInfo(
@@ -62,10 +60,9 @@ object GitHub
                 connection,
                 connection
               )
-          }
-      ),
+          },
 
-      pomExtra := {
+      pomExtra :=
         scmInfo
           .value
           .map {
@@ -73,6 +70,5 @@ object GitHub
               <url>{scm.browseUrl}</url>
           }
           .getOrElse(Empty)
-      }
     )
 }

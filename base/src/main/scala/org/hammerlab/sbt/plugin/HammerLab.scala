@@ -1,29 +1,32 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.Libs
+import hammerlab.sbt._
+import org.hammerlab.sbt.aliases._
+import org.hammerlab.sbt.{ ContainerPlugin, Libs }
 import org.hammerlab.sbt.Libs.disablePrepend
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
-import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.  GitHub.autoImport._
-import org.hammerlab.sbt.plugin.   Maven.autoImport._
-import org.hammerlab.sbt.plugin.  Parent.autoImport._
+import org.hammerlab.sbt.plugin.Deps.testDeps
+import org.hammerlab.sbt.plugin.GitHub.autoImport._
+import org.hammerlab.sbt.plugin.Maven.autoImport._
+import org.hammerlab.sbt.plugin.Parent.autoImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
 object HammerLab
-  extends Plugin(
+  extends ContainerPlugin(
     GitHub,
     Maven,
     Versions,
     Test
-  ) {
+  )
+{
 
   import Group._
 
-  implicit def liftOption[T](t: T): Option[T] = Some(t)
+//  implicit def liftOption[T](t: T): Option[T] = Some(t)
 
   trait all {
     def lib(name: String) = "org.hammerlab" ^^ name
@@ -93,7 +96,7 @@ object HammerLab
 
       object test
         extends Libs(
-          lib('test, 'suite) ^ "1.1.0",
+          lib('test, 'suite) ^ "1.1.0" tests,
           disablePrepend
         ) {
         val base = lib
@@ -102,6 +105,16 @@ object HammerLab
         val jvm = base
 
         val suite = _base
+
+        override val settings =
+          Seq(
+            Deps.deps += (
+              if (isScalaJSProject.value)
+                hammerlab.test.suite
+              else
+                hammerlab.test.base
+            )
+          )
       }
     }
   }
@@ -110,14 +123,14 @@ object HammerLab
 
   import autoImport._
 
-  override def globalSettings =
+  globals +=
     Seq(
       organization := "org.hammerlab",
-      sonatypeStagingPrefix := Some("orghammerlab"),
+      sonatypeStagingPrefix := "orghammerlab",
 
       apache2,
 
-      githubUser := Some("hammerlab"),
+      github.user := "hammerlab",
 
       developers :=
         List(
@@ -133,7 +146,7 @@ object HammerLab
     ) ++
     hammerlab.test.global
 
-  override def projectSettings =
+  projects +=
     Seq(
       /**
        * All org.hammerlab* repos are published with this Sonatype profile

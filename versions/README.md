@@ -155,7 +155,7 @@ object spark
   override val settings: SettingsDefinition =
     `2.11`.only ++
     Seq(
-      Deps.autoImport.dep(
+      Deps.dep(
         spark.core provided,
         spark.tests tests,
         hadoop provided,

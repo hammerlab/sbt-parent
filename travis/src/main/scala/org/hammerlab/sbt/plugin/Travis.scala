@@ -85,7 +85,7 @@ object Travis
     }
   }
 
-  override def projectSettings =
+  projects +=
     Seq(
       travisCoverageScalaVersion :=
         crossScalaVersions

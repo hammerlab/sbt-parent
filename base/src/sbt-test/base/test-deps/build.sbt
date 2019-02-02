@@ -1,42 +1,42 @@
+import com.github.daniel.shuy.sbt.scripted.scalatest.ScriptedScalaTestSuiteMixin
+//import org.scalatest.Assertions._
+import org.scalatest.{ FunSuite, Matchers }
+
 import org.hammerlab.sbt.deps.Dep
 
 default(
   clearTestDeps,
-  github.repo("foo")
+  github.repo := "foo"
 )
 
 lazy val a = project.settings(
   r"1.2.3",
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Nil)
-    assert(
-      scmInfo.value ==
-        Some(
-          ScmInfo(
-            "https://github.com/hammerlab/foo",
-            "scm:git:git@github.com:hammerlab/foo.git",
-            Some("scm:git:git@github.com:hammerlab/foo.git")
-          )
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Nil)
+    scmInfo.value should be(
+      Some(
+        ScmInfo(
+          "https://github.com/hammerlab/foo",
+          "scm:git:git@github.com:hammerlab/foo.git",
+          Some("scm:git:git@github.com:hammerlab/foo.git")
         )
+      )
     )
-    assert(version.value == "1.2.3")
-    ()
-  }
+    version.value should be("1.2.3")
+  })
 )
 
 lazy val b = project.settings(
   r"1.2.3",
   testDeps += scalatest,
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq[Dep](scalatest))
-    ()
-  }
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Seq[Dep](scalatest))
+  })
 )
 
 lazy val c = cross.settings(
   testDeps += scalatest,
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq[Dep](scalatest), s"${testDeps.value} $scalatest")
-    ()
-  }
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Seq[Dep](scalatest))
+  })
 )

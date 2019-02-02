@@ -4,11 +4,55 @@ import hammerlab.deps.syntax._
 import hammerlab.show._
 import org.hammerlab.sbt.Base.showDep
 import org.hammerlab.sbt.deps.{ CrossVersion, Dep, Group }
+import org.hammerlab.sbt.plugin.Plugin
 import org.hammerlab.sbt.plugin.Versions.autoImport.defaultVersions
 import sbt.internal.DslEntry
-import sbt.{ SettingKey, SettingsDefinition }
+import sbt.{ AutoPlugin, Def, SettingKey, SettingsDefinition }
 
 import scala.collection.mutable.ArrayBuffer
+
+trait Settings {
+  val bases = ArrayBuffer[Base]()
+  def apply(base: Base): Unit = bases += base
+//  def apply()(implicit settings: Settings): Unit = {
+    //settings.bases ++= bases
+//  }
+}
+
+trait Container {
+  protected def self = this
+  implicit protected val _settings: Settings =
+    new Settings {
+      override def toString: String = s"${self.getClass}.settings"
+    }
+  def apply(base: Base): Unit = {
+    println(s"registering base: ${base.fullname.value} with $getClass")
+    _settings.bases += base
+  }
+  def apply(container: Container): Unit = {
+    println(s"Adding container ${container.getClass} to $getClass")
+    //_settings()(container._settings)
+    _settings.bases ++= container.bases
+  }
+  def bases = _settings.bases
+  def  global = bases.flatMap { _. global }
+  def project = bases.flatMap { _.project }
+}
+
+abstract class ContainerPlugin(deps: AutoPlugin*)
+  extends Plugin(deps: _*)
+    with Container {
+
+  override def globalSettings = {
+    println(s"ContainerPlugin adding globals: ${self.getClass}")
+    super.globalSettings ++ global
+  }
+  override def projectSettings = {
+    println(s"ContainerPlugin adding projects: ${self.getClass}")
+    super.projectSettings ++ project
+  }
+}
+
 
 // TODO: separate this out to a non-plugin build target
 // TOOD: add string-interpolator macro a la mill ivy"…"
@@ -16,7 +60,15 @@ import scala.collection.mutable.ArrayBuffer
  * Wrapper for [[Lib one]] or [[Libs more]] Maven coordinates, along with default versions and hooks for global- and
  * project-level settings to use when passing the wrapper as a top-level [[SettingsDefinition SBT setting]].
  */
-sealed abstract class Base(implicit fullname: sourcecode.FullName) {
+sealed abstract class Base(
+  implicit
+  val fullname: sourcecode.FullName,
+  _settings: Settings
+) {
+  println(s"Registering ${fullname.value} with ${_settings}")
+  _settings(this)
+  //def apply()(implicit settings: Settings) = settings(this)
+
   def group: Group
   def version: SettingKey[String]
 
@@ -34,6 +86,8 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
 
   /**
    * Settings that this [[Base]] will implicitly convert to, where necessary
+   *
+   * TODO: have [[dep]] be added as a dependency by default; tricky to avoid circular-dep between Versions, Deps plugins
    */
   def settings: SettingsDefinition = Seq()
 
@@ -85,10 +139,11 @@ sealed abstract class Base(implicit fullname: sourcecode.FullName) {
   def snapshot: SettingsDefinition = version := version.value.snapshot
 }
 
-class Lib(
+case class Lib(
   protected val _base: Dep
 )(
   implicit
+  settings: Settings,
   fullname: sourcecode.FullName
 )
 extends Base {
@@ -118,9 +173,10 @@ class Libs(
   artifactFn: (String, String) ⇒ String = Libs.prepend
 )(
   implicit
-  fullname: sourcecode.FullName
+  fullname: sourcecode.FullName,
+  settings: Settings
 )
-  extends Base {
+extends Base {
   val group = _base.group
   val artifactPrefix = _base.artifact.value
 
@@ -136,7 +192,12 @@ class Libs(
   def deps = libs
 
   protected val libs = ArrayBuffer[Dep]()
-  def lib(implicit name: Name) = {
+  def lib(dep: Dep): Dep = {
+    libs += dep
+    dep
+  }
+  def lib(artifact: String): Dep = lib(_base.copy(artifact = artifact))
+  def lib(implicit name: Name): Dep = {
     val dep =
       _base.copy(
         artifact = artifact(name),
@@ -149,6 +210,7 @@ class Libs(
 object Libs {
   val prepend: (String, String) ⇒ String = (prefix, name) ⇒ s"$prefix-$name"
   val disablePrepend: (String, String) ⇒ String = (_, name) ⇒ name
+  val replace = disablePrepend
 }
 
 object Base {

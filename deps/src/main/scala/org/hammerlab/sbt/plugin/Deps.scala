@@ -19,6 +19,18 @@ object Deps
     implicit class DslDep(dep: Base) extends DepArg(dep.asDeps)
   }
 
+  /**
+   * Short-hand for declaring a sequence of dependencies
+   */
+  def dep(ds: DepArg*) = deps ++= ds.flatMap(_.deps)
+
+  val               deps = autoImport.              deps
+  val           testDeps = autoImport.          testDeps
+  val       providedDeps = autoImport.      providedDeps
+  val compileAndTestDeps = autoImport.compileAndTestDeps
+  val       testTestDeps = autoImport.      testTestDeps
+  val           excludes = autoImport.          excludes
+
   object autoImport {
 
     val               deps = settingKey[Seq[Dep]]("Project dependencies; wrapper around libraryDependencies")
@@ -39,7 +51,7 @@ object Deps
     /**
      * Short-hand for declaring a sequence of dependencies
      */
-    def dep(ds: DepArg*) = deps ++= ds.flatMap(_.deps)
+    def dep(ds: DepArg*) = Deps.dep(ds: _*)
 
     def group(org: String) = organization := org
     def group(org: String, artifact: String) =
@@ -62,7 +74,7 @@ object Deps
 
   import autoImport._
 
-  override def globalSettings =
+  globals +=
     Seq(
                     deps := Nil,
                 excludes := Nil,
@@ -72,7 +84,7 @@ object Deps
       compileAndTestDeps := Nil
     )
 
-  override def projectSettings =
+  projects +=
     Seq(
       /**
        * Convert the [[deps]] hierarchy into SBT's native [[ModuleID]] format, joining with [[Versions.versionsMap]] to

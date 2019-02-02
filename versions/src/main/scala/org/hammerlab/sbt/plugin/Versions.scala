@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import hammerlab.sbt._
 import org.hammerlab.sbt.Base
 import org.hammerlab.sbt.deps.VersionOps._
 import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, Snapshot, VersionsMap }
@@ -43,7 +44,8 @@ object Versions
     publishM2        :=    {}
   )
 
-  object autoImport {
+  object autoImport
+    extends hammerlab.sbt.syntax {
     val defaultVersions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
     val snapshot = settingKey[Boolean]("When true, versions set via `v\"x.y.z\"` shorthands will have '-SNAPSHOT' appended, and snapshots repository will be used")
     val fixed = settingKey[Boolean]("Whether this project has its version 'fixed' (pinned to a release), and should be bypassed during various aggregate task runs, e.g. publishing")
@@ -94,7 +96,7 @@ object Versions
      * Minimal syntax for setting [[revision]]
      */
     object v {
-      def apply(v: String) = revision := Some(v)
+      def apply(v: String) = revision := v
     }
 
     /**
@@ -113,7 +115,7 @@ object Versions
 
   import autoImport._
 
-  override def globalSettings =
+  globals +=
     Seq(
       defaultVersions :=   Nil,
              revision :=  None,
@@ -121,7 +123,7 @@ object Versions
                 fixed := false
     )
 
-  override def projectSettings =
+  projects +=
     Seq(
 
       commands += unsnap,

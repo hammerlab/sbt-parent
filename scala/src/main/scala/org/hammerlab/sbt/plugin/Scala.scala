@@ -3,10 +3,10 @@ package org.hammerlab.sbt.plugin
 import hammerlab.bytes
 import hammerlab.bytes._
 import hammerlab.show._
-import org.hammerlab.sbt.Lib
+import org.hammerlab.sbt.{ ContainerPlugin, Lib }
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.deps.IsScalaJS
-import org.hammerlab.sbt.plugin.Deps.autoImport.deps
+import org.hammerlab.sbt.plugin.Deps.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
 import sbt.plugins.SbtPlugin
@@ -14,16 +14,17 @@ import sbt.{ Show ⇒ _, _ }
 import sourcecode.Name
 
 object Scala
-  extends Plugin(
+  extends ContainerPlugin(
     Deps,
     Versions
-  ) {
+  )
+{
 
   object autoImport
     extends bytes.syntax {
 
-    val scala_lang    = "org.scala-lang" ^ "scala-library"
-    val scala_reflect = "org.scala-lang" ^ "scala-reflect"
+    val scala_lang    = Lib("org.scala-lang" ^ "scala-library" ^ "")
+    val scala_reflect = Lib("org.scala-lang" ^ "scala-reflect" ^ "")
 
     def plugin(implicit name: Name): Project =
       Project(
@@ -48,15 +49,18 @@ object Scala
 
     val partialUnification = scalacOptions += "-Ypartial-unification"
 
-    object kindProjector
-      extends Lib(
-        "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
-      ) {
+    object kindProjector extends Lib(
+      "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
+    ) {
       override val settings =
         _base.toModuleIDs(IsScalaJS.no) match {
           case Seq(dep) ⇒ addCompilerPlugin(dep)
         }
     }
+
+    val logImplicits = scalacOptions += "-Xlog-implicits"
+
+    val includeHiddenTestResources = excludeFilter in sbt.Test := NothingFilter
 
     val scalameta: SettingsDefinition = Seq(
       addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full),
@@ -121,7 +125,7 @@ object Scala
 
   import autoImport._
 
-  override def globalSettings =
+  globals +=
     Seq(
       // Primary Build is for Scala 2.12 by default
       ScalaVersion.default := `2.12`,
@@ -132,10 +136,9 @@ object Scala
           `2.12`
         )
     ) ++
-    kindProjector.global ++
     ScalaVersion.defaults
 
-  override def projectSettings =
+  projects +=
     Seq(
       scalaVersion  := (
         ScalaVersion.default.value match {
@@ -171,6 +174,5 @@ object Scala
 
       consoleImports := Nil,
       initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
-    ) ++
-    kindProjector.project
+    )
 }

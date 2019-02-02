@@ -19,12 +19,12 @@ object JSFork
     val forkJVM = settingKey[Boolean]("Wrapper for `fork`, which scala-js requires to always be set to `false`")
   }
   import autoImport._
-  override def globalSettings =
+  globals +=
     Seq(
       forkJVM := true
     )
 
-  override def projectSettings =
+  projects +=
     Seq(
       /*
        * [[fork]] must be [[false]] in ScalaJS projects, even though they always fork!
