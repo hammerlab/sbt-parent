@@ -40,10 +40,7 @@ object Test
           testFrameworks += framework
         )
 
-      override def settings = {
-        println(s"Trying to add scalatest: $this")
-        testing.framework := Some(this)
-      }
+      override def settings = testing.framework := Some(this)
     }
 
     object scalatest
@@ -71,6 +68,13 @@ object Test
 
   noopSettings += disableTests
 
+  // Use scalatest by default
+  override def  globalSettings = super. globalSettings ++ scalatest.settings
+
+  // Adding scalatest to global settings requires its default-versions entries to be added as well, which are
+  // project-settings
+  override def projectSettings = super.projectSettings ++ scalatest.project
+
   globals +=
     (
       test_? := (
@@ -80,12 +84,6 @@ object Test
           true
       )
     )
-
-  println("Test… scalatest/autoImport:")
-  println(scalatest)
-//  println(autoImport)
-  println("printed")
-//  globals += scalatest
 
   projects ++=
     Seq(
@@ -102,22 +100,4 @@ object Test
         }
         .value
     )
-
-  // Use only ScalaTest by default; without this, other frameworks get instantiated and can inadvertently mangle
-  // test-command-lines/args/classpaths.
-  // This needs to be added "lazily" into globalSettings (as opposed to eagerly into globals) because scalatest.settings
-  // isn't initialized yet in [[framework]] while the scalatest object is still being constructed
-  override def globalSettings = super.globalSettings ++ scalatest.settings
-//  {
-//    val spr = super.globalSettings ++ scalatest.settings
-//    println(s"Test globalSettings: ${spr.mkString(",")}")
-//    spr
-//  }
-
-//  override def projectSettings: Seq[Def.Setting[_]] = {
-//    val spr = super.projectSettings
-//    println(s"Test projectSettings: ${spr.mkString(",")}")
-//    spr
-//  }
-
 }

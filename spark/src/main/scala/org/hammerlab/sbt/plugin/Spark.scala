@@ -41,8 +41,6 @@ object Spark
 
       val tests = Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.4.0") - hadoop)
 
-      println(s"spark global settings: ${global.mkString(",")}")
-
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
        */
@@ -67,8 +65,6 @@ object Spark
 
   import autoImport._
 
-  println(s"Spark before outer globals: ${globals.mkString(",")} … ${global.mkString(",")}")
-
   globals +=
     Seq(
       versions ++= Seq[DefaultVersion](
@@ -78,16 +74,10 @@ object Spark
         spark.   sql → computedSparkVersion.value
       ),
 
-      computedHadoopVersion := { println("setting hadoop version"); System.getProperty("hadoop.version", hadoop.version.value) },
-      computedSparkVersion  := { println("setting spark version"); System.getProperty( "spark.version",   spark.version.value) },
+      computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
+      computedSparkVersion  := System.getProperty( "spark.version",  spark.version.value),
 
       // SparkContexts play poorly with parallel test-execution
       parallelExecution in sbt.Test := false
     )
-
-  override def globalSettings: Seq[Def.Setting[_]] = {
-    val spr = super.globalSettings
-    println(s"Spark globalSettings: ${spr.mkString(",")}")
-    spr
-  }
 }

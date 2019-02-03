@@ -19,12 +19,6 @@ abstract class Plugin(deps: AutoPlugin*)
   val  globals = ArrayBuffer[SettingsDefinition]()
   val projects = ArrayBuffer[SettingsDefinition]()
 
-  override def  globalSettings: Seq[Def.Setting[_]] = {
-    println(s"adding global settings for $getClass")
-    super. globalSettings ++ globals.flatten
-  }
-  override def projectSettings: Seq[Def.Setting[_]] = {
-    println(s"adding project settings for $getClass")
-    super.projectSettings ++ projects.flatten
-  }
+  override def  globalSettings = super. globalSettings ++  globals.flatten
+  override def projectSettings = super.projectSettings ++ projects.flatten
 }

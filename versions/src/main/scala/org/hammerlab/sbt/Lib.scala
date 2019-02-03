@@ -14,24 +14,15 @@ import scala.collection.mutable.ArrayBuffer
 case class Settings(container: Container) {
   override def toString: String = s"${container.name}.settings"
   val bases = ArrayBuffer[Base]()
-  def apply(base: Base): Unit = {
-    println(s"$this: adding base $base")
-    bases += base
-  }
+  def apply(base: Base): Unit = bases += base
 }
 
 trait Container {
   protected def self = this
   def name = getClass.getSimpleName
   implicit protected val _settings: Settings = Settings(this)
-  def apply(base: Base): Unit = {
-    println(s"$name: adding base ${base.fullname.value}")
-    _settings.bases += base
-  }
-  def apply(container: Container): Unit = {
-    println(s"$name: adding container ${container.name}")
-    _settings.bases ++= container.bases
-  }
+  def apply(base: Base): Unit = _settings.bases += base
+  def apply(container: Container): Unit = _settings.bases ++= container.bases
   def bases = _settings.bases
   def  global = bases.flatMap { _. global }
   def project = bases.flatMap { _.project }
@@ -41,14 +32,8 @@ abstract class ContainerPlugin(deps: AutoPlugin*)
   extends Plugin(deps: _*)
     with Container {
 
-  override def globalSettings = {
-    println(s"$name: adding global settings for bases: ${bases.mkString(",")}")
-    super.globalSettings ++ global
-  }
-  override def projectSettings = {
-    println(s"$name: adding project settings for bases: ${bases.mkString(",")}")
-    super.projectSettings ++ project
-  }
+  override def globalSettings = super.globalSettings ++ global
+  override def projectSettings = super.projectSettings ++ project
 }
 
 
@@ -63,7 +48,6 @@ sealed abstract class Base(
   val fullname: sourcecode.FullName,
   _settings: Settings
 ) {
-  println(s"${_settings}: register new Base ${fullname.value}")
   _settings(this)
 
   def group: Group
