@@ -131,9 +131,7 @@ object Parent
         val base = lib(_base)
         val core = lib
       }
-//      http()
     }
-//    akka()
 
     object bdg {
       val artifactFn = (prefix: String, name: String) ⇒ s"$prefix-$name-spark2"
@@ -149,7 +147,6 @@ object Parent
       object quinine extends Libs(("org.bdgenomics.quinine" ^^ "quinine" ^ "0.0.2") - adam.core) {
         val core = lib
       }
-      //quinine()
 
       object utils
         extends Libs(
@@ -163,7 +160,6 @@ object Parent
         val     metrics = lib
         val        misc = lib
       }
-//      utils()
     }
 
     object cats
@@ -181,7 +177,6 @@ object Parent
         dep
       }
     }
-//    cats()
 
     object commons {
       val   io = Lib(        "commons-io" ^ "commons-io"    ^ "2.5")

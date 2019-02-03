@@ -1,6 +1,5 @@
 import com.github.daniel.shuy.sbt.scripted.scalatest._
 import org.scalatest._
-import org.hammerlab.sbt.deps.Dep
 
 default(
   hammerlab.test.disable
