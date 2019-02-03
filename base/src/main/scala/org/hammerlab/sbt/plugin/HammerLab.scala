@@ -1,7 +1,6 @@
 package org.hammerlab.sbt.plugin
 
 import hammerlab.sbt._
-import org.hammerlab.sbt.aliases._
 import org.hammerlab.sbt.{ ContainerPlugin, Libs }
 import org.hammerlab.sbt.Libs.disablePrepend
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS

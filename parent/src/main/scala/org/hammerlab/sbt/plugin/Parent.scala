@@ -2,10 +2,9 @@ package org.hammerlab.sbt.plugin
 
 import java.io.File
 
-import org.hammerlab.sbt.aliases._
 import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Root.autoImport.parent
-import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs }
+import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs, aliases }
 import sbt.Keys._
 import sbt._
 import sbtbuildinfo.BuildInfoKeys._
@@ -95,6 +94,9 @@ object Parent
             .getParentFile
         )
     }
+
+    val   kryo = aliases.  kryo
+    val hadoop = aliases.hadoop
 
     // TODO: move these to a non-plugin library, for re-use
     val             args4j = Lib(                    "args4j"  ^        "args4j" ^     "2.33"           )
@@ -187,10 +189,13 @@ object Parent
       extends Libs(
         "io.circe" ^^ "circe" ^ "0.9.3"
       ) {
-      val    core = lib
-      val generic = lib
-      val literal = lib
-      val  parser = lib
+      val     core = lib
+      val  literal = lib
+      val   parser = lib
+      object generic extends Libs("io.circe" ^^ "circe-generic" ^ "0.9.3") {
+        val   core = _base
+        val extras = lib
+      }
     }
 
     object fs2
@@ -225,6 +230,11 @@ object Parent
       import sbt._
       import Keys._
       override def settings: SettingsDefinition = scalacOptions += "-P:scalajs:sjsDefinedByDefault"
+    }
+
+    object slogging extends Libs("biz.enef" ^^ "slogging" ^ "0.6.1") {
+      val core = _base
+      val slf4j = aliases.slf4j.slogging
     }
   }
 }

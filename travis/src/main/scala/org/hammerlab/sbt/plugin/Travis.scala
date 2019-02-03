@@ -1,13 +1,15 @@
 package org.hammerlab.sbt.plugin
 
+import java.lang.System.getenv
+
 import org.hammerlab.sbt.plugin.Root.autoImport.isRoot
 import org.hammerlab.sbt.plugin.Test.autoImport.test_?
+import org.hammerlab.sbt.plugin.Travis.autoImport.travis_?
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys._
-import System.getenv
 
 object Travis
   extends Plugin(
@@ -22,7 +24,8 @@ object Travis
       test_? :=
         Def.settingDyn[Boolean] {
           val default = test_?.value
-          if (travis_? && !isRoot.value)
+          // Always run tests for non-root modules in Travis (otherwise coverage gets messed up, for example)
+          if (travis_?.value && !isRoot.value)
             Def.setting(true)
           else
             Def.setting(default)
@@ -31,12 +34,12 @@ object Travis
       coverageReport :=
         Def.taskDyn[Unit] {
           val default = coverageReport.taskValue
-          if (travis_? && !isRoot.value) {
+          if (travis_?.value && !isRoot.value) {
             streams.value.log.info(s"${name.value}: running coverageReport")
             Def.task(default.value)
           } else
             Def.task {
-              streams.value.log.info(s"${name.value}: skipping coverageReport (travis: ${travis_?}, root: ${isRoot.value})")
+              streams.value.log.info(s"${name.value}: skipping coverageReport (travis: ${travis_?.value}, root: ${isRoot.value})")
 
               ()
             }
@@ -46,11 +49,11 @@ object Travis
 
   val travisScalaEnv = "TRAVIS_SCALA_VERSION"
   def travisScalaVersion = getenv(travisScalaEnv)
-  def travis_? = getenv("TRAVIS") != null
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[Option[String]]("Scala version to measure/report test-coverage for")
     val coverageTest = taskKey[Unit](s"Wrapper for test and, if $travisScalaEnv matches travisCoverageScalaVersion, coverageReport")
+    val travis_? = settingKey[Boolean]("True when running in Travis CI")
   }
 
   import autoImport._
@@ -84,6 +87,8 @@ object Travis
       Def.task {}
     }
   }
+
+  globals += (travis_? := (getenv("TRAVIS") != null))
 
   projects +=
     Seq(
