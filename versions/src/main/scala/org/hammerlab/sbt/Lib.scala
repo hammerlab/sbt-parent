@@ -11,27 +11,25 @@ import sbt.{ AutoPlugin, Def, SettingKey, SettingsDefinition }
 
 import scala.collection.mutable.ArrayBuffer
 
-trait Settings {
+case class Settings(container: Container) {
+  override def toString: String = s"${container.name}.settings"
   val bases = ArrayBuffer[Base]()
-  def apply(base: Base): Unit = bases += base
-//  def apply()(implicit settings: Settings): Unit = {
-    //settings.bases ++= bases
-//  }
+  def apply(base: Base): Unit = {
+    println(s"$this: adding base $base")
+    bases += base
+  }
 }
 
 trait Container {
   protected def self = this
-  implicit protected val _settings: Settings =
-    new Settings {
-      override def toString: String = s"${self.getClass}.settings"
-    }
+  def name = getClass.getSimpleName
+  implicit protected val _settings: Settings = Settings(this)
   def apply(base: Base): Unit = {
-    println(s"registering base: ${base.fullname.value} with $getClass")
+    println(s"$name: adding base ${base.fullname.value}")
     _settings.bases += base
   }
   def apply(container: Container): Unit = {
-    println(s"Adding container ${container.getClass} to $getClass")
-    //_settings()(container._settings)
+    println(s"$name: adding container ${container.name}")
     _settings.bases ++= container.bases
   }
   def bases = _settings.bases
@@ -44,11 +42,11 @@ abstract class ContainerPlugin(deps: AutoPlugin*)
     with Container {
 
   override def globalSettings = {
-    println(s"ContainerPlugin adding globals: ${self.getClass}")
+    println(s"$name: adding global settings for bases: ${bases.mkString(",")}")
     super.globalSettings ++ global
   }
   override def projectSettings = {
-    println(s"ContainerPlugin adding projects: ${self.getClass}")
+    println(s"$name: adding project settings for bases: ${bases.mkString(",")}")
     super.projectSettings ++ project
   }
 }
@@ -65,9 +63,8 @@ sealed abstract class Base(
   val fullname: sourcecode.FullName,
   _settings: Settings
 ) {
-  println(s"Registering ${fullname.value} with ${_settings}")
+  println(s"${_settings}: register new Base ${fullname.value}")
   _settings(this)
-  //def apply()(implicit settings: Settings) = settings(this)
 
   def group: Group
   def version: SettingKey[String]
@@ -83,6 +80,21 @@ sealed abstract class Base(
       .version
       .map { version := _ }
       .toSeq
+
+  def project: SettingsDefinition =
+    Seq(
+      defaultVersions ++=
+        deps
+          .filterNot {
+            dep ⇒
+              defaultVersions
+                .value
+                .exists {
+                  _.groupArtifact == dep.groupArtifact
+                }
+          }
+          .map { _ → version.value }
+    )
 
   /**
    * Settings that this [[Base]] will implicitly convert to, where necessary
@@ -120,21 +132,6 @@ sealed abstract class Base(
       .reverse
       .mkString("-")
   }
-
-  def project: SettingsDefinition =
-    Seq(
-      defaultVersions ++=
-        deps
-          .filterNot {
-            dep ⇒
-              defaultVersions
-                .value
-                .exists(
-                  _.groupArtifact == dep.groupArtifact
-                )
-          }
-          .map { _ → version.value }
-    )
 
   def snapshot: SettingsDefinition = version := version.value.snapshot
 }

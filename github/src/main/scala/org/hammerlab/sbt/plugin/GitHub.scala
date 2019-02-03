@@ -2,6 +2,7 @@ package org.hammerlab.sbt.plugin
 
 import java.net.URL
 
+import hammerlab.sbt._
 import sbt.Keys._
 import sbt.PluginTrigger.AllRequirements
 import sbt._
@@ -19,15 +20,16 @@ object GitHub
   }
 
   object autoImport {
-    object github {
-      def apply(user: String, repo: String) =
-        Seq(
-          this.user := Some(user),
-          this.repo := Some(repo)
-        )
 
-      val user = settingKey[Option[String]]("Github user/org")
-      val repo = settingKey[Option[String]]("Github repository basename")
+    object github {
+      def apply(user: String, repo: String = null) =
+        Seq(
+          this.user.*(user),
+        ) ++
+        Option(repo).map { this.repo.* }.toList
+
+      val user = SettingKey[Option[String]]("github-user", "Github user/org")
+      val repo = SettingKey[Option[String]]("github-repo", "Github repository basename")
       val  org = user
     }
 
@@ -48,7 +50,8 @@ object GitHub
   override def projectSettings =
     Seq(
       scmInfo :=
-        github.user
+        github
+          .user
           .value
           .map {
             user ⇒

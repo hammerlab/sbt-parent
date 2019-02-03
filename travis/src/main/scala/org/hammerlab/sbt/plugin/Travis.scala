@@ -20,12 +20,12 @@ object Travis
   noopSettings ++=
     Seq(
       test_? :=
-        Def.taskDyn[Boolean] {
-          val default = test_?.taskValue
+        Def.settingDyn[Boolean] {
+          val default = test_?.value
           if (travis_? && !isRoot.value)
-            Def.task(true)
+            Def.setting(true)
           else
-            Def.task(default.value)
+            Def.setting(default)
         }
         .value,
       coverageReport :=

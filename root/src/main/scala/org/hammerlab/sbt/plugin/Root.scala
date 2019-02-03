@@ -34,7 +34,7 @@ object Root
         Project(name.value, file)
           .settings(
             settings,
-            github.repo := name.value
+            github.repo in ThisBuild := name.value
           )
           .aggregate(modules: _*)
       }

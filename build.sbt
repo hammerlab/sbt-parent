@@ -54,7 +54,7 @@ lazy val deps = plugin.settings(
   versions
 )
 
-lazy val github = plugin.settings(v"5.0.0")
+lazy val github = plugin.settings(v"5.0.0").dependsOn(lib)
 
 lazy val js = plugin.settings(
   v"2.0.0",
@@ -101,11 +101,12 @@ lazy val scripted =
     .settings(
       v"1.0.0",
       addSbtPlugin("com.github.daniel-shuy" % "sbt-scripted-scalatest" % "1.1.0"),
-      libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5"
+      libraryDependencies ++= Seq(
+        //"org.hammerlab.sbt" %% "lib" % "4.3.0",
+        "org.scalatest" %% "scalatest" % "3.0.5"
+      )
     )
-  .dependsOn(
-    lib
-  )
+    .dependsOn(lib)
 
 lazy val spark = plugin.settings(
   v"5.0.0",

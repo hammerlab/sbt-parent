@@ -10,6 +10,7 @@ import org.hammerlab.sbt.plugin.Deps.testDeps
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Maven.autoImport._
 import org.hammerlab.sbt.plugin.Parent.autoImport._
+import org.hammerlab.sbt.plugin.Test.autoImport.test_?
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
@@ -25,8 +26,6 @@ object HammerLab
 {
 
   import Group._
-
-//  implicit def liftOption[T](t: T): Option[T] = Some(t)
 
   trait all {
     def lib(name: String) = "org.hammerlab" ^^ name
@@ -76,14 +75,17 @@ object HammerLab
       val     utils = lib('math,     'utils)
     }
 
+    val addTestLib = settingKey[Boolean]("When false, skip adding org.hammerlab.test:{base,suite} as a test-dependency (which this plugin otherwise does by default")
+
     val scalatestOnly = addTestLib := false
     val clearTestDeps = Seq(
+      Test.autoImport.testing.framework := None,
       addTestLib := false,
       testDeps := Nil
     )
   }
 
-  object autoImport extends all {
+  object autoImport extends {
     val hl = hammerlab
     object hammerlab extends all {
 
@@ -106,22 +108,37 @@ object HammerLab
 
         val suite = _base
 
-        override val settings =
-          Seq(
-            Deps.deps += (
-              if (isScalaJSProject.value)
-                hammerlab.test.suite
-              else
-                hammerlab.test.base
-            )
-          )
+        val disabled = settingKey[Boolean]("When true, don't add hammerlab.test library")
+        val disable = disabled := true
+        val  enable = disabled := false
+
+        def addLib =
+          testDeps ++= {
+            if (!test_?.value || disabled.value)
+              Nil
+            else
+              Seq(
+                if (isScalaJSProject.value)
+                  hammerlab.test.suite
+                else
+                  hammerlab.test.base
+              )
+            }
+
+        override def settings = addLib
       }
+
+      val developer =
+        Developer(
+          id    = "hammerlab",
+          name  = "Hammer Lab",
+          email = "info@hammerlab.org",
+          url   = "https://github.com/hammerlab"
+        )
     }
   }
 
-  val addTestLib = settingKey[Boolean]("When false, skip adding org.hammerlab.test:{base,suite} as a test-dependency (which this plugin otherwise does by default")
-
-  import autoImport._
+  import autoImport._, hammerlab._
 
   globals +=
     Seq(
@@ -132,19 +149,10 @@ object HammerLab
 
       github.user := "hammerlab",
 
-      developers :=
-        List(
-          Developer(
-            id    = "hammerlab",
-            name  = "Hammer Lab",
-            email = "info@hammerlab.org",
-            url   = "https://github.com/hammerlab"
-          )
-        ),
+      developers := List(developer),
+      test.disabled := false,
+    )
 
-      addTestLib := true
-    ) ++
-    hammerlab.test.global
 
   projects +=
     Seq(
@@ -171,17 +179,6 @@ object HammerLab
        * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
        * project level, so reading it in global scope always returns `false`.
        */
-      testDeps ++= (
-        if (addTestLib.value)
-          Seq(
-            if (isScalaJSProject.value)
-              hammerlab.test.suite
-            else
-              hammerlab.test.base
-          )
-        else
-          Nil
-      )
-    ) ++
-    hammerlab.test.project
+      test.addLib
+    )
 }
