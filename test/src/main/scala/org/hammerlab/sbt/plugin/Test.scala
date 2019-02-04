@@ -27,6 +27,9 @@ object Test
       val framework = SettingKey[Option[autoImport.framework]]("test-framework", "Framework to use for testing")
       val disable = disableTests
       val enabled = test_?
+      // "Hidden" test-resources (resources whose basenames start with ".") are not moved into target/ dirs (and
+      // therefore not present on tests' classpath) by default; this setting overrides that behavior to include them
+      val hiddenResources = excludeFilter in sbt.Test := NothingFilter
     }
 
     trait framework {
@@ -58,10 +61,6 @@ object Test
         with framework {
       val framework = new TestFramework("utest.runner.Framework")
     }
-
-    // "Hidden" test-resources (resources whose basenames start with ".") are not moved into target/ dirs (and therefore
-    // not present on tests' classpath) by default; this setting overrides that behavior to include them
-    val includeHiddenTestResources = excludeFilter in sbt.Test := NothingFilter
   }
 
   import autoImport._

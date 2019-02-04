@@ -93,7 +93,7 @@ object JS
       }
 
       object diode extends Libs("io.suzaku" ^^ "diode" ^ "1.1.4") {
-        val  core = lib("core")
+        val  core = lib
         val react = lib ^ "1.1.4.131"
       }
 
