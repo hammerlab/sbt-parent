@@ -8,6 +8,8 @@ default(
 lazy val p1 = project.settings(
   scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
     libraryDependencies.value should contain("org.scalatest" %% "scalatest" % "3.0.1" % "test")
+    akka.version.value should be("2.5.20")
+    akka.http.version.value should be("10.1.7")
   })
 )
 

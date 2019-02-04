@@ -49,7 +49,7 @@ object Parent
       .enablePlugins(BuildInfoPlugin)
       .settings(
         buildInfoPackage := Seq(pkg(organization.value), "build").mkString("."),
-        buildInfoObject := name.value,
+        buildInfoObject := pkg(name.value),
         (unmanagedResourceDirectories in sbt.Test) +=
           crossType
             .sharedSrcDir(
@@ -97,6 +97,7 @@ object Parent
 
     val   kryo = aliases.  kryo
     val hadoop = aliases.hadoop
+    val  slf4j = aliases. slf4j
 
     // TODO: move these to a non-plugin library, for re-use
     val             args4j = Lib(                    "args4j"  ^        "args4j" ^     "2.33"           )
@@ -124,7 +125,7 @@ object Parent
       extends Libs(
         "com.typesafe.akka" ^^ "akka" ^ "2.5.20"
       ) {
-      val actor = lib
+      val  actor = lib
       val stream = lib
       object http
         extends Libs(
@@ -193,7 +194,7 @@ object Parent
       val  literal = lib
       val   parser = lib
       object generic extends Libs("io.circe" ^^ "circe-generic" ^ "0.9.3") {
-        val   core = _base
+        val   core = lib(_base)
         val extras = lib
       }
     }
@@ -233,7 +234,7 @@ object Parent
     }
 
     object slogging extends Libs("biz.enef" ^^ "slogging" ^ "0.6.1") {
-      val core = _base
+      val core = lib(_base)
       val slf4j = aliases.slf4j.slogging
     }
   }

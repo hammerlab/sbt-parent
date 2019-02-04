@@ -45,7 +45,7 @@ abstract class ContainerPlugin(deps: AutoPlugin*)
  */
 sealed abstract class Base(
   implicit
-  val fullname: sourcecode.FullName,
+  fullname: sourcecode.FullName,
   _settings: Settings
 ) {
   _settings(this)
@@ -125,7 +125,7 @@ case class Lib(
 )(
   implicit
   settings: Settings,
-  fullname: sourcecode.FullName
+  fullname: sourcecode.FullName,
 )
 extends Base {
 
