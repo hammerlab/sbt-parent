@@ -1,6 +1,6 @@
 package org.hammerlab.sbt.plugin
 
-import sbt.{ Def, _ }
+import sbt._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -16,9 +16,15 @@ abstract class Plugin(deps: AutoPlugin*)
         _ && _
       )
 
-  val  globals = ArrayBuffer[SettingsDefinition]()
-  val projects = ArrayBuffer[SettingsDefinition]()
+  type Lazy[T] = () ⇒ T
+  implicit def makeLazy[T](t: ⇒ T): Lazy[T] = () ⇒ t
 
-  override def  globalSettings = super. globalSettings ++  globals.flatten
-  override def projectSettings = super.projectSettings ++ projects.flatten
+  private val  _globals = ArrayBuffer[Lazy[SettingsDefinition]]()
+  private val _projects = ArrayBuffer[Lazy[SettingsDefinition]]()
+
+  def  globals(settings: Lazy[SettingsDefinition]*) = {  _globals ++= settings; this }
+  def projects(settings: Lazy[SettingsDefinition]*) = { _projects ++= settings; this }
+
+  override def  globalSettings = super. globalSettings ++  _globals.flatMap { _() }
+  override def projectSettings = super.projectSettings ++ _projects.flatMap { _() }
 }

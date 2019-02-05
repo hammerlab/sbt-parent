@@ -68,103 +68,103 @@ object Deps
         name := artifact
       )
 
-    val    tests = Configuration.Test
-    val testtest = Configuration.TestTest
-    val provided = Configuration.Provided
+    object configuration {
+      val tests = Configuration.Test
+      val testtest = Configuration.TestTest
+      val provided = Configuration.Provided
+    }
   }
 
   import autoImport._
 
-  globals +=
-    Seq(
-                    deps := Nil,
-                excludes := Nil,
-                testDeps := Nil,
-            providedDeps := Nil,
-            testTestDeps := Nil,
-      compileAndTestDeps := Nil
-    )
+  globals(
+                  deps := Nil,
+              excludes := Nil,
+              testDeps := Nil,
+          providedDeps := Nil,
+          testTestDeps := Nil,
+    compileAndTestDeps := Nil
+  )
 
-  projects +=
-    Seq(
-      /**
-       * Convert the [[deps]] hierarchy into SBT's native [[ModuleID]] format, joining with [[Versions.versionsMap]] to
-       * fill in default versions for [[Dep]]s without explicit versions specified
-       */
-      libraryDependencies ++=
-        deps
-          .value
-          .flatMap(
-            _
-              .withVersion(versionsMap.value)
-              .toModuleIDs(isScalaJSProject.value)
-          ),
+  projects(
+    /**
+     * Convert the [[deps]] hierarchy into SBT's native [[ModuleID]] format, joining with [[Versions.versionsMap]] to
+     * fill in default versions for [[Dep]]s without explicit versions specified
+     */
+    libraryDependencies ++=
+      deps
+        .value
+        .flatMap {
+          _
+            .withVersion(versionsMap.value)
+            .toModuleIDs(isScalaJSProject.value)
+        },
 
-      /**
-       * [[excludes]] is a simple syntax for scala-cross-versioned entries in [[excludeDependencies]]
-       */
-      excludeDependencies ++=
-        excludes
-          .value
-          .map(
-            exclude ⇒
-              ExclusionRule(
-                exclude.group.value,
-                exclude.artifact.value,
-                "*",
-                Vector(),
-                CrossVersion.toSBT(exclude.crossVersion)(isScalaJSProject.value)
+    /**
+     * [[excludes]] is a simple syntax for scala-cross-versioned entries in [[excludeDependencies]]
+     */
+    excludeDependencies ++=
+      excludes
+        .value
+        .map(
+          exclude ⇒
+            ExclusionRule(
+              exclude.group.value,
+              exclude.artifact.value,
+              "*",
+              Vector(),
+              CrossVersion.toSBT(exclude.crossVersion)(isScalaJSProject.value)
+            )
+        ),
+
+    deps ++=
+      testDeps
+        .value
+        .map(_ tests),
+
+    deps ++=
+      providedDeps
+        .value
+        .map(_ provided),
+
+    deps ++=
+      testTestDeps
+        .value
+        .map(_ testtest),
+
+    deps ++= compileAndTestDeps.value,
+
+    testTestDeps ++= compileAndTestDeps.value,
+
+    /**
+     * Work-around for https://github.com/sbt/sbt/issues/3709: `dependsOn(foo % "test->test")` does not get correctly
+     * translated into a test-scoped dependency on foo's "-tests" JAR in the depending project's POM
+     */
+    projectDependencies :=
+      projectDependencies
+        .value
+        .flatMap {
+          dep ⇒
+            val configurations = dep.configurations.toSeq.flatMap(_.split(";"))
+            val (testConfs, otherConfs) = configurations.partition(_ == "test->test")
+            val testConf = testConfs.headOption
+            if (testConf.isDefined)
+              Seq(
+                dep
+                  .withConfigurations(
+                    if (otherConfs.nonEmpty)
+                      Some(otherConfs.mkString(";"))
+                    else
+                      None
+                  ),
+                dep
+                  .withConfigurations(
+                    Some("test->test")
+                  )
+                  .classifier("tests")
               )
-          ),
-
-      deps ++=
-        testDeps
-          .value
-          .map(_ tests),
-
-      deps ++=
-        providedDeps
-          .value
-          .map(_ provided),
-
-      deps ++=
-        testTestDeps
-          .value
-          .map(_ testtest),
-
-      deps ++= compileAndTestDeps.value,
-
-      testTestDeps ++= compileAndTestDeps.value,
-
-      /**
-       * Work-around for https://github.com/sbt/sbt/issues/3709: `dependsOn(foo % "test->test")` does not get correctly
-       * translated into a test-scoped dependency on foo's "-tests" JAR in the depending project's POM
-       */
-      projectDependencies :=
-        projectDependencies
-          .value
-          .flatMap {
-            dep ⇒
-              val configurations = dep.configurations.toSeq.flatMap(_.split(";"))
-              val (testConfs, otherConfs) = configurations.partition(_ == "test->test")
-              val testConf = testConfs.headOption
-              if (testConf.isDefined)
-                Seq(
-                  dep
-                    .withConfigurations(
-                      if (otherConfs.nonEmpty)
-                        Some(otherConfs.mkString(";"))
-                      else
-                        None
-                    ),
-                  dep
-                    .withConfigurations(
-                      Some("test->test")
-                    )
-                    .classifier("tests")
-                )
-              else
-                Seq(dep)
-          }
-    )
+            else
+              Seq(dep)
+        }
+  )
 }

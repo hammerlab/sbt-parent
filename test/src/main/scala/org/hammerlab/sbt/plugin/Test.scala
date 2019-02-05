@@ -23,7 +23,7 @@ object Test
     val test_? = SettingKey[Boolean]("test_q", "Set to false to disable tests")
     val disableTests = test_? := false
 
-    object testing {
+    object tests {
       val framework = SettingKey[Option[autoImport.framework]]("test-framework", "Framework to use for testing")
       val disable = disableTests
       val enabled = test_?
@@ -43,7 +43,7 @@ object Test
           testFrameworks += framework
         )
 
-      override def settings = testing.framework := Some(this)
+      override def settings = tests.framework := Some(this)
     }
 
     object scalatest
@@ -68,35 +68,59 @@ object Test
   noopSettings += disableTests
 
   // Use scalatest by default
-  override def  globalSettings = super. globalSettings ++ scalatest.settings
+  globals(scalatest.settings)
 
-  // Adding scalatest to global settings requires its default-versions entries to be added as well, which are
-  // project-settings
-  override def projectSettings = super.projectSettings ++ scalatest.project
+  // Force initialization/registration of scalatest. It is registered to be lazily add global settings by default (see
+  // previous statement), but if this plugin's projectSettings are accessed before globalSettings, then this plugin's
+  // Settings/Container machinery will be marekd as "finalized" before the scalatest object is ever
+  // initialized/registered.
+  // This should only be necessary in cases like this (where a plugin wants to register an object by default that may
+  // not be constructed before the plugin has begun being accessed), and not in user projects/code.
+  scalatest !
 
-  globals +=
-    (
-      test_? := (
-        if (fixed.value)
-          false
-        else
-          true
-      )
+  globals(
+    test_? := (
+      if (fixed.value)
+        false
+      else
+        true
     )
+  )
 
-  projects ++=
-    Seq(
-      testFrameworks := testing.framework.value.map(_.framework).toList,
-      testDeps ++= testing.framework.value.map(_.dep).toList,
-      testOptions in sbt.Test ++= testing.framework.value.toList.flatMap(_.options),
-      test in sbt.Test :=
-        Def.taskDyn[Unit] {
-          val default = (test in sbt.Test).taskValue
-          if (test_?.value)
-            Def.task(default.value)
-          else
-            Def.task(())
-        }
+  projects(
+    testFrameworks :=
+      tests
+        .framework
         .value
-    )
+        .map { _.framework }
+        .toList,
+
+    testDeps ++=
+      tests
+        .framework
+        .value
+        .map { _.dep }
+        .fold {
+          List[Dep]()
+        } {
+          List(_)
+        },
+
+    testOptions in sbt.Test ++=
+      tests
+        .framework
+        .value
+        .map { _.options }
+        .getOrElse { Nil },
+
+    test in sbt.Test :=
+      Def.taskDyn[Unit] {
+        val default = (test in sbt.Test).taskValue
+        if (test_?.value)
+          Def.task(default.value)
+        else
+          Def.task(())
+      }
+      .value
+  )
 }

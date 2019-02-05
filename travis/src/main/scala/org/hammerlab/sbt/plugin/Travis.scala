@@ -88,63 +88,62 @@ object Travis
     }
   }
 
-  globals += (travis_? := (getenv("TRAVIS") != null))
+  globals(travis_? := (getenv("TRAVIS") != null))
 
-  projects +=
-    Seq(
-      travisCoverageScalaVersion :=
-        crossScalaVersions
-          .value
-          .sortWith {
-            (ls, rs) ⇒
-              def ints(s: String) =
-                s
-                  .split("\\.")
-                  .map(_.toInt)
+  projects(
+    travisCoverageScalaVersion :=
+      crossScalaVersions
+        .value
+        .sortWith {
+          (ls, rs) ⇒
+            def ints(s: String) =
+              s
+                .split("\\.")
+                .map(_.toInt)
 
-              val (l, r) = (ints(ls), ints(rs))
+            val (l, r) = (ints(ls), ints(rs))
 
-              l
-                .zip(r)
-                .find { case (l, r) ⇒ l != r }
-                .map {
-                  case (l, r) ⇒ l < r
-                }
-                .getOrElse(
-                  l.length < r.length
-                )
-          }
-          .lastOption,
-
-      coverageTest := Def.sequential(
-        test in sbt.Test,
-        Def.taskDyn[Unit] {
-          if (coverageEnabled.value) {
-            streams.value.log.info(s"${name.value}: generating coverage reports")
-            coverageReport
-          } else {
-            streams.value.log.debug(s"${name.value}: skipping coverageReport generation")
-            Def.task {}
-          }
-        },
-        Def.taskDyn[Unit] {
-          if (coverageEnabled.value && isRoot.value) {
-            streams.value.log.info(s"${name.value}: aggregating coverage reports")
-            coverageAggregate
-          } else {
-            streams.value.log.debug(s"${name.value}: skipping coverageReport aggregation")
-            Def.task {}
-          }
+            l
+              .zip(r)
+              .find { case (l, r) ⇒ l != r }
+              .map {
+                case (l, r) ⇒ l < r
+              }
+              .getOrElse(
+                l.length < r.length
+              )
         }
-      ).value,
+        .lastOption,
 
-      travisReport := travisReportTask.value,
+    coverageTest := Def.sequential(
+      test in sbt.Test,
+      Def.taskDyn[Unit] {
+        if (coverageEnabled.value) {
+          streams.value.log.info(s"${name.value}: generating coverage reports")
+          coverageReport
+        } else {
+          streams.value.log.debug(s"${name.value}: skipping coverageReport generation")
+          Def.task {}
+        }
+      },
+      Def.taskDyn[Unit] {
+        if (coverageEnabled.value && isRoot.value) {
+          streams.value.log.info(s"${name.value}: aggregating coverage reports")
+          coverageAggregate
+        } else {
+          streams.value.log.debug(s"${name.value}: skipping coverageReport aggregation")
+          Def.task {}
+        }
+      }
+    ).value,
 
-      coverageEnabled := (
-        if (travisCoverageScalaVersion.value.contains(travisScalaVersion) && !disableCoverallsEnv)
-          true
-        else
-          coverageEnabled.value
-      )
+    travisReport := travisReportTask.value,
+
+    coverageEnabled := (
+      if (travisCoverageScalaVersion.value.contains(travisScalaVersion) && !disableCoverallsEnv)
+        true
+      else
+        coverageEnabled.value
+    )
   )
 }

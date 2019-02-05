@@ -75,8 +75,7 @@ object Root
 
   import autoImport._
 
-  projects +=
-    Seq(
-      isRoot := false
-    )
+  projects(
+    isRoot := false
+  )
 }

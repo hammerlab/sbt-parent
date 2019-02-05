@@ -1,26 +1,24 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.{ Container, Lib, Libs }
-import Libs.replace
+import org.hammerlab.sbt.Libs.replace
 import org.hammerlab.sbt.plugin.Deps.autoImport._
 import org.hammerlab.sbt.plugin.JS.autoImport.scalajs.css
-import org.hammerlab.sbt.plugin.Versions.autoImport._
+import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs }
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import sbt.Keys._
 import sbt._
 import sbtcrossproject.{ CrossClasspathDependency, CrossProject }
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.npmDependencies
 import scalajscrossproject.ScalaJSCrossPlugin
 
 object JS
-  extends Plugin(
+  extends ContainerPlugin(
     Deps,
     ScalaJSPlugin,
     ScalaJSCrossPlugin,
     Versions
   )
-  with Container {
+{
 
   override def trigger = noTrigger
 
@@ -97,7 +95,9 @@ object JS
         val react = lib ^ "1.1.4.131"
       }
 
-      val stubs = libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+      val stubs = Lib("org.scala-js" ^^ "scalajs-stubs" ^ scalaJSVersion ^ "provided")
+
+      val time = Lib("io.github.cquiroz" ^^ "scala-java-time" ^ "2.0.0-M13")
     }
 
     implicit def makeScalaJSProject(s: scalajs.type): Seq[Setting[_]] =
@@ -113,16 +113,4 @@ object JS
       def forTests: CrossClasspathDependency = new CrossClasspathDependency(p, Some("test->compile"))
     }
   }
-
-  import autoImport._
-
-  globals +=
-    scalajs.react.global ++  // TODO: make these get automatically added based on an implicit parent-plugin context
-    scalajs.diode.global ++
-    scalajs.  css.global
-
-  projects +=
-    scalajs.react.project ++
-    scalajs.diode.project ++
-    scalajs.  css.project
 }

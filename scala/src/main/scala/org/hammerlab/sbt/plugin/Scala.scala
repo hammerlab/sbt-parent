@@ -107,6 +107,7 @@ object Scala
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")
     case object `2.12` extends ScalaMajorVersion("2.12", "2.12.8")
+    case object `2.13` extends ScalaMajorVersion("2.13", "2.13.8-M5")
 
     object scalac {
       implicit val showBytes: Show[Bytes] = { _.toString.filter(_ != 'B').toLowerCase }
@@ -116,10 +117,11 @@ object Scala
 
     object ScalaVersion {
       val default = SettingKey[ScalaMajorVersion]("defaultScalaVersion", "Default scala major version; wrapper for scalaVersion")
-      val defaults =
+      val defaults: SettingsDefinition =
         `2.10`.defaults ++
         `2.11`.defaults ++
-        `2.12`.defaults
+        `2.12`.defaults ++
+        `2.13`.defaults
     }
 
     val scalaVersions = settingKey[Seq[ScalaMajorVersion]]("Wrapper for crossScalaVersions")
@@ -127,54 +129,52 @@ object Scala
 
   import autoImport._
 
-  globals +=
-    Seq(
-      // Primary Build is for Scala 2.12 by default
-      ScalaVersion.default := `2.12`,
+  globals(
+    // Primary Build is for Scala 2.12 by default
+    ScalaVersion.default := `2.12`,
 
-      // Build for Scala 2.12 only, by default
-      scalaVersions :=
-        Seq(
-          `2.12`
-        )
-    ) ++
-    ScalaVersion.defaults
-
-  projects +=
-    Seq(
-      scalaVersion  := (
-        ScalaVersion.default.value match {
-          case `2.10` ⇒ `2.10`.version.value
-          case `2.11` ⇒ `2.11`.version.value
-          case `2.12` ⇒ `2.12`.version.value
-        }
+    // Build for Scala 2.12 only, by default
+    scalaVersions :=
+      Seq(
+        `2.12`
       ),
-      crossScalaVersions := {
-        scalaVersions.value.map {
-          case `2.10` ⇒ `2.10`.version.value
-          case `2.11` ⇒ `2.11`.version.value
-          case `2.12` ⇒ `2.12`.version.value
-        }
-      },
+    ScalaVersion.defaults  // TODO: register this as a non-dep-related settings-provider
+  )
 
-      scalacOptions ++= Seq(
-        "-feature",
-        "-language:existentials",
-        "-language:implicitConversions",
-        "-language:postfixOps",
-        "-language:higherKinds",
-        "-language:reflectiveCalls"
-      ),
+  projects(
+    scalaVersion  := (
+      ScalaVersion.default.value match {
+        case `2.10` ⇒ `2.10`.version.value
+        case `2.11` ⇒ `2.11`.version.value
+        case `2.12` ⇒ `2.12`.version.value
+      }
+    ),
+    crossScalaVersions := {
+      scalaVersions.value.map {
+        case `2.10` ⇒ `2.10`.version.value
+        case `2.11` ⇒ `2.11`.version.value
+        case `2.12` ⇒ `2.12`.version.value
+      }
+    },
 
-      versions ++= Seq(
-        scala_lang    → scalaVersion.value,
-        scala_reflect → scalaVersion.value
-      ),
+    scalacOptions ++= Seq(
+      "-feature",
+      "-language:existentials",
+      "-language:implicitConversions",
+      "-language:postfixOps",
+      "-language:higherKinds",
+      "-language:reflectiveCalls"
+    ),
 
-      consolePkgs := Nil,
-      initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n"),
+    versions ++= Seq(
+      scala_lang    → scalaVersion.value,
+      scala_reflect → scalaVersion.value
+    ),
 
-      consoleImports := Nil,
-      initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
-    )
+    consolePkgs := Nil,
+    initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n"),
+
+    consoleImports := Nil,
+    initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
+  )
 }

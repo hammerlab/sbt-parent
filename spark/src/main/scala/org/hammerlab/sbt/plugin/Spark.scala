@@ -8,13 +8,14 @@ import org.hammerlab.sbt.plugin.Versions.DefaultVersion
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs, aliases }
 import sbt.Keys.{ excludeDependencies, parallelExecution }
-import sbt.{ Def, _ }
+import sbt._
 import sbt.librarymanagement.syntax.ExclusionRule
 
 object Spark
   extends ContainerPlugin(
     Deps,
     Scala,
+    Test,
     Versions
   )
 {
@@ -65,19 +66,20 @@ object Spark
 
   import autoImport._
 
-  globals +=
-    Seq(
-      versions ++= Seq[DefaultVersion](
-        spark.  core → computedSparkVersion.value,
-        spark.graphx → computedSparkVersion.value,
-        spark. mllib → computedSparkVersion.value,
-        spark.   sql → computedSparkVersion.value
-      ),
+  spark !
 
-      computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
-      computedSparkVersion  := System.getProperty( "spark.version",  spark.version.value),
+  globals(
+    versions ++= Seq[DefaultVersion](
+      spark.  core → computedSparkVersion.value,
+      spark.graphx → computedSparkVersion.value,
+      spark. mllib → computedSparkVersion.value,
+      spark.   sql → computedSparkVersion.value
+    ),
 
-      // SparkContexts play poorly with parallel test-execution
-      parallelExecution in sbt.Test := false
-    )
+    computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
+    computedSparkVersion  := System.getProperty( "spark.version",  spark.version.value),
+
+    // SparkContexts play poorly with parallel test-execution
+    parallelExecution in sbt.Test := false
+  )
 }

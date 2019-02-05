@@ -13,26 +13,47 @@ import scala.collection.mutable.ArrayBuffer
 
 case class Settings(container: Container) {
   override def toString: String = s"${container.name}.settings"
-  val bases = ArrayBuffer[Base]()
-  def apply(base: Base): Unit = bases += base
+  private val _bases = ArrayBuffer[Base]()
+  private var finalized = false
+  def check(arg: Any) = {
+    if (finalized)
+      throw new IllegalStateException(
+        s"$this: can't add $arg post-finalization"
+      )
+  }
+  def bases = {
+    finalized = true
+    _bases.toVector
+  }
+  def add(settings: Settings) = {
+    check(settings)
+    _bases ++= settings.bases
+  }
+  def apply(base: Base): Unit = {
+    check(base)
+    _bases += base
+  }
 }
 
 trait Container {
   protected def self = this
   def name = getClass.getSimpleName
   implicit protected val _settings: Settings = Settings(this)
-  def apply(base: Base): Unit = _settings.bases += base
-  def apply(container: Container): Unit = _settings.bases ++= container.bases
+  def apply(base: Base): Unit = _settings(base)
+  def apply(container: Container): Unit = _settings.add(container)
   def bases = _settings.bases
   def  global = bases.flatMap { _. global }
   def project = bases.flatMap { _.project }
+}
+object Container {
+  implicit def toSettings(container: Container): Settings = container._settings
 }
 
 abstract class ContainerPlugin(deps: AutoPlugin*)
   extends Plugin(deps: _*)
     with Container {
 
-  override def globalSettings = super.globalSettings ++ global
+  override def  globalSettings = super. globalSettings ++  global
   override def projectSettings = super.projectSettings ++ project
 }
 
@@ -50,6 +71,10 @@ sealed abstract class Base(
 ) {
   _settings(this)
 
+  // Force-register this [[Base]] with its container; needed in some cases when the container's settings would otherwise
+  // be accessed before this [[Base]] has a chance to be initialized and register itself with the container
+  def !() = this
+
   def group: Group
   def version: SettingKey[String]
 
@@ -65,20 +90,20 @@ sealed abstract class Base(
       .map { version := _ }
       .toSeq
 
-  def project: SettingsDefinition =
-    Seq(
-      defaultVersions ++=
-        deps
-          .filterNot {
-            dep ⇒
-              defaultVersions
-                .value
-                .exists {
-                  _.groupArtifact == dep.groupArtifact
-                }
-          }
-          .map { _ → version.value }
-    )
+  def addDefaultVersions =
+    defaultVersions ++=
+      deps
+        .filterNot {
+          dep ⇒
+            defaultVersions
+              .value
+              .exists {
+                _.groupArtifact == dep.groupArtifact
+              }
+        }
+        .map { _ → version.value }
+
+  def project: SettingsDefinition = addDefaultVersions
 
   /**
    * Settings that this [[Base]] will implicitly convert to, where necessary

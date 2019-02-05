@@ -115,52 +115,49 @@ object Versions
 
   import autoImport._
 
-  globals +=
-    Seq(
-      defaultVersions :=   Nil,
-             revision :=  None,
-             snapshot :=  true,
-                fixed := false
-    )
+  globals(
+    defaultVersions :=   Nil,
+           revision :=  None,
+           snapshot :=  true,
+              fixed := false
+  )
 
-  projects +=
-    Seq(
+  projects(
 
-      commands += unsnap,
-      commands += unsnapAll,
+    commands += unsnap,
+    commands += unsnapAll,
 
-      /**
-       * Turn [[revision]] (if present) directly into [[version]] appending "-SNAPSHOT" or not based on [[snapshot]]
-       */
-      version :=
-        revision
+    /**
+     * Turn [[revision]] (if present) directly into [[version]] appending "-SNAPSHOT" or not based on [[snapshot]]
+     */
+    version :=
+      revision
+        .value
+        .map {
+          _.maybeForceSnapshot(snapshot.value)
+        }
+        .getOrElse(version.value),
+
+    projectID := projectID.value.withRevision(revision = version.value),
+    artifactPath := artifactPathSetting(artifact).value,
+
+    /**
+     * Re-iterate this definition of [[isSnapshot]] to reference [[version]] after it is overwritten by [[revision]]
+     */
+    isSnapshot := version.value.endsWith(Snapshot.suffix),
+
+    /**
+     * In general, append "-SNAPSHOT" when turning [[revision]] (which can be set with helpful syntaxes defined in
+     * this plugin) into [[version]] (used by main/downstream SBT machinery)
+     */
+
+    versionsMap :=
+      VersionsMap(
+        defaultVersions
           .value
-          .map {
-            _.maybeForceSnapshot(snapshot.value)
-          }
-          .getOrElse(version.value),
-
-      projectID := projectID.value.withRevision(revision = version.value),
-      artifactPath := artifactPathSetting(artifact).value,
-
-      /**
-       * Re-iterate this definition of [[isSnapshot]] to reference [[version]] after it is overwritten by [[revision]]
-       */
-      isSnapshot := version.value.endsWith(Snapshot.suffix)
-    ) ++
-    Seq(
-      /**
-       * In general, append "-SNAPSHOT" when turning [[revision]] (which can be set with helpful syntaxes defined in
-       * this plugin) into [[version]] (used by main/downstream SBT machinery)
-       */
-
-      versionsMap :=
-        VersionsMap(
-          defaultVersions
-            .value
-            .map { d ⇒ d.groupArtifact → d.version }
-            .groupBy(_._1)
-            .mapValues(_.last._2)
-        )
-    )
+          .map { d ⇒ d.groupArtifact → d.version }
+          .groupBy(_._1)
+          .mapValues(_.last._2)
+      )
+  )
 }

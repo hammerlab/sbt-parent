@@ -78,7 +78,7 @@ object HammerLab
 
     val scalatestOnly = addTestLib := false
     val clearTestDeps = Seq(
-      Test.autoImport.testing.framework := None,
+      Test.autoImport.tests.framework := None,
       addTestLib := false,
       testDeps := Nil
     )
@@ -139,45 +139,42 @@ object HammerLab
 
   import autoImport._, hammerlab._
 
-  globals +=
-    Seq(
-      organization := "org.hammerlab",
-      sonatypeStagingPrefix := "orghammerlab",
+  globals(
+    organization := "org.hammerlab",
+    sonatypeStagingPrefix := "orghammerlab",
 
-      apache2,
+    apache2,
 
-      github.user := "hammerlab",
+    github.user := "hammerlab",
 
-      developers := List(developer),
-      test.disabled := false,
-    )
+    developers := List(developer),
+    test.disabled := false,
+  )
 
+  projects(
+    /**
+     * All org.hammerlab* repos are published with this Sonatype profile
+     *
+     * Must be defined here instead of [[globalSettings]] because it is originally only defined in
+     * [[projectSettings]] (in [[xerial.sbt.Sonatype]])
+     */
+    sonatypeProfileName := (
+      if (organization.value.startsWith("org.hammerlab"))
+        "org.hammerlab"
+      else
+        sonatypeProfileName.value
+    ),
 
-  projects +=
-    Seq(
-      /**
-       * All org.hammerlab* repos are published with this Sonatype profile
-       *
-       * Must be defined here instead of [[globalSettings]] because it is originally only defined in
-       * [[projectSettings]] (in [[xerial.sbt.Sonatype]])
-       */
-      sonatypeProfileName := (
-        if (organization.value.startsWith("org.hammerlab"))
-          "org.hammerlab"
-        else
-          sonatypeProfileName.value
-      ),
-
-      /**
-       * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
-       *
-       * {{{
-       * default(testDeps := Seq(scalatest)
-       * }}}
-       *
-       * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
-       * project level, so reading it in global scope always returns `false`.
-       */
-      test.addLib
-    )
+    /**
+     * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
+     *
+     * {{{
+     * default(testDeps := Seq(scalatest)
+     * }}}
+     *
+     * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
+     * project level, so reading it in global scope always returns `false`.
+     */
+    test.addLib
+  )
 }
