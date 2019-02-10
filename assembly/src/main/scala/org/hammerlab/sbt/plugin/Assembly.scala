@@ -1,7 +1,8 @@
 package org.hammerlab.sbt.plugin
 
+import hammerlab.sbt._
 import org.hammerlab.sbt.deps.Dep
-import org.hammerlab.sbt.plugin.Deps.autoImport.deps
+import org.hammerlab.sbt.plugin.Deps.deps
 import org.hammerlab.sbt.plugin.Versions.versionsMap
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
@@ -98,7 +99,7 @@ object Assembly
         },
 
         // Add a classifier to the default (unshaded) JAR, so that it is not the default artifact at this coordinate.
-        artifactClassifier in (Compile, packageBin) := Some("unshaded"),
+        artifactClassifier in (Compile, packageBin) := "unshaded",
 
         // The "-tests" JAR doesn't need the "unshaded" classifier
         artifactClassifier in (sbt.Test, packageBin) := None,

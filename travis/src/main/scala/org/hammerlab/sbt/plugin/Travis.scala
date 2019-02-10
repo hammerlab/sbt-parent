@@ -1,13 +1,15 @@
 package org.hammerlab.sbt.plugin
 
+import java.lang.System.getenv
+
 import org.hammerlab.sbt.plugin.Root.autoImport.isRoot
 import org.hammerlab.sbt.plugin.Test.autoImport.test_?
+import org.hammerlab.sbt.plugin.Travis.autoImport.travis_?
 import org.hammerlab.sbt.plugin.Versions.noopSettings
 import org.scoverage.coveralls.CoverallsPlugin.coveralls
 import sbt.Keys._
 import sbt._
 import scoverage.ScoverageKeys._
-import System.getenv
 
 object Travis
   extends Plugin(
@@ -20,23 +22,24 @@ object Travis
   noopSettings ++=
     Seq(
       test_? :=
-        Def.taskDyn[Boolean] {
-          val default = test_?.taskValue
-          if (travis_? && !isRoot.value)
-            Def.task(true)
+        Def.settingDyn[Boolean] {
+          val default = test_?.value
+          // Always run tests for non-root modules in Travis (otherwise coverage gets messed up, for example)
+          if (travis_?.value && !isRoot.value)
+            Def.setting(true)
           else
-            Def.task(default.value)
+            Def.setting(default)
         }
         .value,
       coverageReport :=
         Def.taskDyn[Unit] {
           val default = coverageReport.taskValue
-          if (travis_? && !isRoot.value) {
+          if (travis_?.value && !isRoot.value) {
             streams.value.log.info(s"${name.value}: running coverageReport")
             Def.task(default.value)
           } else
             Def.task {
-              streams.value.log.info(s"${name.value}: skipping coverageReport (travis: ${travis_?}, root: ${isRoot.value})")
+              streams.value.log.info(s"${name.value}: skipping coverageReport (travis: ${travis_?.value}, root: ${isRoot.value})")
 
               ()
             }
@@ -46,11 +49,11 @@ object Travis
 
   val travisScalaEnv = "TRAVIS_SCALA_VERSION"
   def travisScalaVersion = getenv(travisScalaEnv)
-  def travis_? = getenv("TRAVIS") != null
 
   object autoImport {
     val travisCoverageScalaVersion = settingKey[Option[String]]("Scala version to measure/report test-coverage for")
     val coverageTest = taskKey[Unit](s"Wrapper for test and, if $travisScalaEnv matches travisCoverageScalaVersion, coverageReport")
+    val travis_? = settingKey[Boolean]("True when running in Travis CI")
   }
 
   import autoImport._
@@ -85,61 +88,62 @@ object Travis
     }
   }
 
-  override def projectSettings =
-    Seq(
-      travisCoverageScalaVersion :=
-        crossScalaVersions
-          .value
-          .sortWith {
-            (ls, rs) ⇒
-              def ints(s: String) =
-                s
-                  .split("\\.")
-                  .map(_.toInt)
+  globals(travis_? := (getenv("TRAVIS") != null))
 
-              val (l, r) = (ints(ls), ints(rs))
+  projects(
+    travisCoverageScalaVersion :=
+      crossScalaVersions
+        .value
+        .sortWith {
+          (ls, rs) ⇒
+            def ints(s: String) =
+              s
+                .split("\\.")
+                .map(_.toInt)
 
-              l
-                .zip(r)
-                .find { case (l, r) ⇒ l != r }
-                .map {
-                  case (l, r) ⇒ l < r
-                }
-                .getOrElse(
-                  l.length < r.length
-                )
-          }
-          .lastOption,
+            val (l, r) = (ints(ls), ints(rs))
 
-      coverageTest := Def.sequential(
-        test in sbt.Test,
-        Def.taskDyn[Unit] {
-          if (coverageEnabled.value) {
-            streams.value.log.info(s"${name.value}: generating coverage reports")
-            coverageReport
-          } else {
-            streams.value.log.debug(s"${name.value}: skipping coverageReport generation")
-            Def.task {}
-          }
-        },
-        Def.taskDyn[Unit] {
-          if (coverageEnabled.value && isRoot.value) {
-            streams.value.log.info(s"${name.value}: aggregating coverage reports")
-            coverageAggregate
-          } else {
-            streams.value.log.debug(s"${name.value}: skipping coverageReport aggregation")
-            Def.task {}
-          }
+            l
+              .zip(r)
+              .find { case (l, r) ⇒ l != r }
+              .map {
+                case (l, r) ⇒ l < r
+              }
+              .getOrElse(
+                l.length < r.length
+              )
         }
-      ).value,
+        .lastOption,
 
-      travisReport := travisReportTask.value,
+    coverageTest := Def.sequential(
+      test in sbt.Test,
+      Def.taskDyn[Unit] {
+        if (coverageEnabled.value) {
+          streams.value.log.info(s"${name.value}: generating coverage reports")
+          coverageReport
+        } else {
+          streams.value.log.debug(s"${name.value}: skipping coverageReport generation")
+          Def.task {}
+        }
+      },
+      Def.taskDyn[Unit] {
+        if (coverageEnabled.value && isRoot.value) {
+          streams.value.log.info(s"${name.value}: aggregating coverage reports")
+          coverageAggregate
+        } else {
+          streams.value.log.debug(s"${name.value}: skipping coverageReport aggregation")
+          Def.task {}
+        }
+      }
+    ).value,
 
-      coverageEnabled := (
-        if (travisCoverageScalaVersion.value.contains(travisScalaVersion) && !disableCoverallsEnv)
-          true
-        else
-          coverageEnabled.value
-      )
+    travisReport := travisReportTask.value,
+
+    coverageEnabled := (
+      if (travisCoverageScalaVersion.value.contains(travisScalaVersion) && !disableCoverallsEnv)
+        true
+      else
+        coverageEnabled.value
+    )
   )
 }

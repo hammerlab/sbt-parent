@@ -1,19 +1,20 @@
-import org.hammerlab.sbt.deps.Dep
+import com.github.daniel.shuy.sbt.scripted.scalatest._
+import org.scalatest._
 
 default(
-  scalatestOnly
+  hammerlab.test.disable
 )
 
 lazy val a = cross
 lazy val aJS  = a.js.settings(
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq[Dep](scalatest))
-    ()
-  }
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    deps.value should contain(scalatest.dep)
+    deps.value should not contain(hammerlab.test.suite)
+  })
 )
 lazy val aJVM = a.jvm.settings(
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq[Dep](scalatest))
-    ()
-  }
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    deps.value should contain(scalatest.dep)
+    deps.value should not contain(hammerlab.test.base)
+  })
 )

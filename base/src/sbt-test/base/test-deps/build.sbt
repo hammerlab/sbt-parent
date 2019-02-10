@@ -1,42 +1,51 @@
-import org.hammerlab.sbt.deps.Dep
+import com.github.daniel.shuy.sbt.scripted.scalatest._
+import org.scalatest._
 
 default(
-  clearTestDeps,
-  github.repo("foo")
+  hammerlab.test.disable,
+  github.repo := "foo"
 )
 
 lazy val a = project.settings(
   r"1.2.3",
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Nil)
-    assert(
-      scmInfo.value ==
-        Some(
-          ScmInfo(
-            "https://github.com/hammerlab/foo",
-            "scm:git:git@github.com:hammerlab/foo.git",
-            Some("scm:git:git@github.com:hammerlab/foo.git")
-          )
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Seq(scalatest.dep))
+    github.user.value should be(Some("hammerlab"))
+    github.repo.value should be(Some("foo"))
+    scmInfo.value should be(
+      Some(
+        ScmInfo(
+          "https://github.com/hammerlab/foo",
+          "scm:git:git@github.com:hammerlab/foo.git",
+          Some("scm:git:git@github.com:hammerlab/foo.git")
         )
+      )
     )
-    assert(version.value == "1.2.3")
-    ()
-  }
+    version.value should be("1.2.3")
+  })
 )
 
 lazy val b = project.settings(
   r"1.2.3",
-  testDeps += scalatest,
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq[Dep](scalatest))
-    ()
-  }
+  // "Release-versioned" modules skip running tests and getting hammerlab.test libs added
+  hammerlab.test.enable,
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Seq(scalatest.dep))
+  }),
+  // (Normally, Travis runs tests even for "release-versioned" modules that would otherwise skip running tests; skip that behavior here)
+  travis_? := false,
 )
 
 lazy val c = cross.settings(
-  testDeps += scalatest,
-  TaskKey[Unit]("check") := {
-    assert(testDeps.value == Seq[Dep](scalatest), s"${testDeps.value} $scalatest")
-    ()
-  }
+  hammerlab.test.enable
+)
+.jvmSettings(
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Seq(scalatest.dep, hammerlab.test.base))
+  })
+)
+.jsSettings(
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    testDeps.value should be(Seq(scalatest.dep, hammerlab.test.suite))
+  })
 )

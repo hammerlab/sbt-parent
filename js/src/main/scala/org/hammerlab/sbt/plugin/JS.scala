@@ -1,24 +1,24 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.Lib
+import org.hammerlab.sbt.Libs.replace
 import org.hammerlab.sbt.plugin.Deps.autoImport._
 import org.hammerlab.sbt.plugin.JS.autoImport.scalajs.css
-import org.hammerlab.sbt.plugin.Versions.autoImport._
+import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs }
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import sbt.Keys._
 import sbt._
 import sbtcrossproject.{ CrossClasspathDependency, CrossProject }
 import scalajsbundler.sbtplugin.ScalaJSBundlerPlugin.autoImport.npmDependencies
 import scalajscrossproject.ScalaJSCrossPlugin
 
 object JS
-  extends Plugin(
+  extends ContainerPlugin(
     Deps,
     ScalaJSPlugin,
     ScalaJSCrossPlugin,
     Versions
-  ) {
+  )
+{
 
   override def trigger = noTrigger
 
@@ -27,22 +27,25 @@ object JS
 
     object scalajs {
 
-      object css extends Lib("com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3") {
-        val  core = dep
-        val react = group ^^ "ext-react"
-        override val global: SettingsDefinition =
-          super.global ++
-          Seq(
-            versions +=
-              react → version.value
-          )
+      object css
+        extends Libs(
+          "com.github.japgolly.scalacss" ^^ "core" ^ "0.5.3",
+          replace
+        ) {
+        val  core = lib
+        val react = lib("ext-react")
       }
 
-      val dom = "org.scala-js" ^^ "scalajs-dom"
+      val dom = Lib("org.scala-js" ^^ "scalajs-dom" ^ "0.9.6")
 
-      object react extends Lib("com.github.japgolly.scalajs-react" ^^ "core" ^ "1.3.1") {
-        val  core = dep
-        val extra = group ^^ "extra"
+      object react
+        extends
+          Libs(
+            "com.github.japgolly.scalajs-react" ^^ "core" ^ "1.3.1",
+            replace
+          ) {
+        val  core = lib
+        val extra = lib
         val jsVersion = SettingKey[String]("reactJSVersion", "Version of react JS libraries")
         val webjars =
           jsDependencies ++= Seq(
@@ -68,13 +71,11 @@ object JS
           super.global ++
           Seq(
             jsVersion := "16.5.1",
-            versions +=
-              extra → version.value
           )
 
         override def settings: SettingsDefinition =
           Seq(
-            Deps.autoImport.dep(
+            Deps.dep(
               css,
               react
             ),
@@ -89,18 +90,14 @@ object JS
           )
       }
 
-      object diode extends Lib("io.suzaku" ^^ "diode" ^ "1.1.3") {
-        val core = dep
-        val react = group ^^ "diode-react"
-        override val global: SettingsDefinition =
-          super.global ++
-          Seq(
-            versions +=
-                react → "1.1.3.120"
-          )
+      object diode extends Libs("io.suzaku" ^^ "diode" ^ "1.1.4") {
+        val  core = lib
+        val react = lib ^ "1.1.4.131"
       }
 
-      val stubs = libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+      val stubs = Lib("org.scala-js" ^^ "scalajs-stubs" ^ scalaJSVersion ^ "provided")
+
+      val time = Lib("io.github.cquiroz" ^^ "scala-java-time" ^ "2.0.0-M13")
     }
 
     implicit def makeScalaJSProject(s: scalajs.type): Seq[Setting[_]] =
@@ -113,23 +110,7 @@ object JS
       def  andTest: CrossClasspathDependency = new CrossClasspathDependency(p, Some("compile->compile;test->test"))
       def testtest: CrossClasspathDependency = new CrossClasspathDependency(p, Some("test->test"))
       def     test: CrossClasspathDependency = new CrossClasspathDependency(p, Some("compile->test"))
+      def forTests: CrossClasspathDependency = new CrossClasspathDependency(p, Some("test->compile"))
     }
   }
-
-  import autoImport._
-
-  override def globalSettings =
-    scalajs.react.global ++
-    scalajs.diode.global ++
-    scalajs.  css.global
-
-  override def projectSettings =
-    Seq(
-      versions(
-        scalajs.dom → "0.9.6"
-      )
-    ) ++
-    scalajs.react.project ++
-    scalajs.diode.project ++
-    scalajs.  css.project
 }

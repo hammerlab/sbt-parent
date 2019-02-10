@@ -1,16 +1,16 @@
 # org.hammerlab.sbt:root
 
-[![org.hammerlab.sbt:root](https://img.shields.io/badge/org.hammerlab.sbt:root-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22root%22)
+[![org.hammerlab.sbt:root](https://img.shields.io/badge/org.hammerlab.sbt:root-5.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22root%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "root" % "4.6.6")
+addSbtPlugin("org.hammerlab.sbt" % "root" % "5.0.0")
 ```
 
 ## `root`: top-level no-op aggregator project
 [The `Root` plugin](src/main/scala/org/hammerlab/sbt/plugin/Root.scala) provides the `root` helper for aggregating a project's modules and no-op'ing various settings/tasks that should not operate directly on the root wrapper-module:
 
 ```scala
-lazy val    base = root(module1, module2)
+lazy val    base = root(module1, module2)  // "all" is another alias for "root"
 lazy val module1 = project.settings(…)
 lazy val module2 = project.settings(…)
 ```

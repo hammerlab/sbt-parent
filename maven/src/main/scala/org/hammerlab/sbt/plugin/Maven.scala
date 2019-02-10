@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import hammerlab.sbt._
 import org.hammerlab.sbt.deps.VersionOps._
 import sbt.Keys._
 import sbt._
@@ -33,10 +34,7 @@ object Maven
   }
   import autoImport.sonatypeStagingPrefix
 
-  override def globalSettings =
-    Seq(
-      sonatypeStagingPrefix := None
-    )
+  override def globalSettings = Seq(sonatypeStagingPrefix := None)
 
   override def projectSettings =
     Seq(

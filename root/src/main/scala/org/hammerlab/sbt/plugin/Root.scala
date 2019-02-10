@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import hammerlab.sbt._
 import org.hammerlab.sbt.plugin.GitHub.autoImport._
 import org.hammerlab.sbt.plugin.Maven.autoImport._
 import org.hammerlab.sbt.plugin.Test.autoImport.disableTests
@@ -15,7 +16,9 @@ object Root
     Test,
     Versions,
     ScoverageSbtPlugin
-  ) {
+  )
+{
+
   object autoImport {
     val isRoot = settingKey[Boolean]("Set to true on multi-module projects' (empty) root modules")
 
@@ -31,7 +34,7 @@ object Root
         Project(name.value, file)
           .settings(
             settings,
-            github.repo(name.value)
+            github.repo in ThisBuild := name.value
           )
           .aggregate(modules: _*)
       }
@@ -44,6 +47,7 @@ object Root
         ) ++
         noopSettings
     }
+    val all = root
 
     object parent {
       def apply(
@@ -71,8 +75,7 @@ object Root
 
   import autoImport._
 
-  override def projectSettings =
-    Seq(
-      isRoot := false
-    )
+  projects(
+    isRoot := false
+  )
 }

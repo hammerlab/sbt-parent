@@ -1,22 +1,26 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.{ Lib, Libs, aliases }
+import org.hammerlab.sbt.aliases._
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.plugin.Scala.autoImport.`2.11`
 import org.hammerlab.sbt.plugin.Test.autoImport.scalatest
 import org.hammerlab.sbt.plugin.Versions.DefaultVersion
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
+import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs, aliases }
 import sbt.Keys.{ excludeDependencies, parallelExecution }
 import sbt._
 import sbt.librarymanagement.syntax.ExclusionRule
 
 object Spark
-  extends Plugin(
+  extends ContainerPlugin(
     Deps,
     Scala,
+    Test,
     Versions
   )
-  with aliases {
+{
+
+  this.apply(aliases)
 
   object autoImport {
     object spark
@@ -36,7 +40,7 @@ object Spark
       val  mllib = lib
       val    sql = lib
 
-      object tests extends Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.4.0") - hadoop)
+      val tests = Lib(("org.hammerlab" ^^ "spark-tests" ^ "2.4.0") - hadoop)
 
       /**
        * Add Spark dependencies and set the Scala version to 2.11.x
@@ -44,7 +48,7 @@ object Spark
       override val settings: SettingsDefinition =
         Seq(
           +`2.11`,
-          Deps.autoImport.dep(
+          Deps.dep(
             spark.core provided,
             spark.tests tests,
             hadoop provided,
@@ -62,30 +66,20 @@ object Spark
 
   import autoImport._
 
-  override def globalSettings =
-    Seq(
+  spark !
 
-      versions ++= Seq[DefaultVersion](
-        spark.  core → computedSparkVersion.value,
-        spark.graphx → computedSparkVersion.value,
-        spark. mllib → computedSparkVersion.value,
-        spark.   sql → computedSparkVersion.value
-      ),
+  globals(
+    versions ++= Seq[DefaultVersion](
+      spark.  core → computedSparkVersion.value,
+      spark.graphx → computedSparkVersion.value,
+      spark. mllib → computedSparkVersion.value,
+      spark.   sql → computedSparkVersion.value
+    ),
 
-      computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
-      computedSparkVersion  := System.getProperty( "spark.version",  spark.version.value),
+    computedHadoopVersion := System.getProperty("hadoop.version", hadoop.version.value),
+    computedSparkVersion  := System.getProperty( "spark.version",  spark.version.value),
 
-      // SparkContexts play poorly with parallel test-execution
-      parallelExecution in sbt.Test := false
-    ) ++
-           kryo.global ++
-    spark.tests.global ++
-         hadoop.global ++
-          spark.global
-
-  override def projectSettings =
-           kryo.project ++
-    spark.tests.project ++
-         hadoop.project ++
-          spark.project
+    // SparkContexts play poorly with parallel test-execution
+    parallelExecution in sbt.Test := false
+  )
 }

@@ -1,3 +1,5 @@
+import com.github.daniel.shuy.sbt.scripted.scalatest._
+import org.scalatest._
 
 val foo = root(p1, p2)
 
@@ -11,18 +13,17 @@ val scm =
   )
 
 lazy val p1 = project.settings(
-  github.user("bar"),
-  TaskKey[Unit]("check") := {
-    assert(githubRepo.value == Some("foo"))
-    assert(scmInfo.value == scm)
-    ()
-  }
+  // '*'-assignment even inside this project applies the value globally (to `ThisBuild`)
+  github.user.*("bar"),
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    github.repo.value should be(Some("foo"))
+    scmInfo.value should be(scm)
+  })
 )
 lazy val p2 = project.settings(
-  TaskKey[Unit]("check") := {
-    assert(githubRepo.value == Some("foo"))
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    github.repo.value should be(Some("foo"))
     // github.user setting in p1 applies to whole build!
-    assert(scmInfo.value == scm)
-    ()
-  }
+    scmInfo.value should be(scm)
+  })
 )

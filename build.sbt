@@ -1,5 +1,6 @@
 // upstream setting conflicts with module name in this project
 import org.hammerlab.sbt.plugin.GitHub.autoImport.{ github ⇒ _ }
+import Root.autoImport.{ root ⇒ all }
 import Resolver.bintrayIvyRepo
 
 default(
@@ -25,7 +26,7 @@ val   scalaCrossProject = addSbtPlugin("org.portable-scala" % "sbt-crossproject"
 val scalaJSCrossProject = addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.6.0" )
 
 lazy val lib = project.settings(
-  r"4.3.0",
+  v"5.0.0",
   providedDeps += "org.scala-sbt" ^ "sbt" ^ sbtVersion.value,
   dep(
     sourcecode,
@@ -35,7 +36,7 @@ lazy val lib = project.settings(
 )
 
 lazy val assembly = plugin.settings(
-  r"4.6.6",
+  v"5.0.0",
   sbtAssembly,
   sbtScalaJS
 ).dependsOn(
@@ -46,17 +47,17 @@ lazy val assembly = plugin.settings(
 )
 
 lazy val deps = plugin.settings(
-  r"4.5.6",
+  v"5.0.0",
   sbtScalaJS
 ).dependsOn(
   lib,
   versions
 )
 
-lazy val github = plugin.settings(r"4.1.0")
+lazy val github = plugin.settings(v"5.0.0").dependsOn(lib)
 
 lazy val js = plugin.settings(
-  r"1.3.3",
+  v"2.0.0",
   sbtScalaJS,
   scalaJSBundler,
   scalaJSCrossProject
@@ -66,14 +67,14 @@ lazy val js = plugin.settings(
 )
 
 lazy val maven = plugin.settings(
-  r"4.2.2",
+  v"5.0.0",
   sonatype
 ).dependsOn(
   lib
 )
 
 lazy val root = plugin.settings(
-  r"4.6.6",
+  v"5.0.0",
   scoverage,
   dep(sourcecode)
 ).dependsOn(
@@ -84,7 +85,7 @@ lazy val root = plugin.settings(
 )
 
 lazy val scala = plugin.settings(
-  r"4.6.6",
+  v"5.0.0",
   dep(
     hammerlab.bytes % "1.3.0",
     hammerlab.io % "5.2.1"
@@ -95,8 +96,20 @@ lazy val scala = plugin.settings(
   versions
 )
 
+lazy val scripted =
+  plugin
+    .settings(
+      v"1.0.0",
+      addSbtPlugin("com.github.daniel-shuy" % "sbt-scripted-scalatest" % "1.1.0"),
+      libraryDependencies ++= Seq(
+        //"org.hammerlab.sbt" %% "lib" % "4.3.0",
+        "org.scalatest" %% "scalatest" % "3.0.5"
+      )
+    )
+    .dependsOn(lib)
+
 lazy val spark = plugin.settings(
-  v"4.6.7",
+  v"5.0.0",
   dep(sourcecode)
 ).dependsOn(
   deps,
@@ -107,7 +120,7 @@ lazy val spark = plugin.settings(
 )
 
 lazy val test = plugin.settings(
-  r"4.5.6"
+  v"5.0.0",
 ).dependsOn(
   deps,
   lib,
@@ -115,7 +128,7 @@ lazy val test = plugin.settings(
 )
 
 lazy val travis = plugin.settings(
-  r"4.6.6",
+  v"5.0.0",
   scoverage,
   coveralls
 ).dependsOn(
@@ -126,7 +139,7 @@ lazy val travis = plugin.settings(
 .enablePlugins(SbtPlugin)
 
 lazy val versions = plugin.settings(
-  r"4.5.6",
+  v"5.0.0",
   pgp
 ).dependsOn(
   lib
@@ -134,7 +147,7 @@ lazy val versions = plugin.settings(
 
 // Plugin exposing all non-hammerlab-specific functionality
 lazy val parent = plugin.settings(
-  v"4.6.8",
+  v"5.0.0",
   coursier,
   scalaCrossProject,
   buildinfo,
@@ -158,12 +171,12 @@ lazy val parent = plugin.settings(
 
 // All-purpose hammerlab-specific plugin
 lazy val base = plugin.settings(
-  v"4.6.8"
+  v"5.0.0",
 ).dependsOn(
   parent
 )
 
-lazy val `sbt-parent` = Root.autoImport.root(
+lazy val `sbt-parent` = all(
   assembly,
   base,
   deps,
@@ -174,6 +187,7 @@ lazy val `sbt-parent` = Root.autoImport.root(
   parent,
   root,
   scala,
+  scripted,
   spark,
   test,
   travis,

@@ -1,14 +1,14 @@
 # org.hammerlab.sbt:scala
 
-[![org.hammerlab.sbt:scala](https://img.shields.io/badge/org.hammerlab.sbt:scala-4.6.6-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22scala%22)
+[![org.hammerlab.sbt:scala](https://img.shields.io/badge/org.hammerlab.sbt:scala-5.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22scala%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "scala" % "4.6.6")
+addSbtPlugin("org.hammerlab.sbt" % "scala" % "5.0.0")
 ```
 
 [Scala-library and -version settings](src/main/scala/org/hammerlab/sbt/plugin/Scala.scala):
 
-Major-version predicates:
+Major-version predicates (is each major version enabled?):
 
 ```scala
 `2.10`.?
@@ -16,16 +16,16 @@ Major-version predicates:
 `2.12`.?
 ```
 
-Minor-version get/set DSL:
+Version get/set DSL:
 
 ```scala
 `2.10`.version
 `2.11`.version
 `2.12`.version
 
-`2.10`.version = "2.10.5"
-`2.11`.version = "2.11.12"
-`2.12`.version = "2.12.8"
+`2.10`.version := "2.10.5"
+`2.11`.version := "2.11.12"
+`2.12`.version := "2.12.8"
 ```
 
 Restrict a project to one Scala major version:
@@ -36,7 +36,7 @@ Restrict a project to one Scala major version:
 `2.12`.only
 ```
 
-Add a Scala major version to cross-build:
+Add a Scala major version to cross-build (default: 2.12 only):
 
 ```scala
 `2.10`.add

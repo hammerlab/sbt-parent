@@ -1,8 +1,12 @@
 # org.hammerlab.sbt:js
 
-[![org.hammerlab.sbt:js](https://img.shields.io/badge/org.hammerlab.sbt:js-1.3.3-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22js%22)
+[![org.hammerlab.sbt:js](https://img.shields.io/badge/org.hammerlab.sbt:js-2.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22js%22)
 
 Shorthands and dependency-aliases for [ScalaJS](https://www.scala-js.org/) projects
+
+```scala
+addSbtPlugin("org.hammerlab.sbt" % "js" % "2.0.0")
+```
 
 [Scope cross-project dependencies](src/main/scala/org/hammerlab/sbt/plugin/JS.scala#L111-L113):
 

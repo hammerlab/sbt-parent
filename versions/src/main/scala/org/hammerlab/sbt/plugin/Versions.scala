@@ -1,5 +1,6 @@
 package org.hammerlab.sbt.plugin
 
+import hammerlab.sbt._
 import org.hammerlab.sbt.Base
 import org.hammerlab.sbt.deps.VersionOps._
 import org.hammerlab.sbt.deps.{ Dep, GroupArtifact, Snapshot, VersionsMap }
@@ -43,7 +44,8 @@ object Versions
     publishM2        :=    {}
   )
 
-  object autoImport {
+  object autoImport
+    extends hammerlab.sbt.syntax {
     val defaultVersions = settingKey[Seq[DefaultVersion]]("Appendable list of mappings from {group,artifact}s to default-version strings")
     val snapshot = settingKey[Boolean]("When true, versions set via `v\"x.y.z\"` shorthands will have '-SNAPSHOT' appended, and snapshots repository will be used")
     val fixed = settingKey[Boolean]("Whether this project has its version 'fixed' (pinned to a release), and should be bypassed during various aggregate task runs, e.g. publishing")
@@ -94,7 +96,7 @@ object Versions
      * Minimal syntax for setting [[revision]]
      */
     object v {
-      def apply(v: String) = revision := Some(v)
+      def apply(v: String) = revision := v
     }
 
     /**
@@ -113,52 +115,49 @@ object Versions
 
   import autoImport._
 
-  override def globalSettings =
-    Seq(
-      defaultVersions :=   Nil,
-             revision :=  None,
-             snapshot :=  true,
-                fixed := false
-    )
+  globals(
+    defaultVersions :=   Nil,
+           revision :=  None,
+           snapshot :=  true,
+              fixed := false
+  )
 
-  override def projectSettings =
-    Seq(
+  projects(
 
-      commands += unsnap,
-      commands += unsnapAll,
+    commands += unsnap,
+    commands += unsnapAll,
 
-      /**
-       * Turn [[revision]] (if present) directly into [[version]] appending "-SNAPSHOT" or not based on [[snapshot]]
-       */
-      version :=
-        revision
+    /**
+     * Turn [[revision]] (if present) directly into [[version]] appending "-SNAPSHOT" or not based on [[snapshot]]
+     */
+    version :=
+      revision
+        .value
+        .map {
+          _.maybeForceSnapshot(snapshot.value)
+        }
+        .getOrElse(version.value),
+
+    projectID := projectID.value.withRevision(revision = version.value),
+    artifactPath := artifactPathSetting(artifact).value,
+
+    /**
+     * Re-iterate this definition of [[isSnapshot]] to reference [[version]] after it is overwritten by [[revision]]
+     */
+    isSnapshot := version.value.endsWith(Snapshot.suffix),
+
+    /**
+     * In general, append "-SNAPSHOT" when turning [[revision]] (which can be set with helpful syntaxes defined in
+     * this plugin) into [[version]] (used by main/downstream SBT machinery)
+     */
+
+    versionsMap :=
+      VersionsMap(
+        defaultVersions
           .value
-          .map {
-            _.maybeForceSnapshot(snapshot.value)
-          }
-          .getOrElse(version.value),
-
-      projectID := projectID.value.withRevision(revision = version.value),
-      artifactPath := artifactPathSetting(artifact).value,
-
-      /**
-       * Re-iterate this definition of [[isSnapshot]] to reference [[version]] after it is overwritten by [[revision]]
-       */
-      isSnapshot := version.value.endsWith(Snapshot.suffix)
-    ) ++
-    Seq(
-      /**
-       * In general, append "-SNAPSHOT" when turning [[revision]] (which can be set with helpful syntaxes defined in
-       * this plugin) into [[version]] (used by main/downstream SBT machinery)
-       */
-
-      versionsMap :=
-        VersionsMap(
-          defaultVersions
-            .value
-            .map { d ⇒ d.groupArtifact → d.version }
-            .groupBy(_._1)
-            .mapValues(_.last._2)
-        )
-    )
+          .map { d ⇒ d.groupArtifact → d.version }
+          .groupBy(_._1)
+          .mapValues(_.last._2)
+      )
+  )
 }

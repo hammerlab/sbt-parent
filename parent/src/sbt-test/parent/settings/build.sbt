@@ -1,4 +1,5 @@
-
+import com.github.daniel.shuy.sbt.scripted.scalatest._
+import org.scalatest._
 import scala.io.Source.fromFile
 
 github("my-org", "repo-name")
@@ -13,11 +14,10 @@ lazy val a = project.settings(
    * POM dependency on the scoverage scalac plugin that we are not expecting in `pom.xml`
    */
   coverageEnabled := false,
-  TaskKey[Unit]("check") := {
-    assert(githubUser.value == Some("my-org"))
-    assert(githubRepo.value == Some("repo-name"))
-    assert(
-      scmInfo.value ==
+  scriptedScalaTestSpec := Some(new FunSuite with Matchers with ScriptedScalaTestSuiteMixin { override val sbtState: State = state.value
+    github.user.value should be(Some("my-org"))
+    github.repo.value should be(Some("repo-name"))
+    scmInfo.value should be(
         Some(
           ScmInfo(
             "https://github.com/my-org/repo-name",
@@ -26,14 +26,11 @@ lazy val a = project.settings(
           )
         )
     )
-    assert(version.value == "1.2.3-SNAPSHOT")
+    version.value should be("1.2.3-SNAPSHOT")
 
     val   actualPom = fromFile( makePom.value ).mkString
     val expectedPom = fromFile(   "pom.xml"   ).mkString.trim  // actual POM doesn't contain final newline
 
-    if (actualPom != expectedPom)
-      sys.error(s"Actual POM:\n$actualPom\n\nExpected POM:\n$expectedPom")
-
-    ()
-  }
+    actualPom should be(expectedPom)
+  })
 )

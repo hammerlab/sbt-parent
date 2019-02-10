@@ -1,9 +1,9 @@
 # org.hammerlab.sbt:spark
 
-[![org.hammerlab.sbt:spark](https://img.shields.io/badge/org.hammerlab.sbt:spark-4.6.7-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22spark%22)
+[![org.hammerlab.sbt:spark](https://img.shields.io/badge/org.hammerlab.sbt:spark-5.0.0-green.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.hammerlab.sbt%22%20a%3A%22spark%22)
 
 ```scala
-addSbtPlugin("org.hammerlab.sbt" % "spark" % "4.6.7")
+addSbtPlugin("org.hammerlab.sbt" % "spark" % "5.0.0")
 ```
 
 SBT configs for projects that use [Apache Spark](http://spark.apache.org/); ([source](src/main/scala/org/hammerlab/sbt/plugin/Spark.scala)):
@@ -13,10 +13,10 @@ spark
 ```
 
 This adds:
-- `provided` dependencies on Spark and Hadoop
-- a `test`-dep on [hammerlab/spark-tests](https://github.com/hammerlab/spark-tests)
-- a dep on [Kryo](https://github.com/EsotericSoftware/kryo)
-- sets the Scala version to 2.11 only
+- `provided` dependencies on Spark (2.4.0) and Hadoop (2.7.3)
+- a `test`-dep on [hammerlab/spark-tests](https://github.com/hammerlab/spark-tests) (2.4.0)
+- a dep on [Kryo](https://github.com/EsotericSoftware/kryo) (2.24.0)
+- adds a Scala 2.11 cross-build to the default 2.12-only build inherited from [the `org.hammerlab.sbt:scala` plugin](../scala) 
 
 ## Version DSL
 
@@ -35,10 +35,10 @@ Versions can also be set via [the `versions` helper](../versions):
 
 ```scala
 versions(
-   spark       → "2.1.1",
-   spark.tests → "2.3.3",
-  hadoop       → "2.6.0",
-    kryo       → "2.21.0"
+   spark       → "2.4.0",
+   spark.tests → "2.4.0",
+  hadoop       → "2.7.3",
+    kryo       → "2.24.0"
 )
 ```
 

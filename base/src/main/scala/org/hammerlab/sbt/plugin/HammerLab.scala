@@ -1,29 +1,30 @@
 package org.hammerlab.sbt.plugin
 
-import org.hammerlab.sbt.Libs
+import hammerlab.sbt._
+import org.hammerlab.sbt.{ ContainerPlugin, Libs }
 import org.hammerlab.sbt.Libs.disablePrepend
 import org.hammerlab.sbt.deps.CrossVersion.BinaryJS
 import org.hammerlab.sbt.deps.{ Dep, Group }
-import org.hammerlab.sbt.plugin.    Deps.autoImport.testDeps
-import org.hammerlab.sbt.plugin.  GitHub.autoImport._
-import org.hammerlab.sbt.plugin.   Maven.autoImport._
-import org.hammerlab.sbt.plugin.  Parent.autoImport._
+import org.hammerlab.sbt.plugin.Deps.testDeps
+import org.hammerlab.sbt.plugin.GitHub.autoImport._
+import org.hammerlab.sbt.plugin.Maven.autoImport._
+import org.hammerlab.sbt.plugin.Parent.autoImport._
+import org.hammerlab.sbt.plugin.Test.autoImport.test_?
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject
 import sbt.Keys._
 import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys.sonatypeProfileName
 
 object HammerLab
-  extends Plugin(
+  extends ContainerPlugin(
     GitHub,
     Maven,
     Versions,
     Test
-  ) {
+  )
+{
 
   import Group._
-
-  implicit def liftOption[T](t: T): Option[T] = Some(t)
 
   trait all {
     def lib(name: String) = "org.hammerlab" ^^ name
@@ -73,14 +74,17 @@ object HammerLab
       val     utils = lib('math,     'utils)
     }
 
+    val addTestLib = settingKey[Boolean]("When false, skip adding org.hammerlab.test:{base,suite} as a test-dependency (which this plugin otherwise does by default")
+
     val scalatestOnly = addTestLib := false
     val clearTestDeps = Seq(
+      Test.autoImport.tests.framework := None,
       addTestLib := false,
       testDeps := Nil
     )
   }
 
-  object autoImport extends all {
+  object autoImport extends {
     val hl = hammerlab
     object hammerlab extends all {
 
@@ -93,7 +97,7 @@ object HammerLab
 
       object test
         extends Libs(
-          lib('test, 'suite) ^ "1.1.0",
+          lib('test, 'suite) ^ "1.1.0" tests,
           disablePrepend
         ) {
         val base = lib
@@ -102,73 +106,75 @@ object HammerLab
         val jvm = base
 
         val suite = _base
+
+        val disabled = settingKey[Boolean]("When true, don't add hammerlab.test library")
+        val disable = disabled := true
+        val  enable = disabled := false
+
+        def addLib =
+          testDeps ++= {
+            if (!test_?.value || disabled.value)
+              Nil
+            else
+              Seq(
+                if (isScalaJSProject.value)
+                  hammerlab.test.suite
+                else
+                  hammerlab.test.base
+              )
+            }
+
+        override def settings = addLib
       }
+
+      val developer =
+        Developer(
+          id    = "hammerlab",
+          name  = "Hammer Lab",
+          email = "info@hammerlab.org",
+          url   = "https://github.com/hammerlab"
+        )
     }
   }
 
-  val addTestLib = settingKey[Boolean]("When false, skip adding org.hammerlab.test:{base,suite} as a test-dependency (which this plugin otherwise does by default")
+  import autoImport._, hammerlab._
 
-  import autoImport._
+  globals(
+    organization := "org.hammerlab",
+    sonatypeStagingPrefix := "orghammerlab",
 
-  override def globalSettings =
-    Seq(
-      organization := "org.hammerlab",
-      sonatypeStagingPrefix := Some("orghammerlab"),
+    apache2,
 
-      apache2,
+    github.user := "hammerlab",
 
-      githubUser := Some("hammerlab"),
+    developers := List(developer),
+    test.disabled := false,
+  )
 
-      developers :=
-        List(
-          Developer(
-            id    = "hammerlab",
-            name  = "Hammer Lab",
-            email = "info@hammerlab.org",
-            url   = "https://github.com/hammerlab"
-          )
-        ),
+  projects(
+    /**
+     * All org.hammerlab* repos are published with this Sonatype profile
+     *
+     * Must be defined here instead of [[globalSettings]] because it is originally only defined in
+     * [[projectSettings]] (in [[xerial.sbt.Sonatype]])
+     */
+    sonatypeProfileName := (
+      if (organization.value.startsWith("org.hammerlab"))
+        "org.hammerlab"
+      else
+        sonatypeProfileName.value
+    ),
 
-      addTestLib := true
-    ) ++
-    hammerlab.test.global
-
-  override def projectSettings =
-    Seq(
-      /**
-       * All org.hammerlab* repos are published with this Sonatype profile
-       *
-       * Must be defined here instead of [[globalSettings]] because it is originally only defined in
-       * [[projectSettings]] (in [[xerial.sbt.Sonatype]])
-       */
-      sonatypeProfileName := (
-        if (organization.value.startsWith("org.hammerlab"))
-          "org.hammerlab"
-        else
-          sonatypeProfileName.value
-      ),
-
-      /**
-       * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
-       *
-       * {{{
-       * default(testDeps := Seq(scalatest)
-       * }}}
-       *
-       * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
-       * project level, so reading it in global scope always returns `false`.
-       */
-      testDeps ++= (
-        if (addTestLib.value)
-          Seq(
-            if (isScalaJSProject.value)
-              hammerlab.test.suite
-            else
-              hammerlab.test.base
-          )
-        else
-          Nil
-      )
-    ) ++
-    hammerlab.test.project
+    /**
+     * This would ideally be a global-setting, so that it would be obviated in projects that declare e.g.:
+     *
+     * {{{
+     * default(testDeps := Seq(scalatest)
+     * }}}
+     *
+     * However, [[org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.isScalaJSProject]] only gets initialized at the
+     * project level, so reading it in global scope always returns `false`.
+     */
+    test.addLib
+  )
 }

@@ -14,6 +14,7 @@ case class Dep(group: Group,
 
   def snapshot: Dep = copy(forceSnapshot = true)
 
+  def compile: Dep = copy(configurations = Configuration.Default)
   def tests: Dep = copy(configurations = Configuration.Test)
   def testtest: Dep = copy(configurations = Configuration.TestTest)
   def provided: Dep = copy(configurations = Configuration.Provided)

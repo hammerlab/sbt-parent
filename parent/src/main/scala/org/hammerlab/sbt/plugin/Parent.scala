@@ -4,8 +4,7 @@ import java.io.File
 
 import org.hammerlab.sbt.deps.Group
 import org.hammerlab.sbt.plugin.Root.autoImport.parent
-import org.hammerlab.sbt.plugin.Versions.autoImport.versions
-import org.hammerlab.sbt.{ Lib, Libs, aliases }
+import org.hammerlab.sbt.{ ContainerPlugin, Lib, Libs, aliases }
 import sbt.Keys._
 import sbt._
 import sbtbuildinfo.BuildInfoKeys._
@@ -15,14 +14,15 @@ import scalajscrossproject.JSPlatform
 import sourcecode.Name
 
 object Parent
-  extends Plugin(
+  extends ContainerPlugin(
     Deps,
     GitHub,
     Maven,
     CrossPlugin,
     Spark,
     Versions
-  ) {
+  )
+{
 
   import Group._
 
@@ -31,9 +31,10 @@ object Parent
     val jvm = JVMPlatform
   }
 
+  def pkg(str: String) = str.replaceAll("-", "_")
+
   object autoImport
     extends hammerlab.deps.syntax
-       with aliases
        with platform {
 
     def cross                      (implicit name: Name, crossType: CrossType = CrossType.Full): CrossProject = cross(jvm, js)(name, crossType)
@@ -47,8 +48,8 @@ object Parent
       .crossType(crossType)
       .enablePlugins(BuildInfoPlugin)
       .settings(
-        buildInfoPackage := s"${organization.value}.${name.value}",
-        buildInfoObject := "build",
+        buildInfoPackage := Seq(pkg(organization.value), "build").mkString("."),
+        buildInfoObject := pkg(name.value),
         (unmanagedResourceDirectories in sbt.Test) +=
           crossType
             .sharedSrcDir(
@@ -86,28 +87,54 @@ object Parent
             }
             : _ *
         )
+        .in(
+          cp
+            .projects(JVMPlatform)
+            .base
+            .getParentFile
+        )
     }
 
+    val   kryo = aliases.  kryo
+    val hadoop = aliases.hadoop
+    val  slf4j = aliases. slf4j
+
     // TODO: move these to a non-plugin library, for re-use
-    val             args4j =                     "args4j"  ^ "args4j"
-    val           autowire =                "com.lihaoyi" ^^ "autowire"
-    val          boopickle =                  "io.suzaku" ^^ "boopickle"
-    val             breeze =               "org.scalanlp" ^^ "breeze"
-    val           case_app = "com.github.alexarchambault" ^^ "case-app"
-    val              guava =           "com.google.guava"  ^ "guava"
-    val seqdoop_hadoop_bam =               ("org.seqdoop"  ^ "hadoop-bam") - hadoop
-    val             htsjdk =       ("com.github.samtools"  ^ "htsjdk") - ("org.xerial.snappy" ^ "snappy-java")
-    val            kittens =              "org.typelevel" ^^ "kittens"
-    val           magnolia =             "com.propensive" ^^ "magnolia"
-    val       parquet_avro =         "org.apache.parquet"  ^ "parquet-avro"
-    val            purecsv =         "com.github.melrief" ^^ "purecsv"
-    val          scalatags =                "com.lihaoyi" ^^ "scalatags"
-    val         scalautils =             "org.scalautils" ^^ "scalautils"
-    val          shapeless =                "com.chuusai" ^^ "shapeless"
-    val              slf4j =                "org.clapper" ^^ "grizzled-slf4j"
-    val         sourcecode =                "com.lihaoyi" ^^ "sourcecode"
-    val              spire =              "org.typelevel" ^^ "spire"
-    val               sttp =      "com.softwaremill.sttp" ^^ "core"
+    val             args4j = Lib(                    "args4j"  ^        "args4j" ^     "2.33"           )
+    val           autowire = Lib(               "com.lihaoyi" ^^      "autowire" ^    "0.2.6"           )
+    val          boopickle = Lib(                 "io.suzaku" ^^     "boopickle" ^    "1.3.0"           )
+    val             breeze = Lib(              "org.scalanlp" ^^        "breeze" ^   "0.13.2"           )
+    val           case_app = Lib("com.github.alexarchambault" ^^      "case-app" ^ "2.0.0-M5"           )
+    val              guava = Lib(          "com.google.guava"  ^         "guava" ^     "19.0"           )
+    val              junit = Lib(                     "junit"  ^         "junit" ^     "4.12"           )
+    val            kittens = Lib(             "org.typelevel" ^^       "kittens" ^    "1.2.0"           )
+    val           magnolia = Lib(            "com.propensive" ^^      "magnolia" ^   "0.10.0"           )
+    val       parquet_avro = Lib(        "org.apache.parquet"  ^  "parquet-avro" ^    "1.8.1"           )
+    val            purecsv = Lib(        "com.github.melrief" ^^       "purecsv" ^    "0.1.1"           )
+    val          scalatags = Lib(               "com.lihaoyi" ^^     "scalatags" ^    "0.6.7"           )
+    val         scalautils = Lib(            "org.scalautils" ^^    "scalautils" ^    "2.1.5"           )
+    val seqdoop_hadoop_bam = Lib(              ("org.seqdoop"  ^    "hadoop-bam" ^    "7.9.0") - hadoop )
+    val          shapeless = Lib(               "com.chuusai" ^^     "shapeless" ^    "2.3.3"           )
+    val             snappy = Lib(         "org.xerial.snappy"  ^   "snappy-java" ^  "1.1.7.2"           )
+    val         sourcecode = Lib(               "com.lihaoyi" ^^    "sourcecode" ^    "0.1.5"           )
+    val              spire = Lib(             "org.typelevel" ^^         "spire" ^   "0.15.0"           )
+    val               sttp = Lib(     "com.softwaremill.sttp" ^^          "core" ^    "1.3.9"           )
+    val             htsjdk = Lib(      ("com.github.samtools"  ^        "htsjdk" ^    "2.9.1") - snappy )  // out of sort-order bc depends on snappy
+
+    object akka
+      extends Libs(
+        "com.typesafe.akka" ^^ "akka" ^ "2.5.20"
+      ) {
+      val  actor = lib
+      val stream = lib
+      object http
+        extends Libs(
+          "com.typesafe.akka" ^^ "akka-http" ^ "10.1.7"
+        ) {
+        val base = lib(_base)
+        val core = lib
+      }
+    }
 
     object bdg {
       val artifactFn = (prefix: String, name: String) ⇒ s"$prefix-$name-spark2"
@@ -118,10 +145,12 @@ object Parent
         ) {
         val core = lib
       }
-      object formats extends Lib("org.bdgenomics.bdg-formats" ^ "bdg-formats" ^ "0.10.1")
+      val formats = Lib("org.bdgenomics.bdg-formats" ^ "bdg-formats" ^ "0.10.1")
+
       object quinine extends Libs(("org.bdgenomics.quinine" ^^ "quinine" ^ "0.0.2") - adam.core) {
         val core = lib
       }
+
       object utils
         extends Libs(
           "org.bdgenomics.utils" ^^ "utils" ^ "0.2.14",
@@ -134,8 +163,6 @@ object Parent
         val     metrics = lib
         val        misc = lib
       }
-      def  global = Seq(adam, formats, quinine, utils).flatMap(_.global)
-      def project = Seq(adam, formats, quinine, utils).flatMap(_.project)
     }
 
     object cats
@@ -155,23 +182,21 @@ object Parent
     }
 
     object commons {
-      val   io =         "commons-io" ^ "commons-io"
-      val math = "org.apache.commons" ^ "commons-math3"
-      val defaults =
-        versions(
-            io → "2.5",
-          math → "3.6.1"
-        )
+      val   io = Lib(        "commons-io" ^ "commons-io"    ^ "2.5")
+      val math = Lib("org.apache.commons" ^ "commons-math3" ^ "3.6.1")
     }
 
     object circe
       extends Libs(
         "io.circe" ^^ "circe" ^ "0.9.3"
       ) {
-      val    core = lib
-      val generic = lib
-      val literal = lib
-      val  parser = lib
+      val     core = lib
+      val  literal = lib
+      val   parser = lib
+      object generic extends Libs("io.circe" ^^ "circe-generic" ^ "0.9.3") {
+        val   core = lib(_base)
+        val extras = lib
+      }
     }
 
     object fs2
@@ -195,7 +220,7 @@ object Parent
 
     object slinky
       extends Libs(
-        "me.shadaj" ^^ "slinky" ^ "0.5.0"
+        "me.shadaj" ^^ "slinky" ^ "0.5.1"
       ) {
       val                  core  = lib
       val                   web  = lib
@@ -207,53 +232,10 @@ object Parent
       import Keys._
       override def settings: SettingsDefinition = scalacOptions += "-P:scalajs:sjsDefinedByDefault"
     }
+
+    object slogging extends Libs("biz.enef" ^^ "slogging" ^ "0.6.1") {
+      val core = lib(_base)
+      val slf4j = aliases.slf4j.slogging
+    }
   }
-
-  import autoImport._
-
-  val wrappers = Seq(
-    cats,
-    circe,
-    fs2,
-    http4s,
-    slinky
-  )
-
-  override def globalSettings = (
-    Seq(
-      versions(
-        args4j             → "2.33"     ,
-        autowire           → "0.2.6"    ,
-        boopickle          → "1.3.0"    ,
-        breeze             → "0.13.2"   ,
-        case_app           → "2.0.0-M5" ,
-        guava              → "19.0"     ,
-        htsjdk             → "2.9.1"    ,
-        kittens            → "1.2.0"    ,
-        log4j              → "1.7.21"   ,
-        magnolia           → "0.10.0"   ,
-        parquet_avro       → "1.8.1"    ,
-        purecsv            → "0.1.1"    ,
-        scalatags          → "0.6.7"    ,
-        scalautils         → "2.1.5"    ,
-        seqdoop_hadoop_bam → "7.9.0"    ,
-        shapeless          → "2.3.3"    ,
-        slf4j              → "1.3.1"    ,
-        sourcecode         → "0.1.4"    ,
-        spire              → "0.15.0"   ,
-        sttp               → "1.3.9"    ,
-        test_logging       → "1.1.0"    ,
-      )
-    )
-    ++ bdg.global
-    ++ wrappers.flatMap(_.global)
-  )
-
-  override def projectSettings = (
-    Seq(
-      commons.defaults
-    )
-    ++ bdg.project
-    ++ wrappers.flatMap(_.project)
-  )
 }

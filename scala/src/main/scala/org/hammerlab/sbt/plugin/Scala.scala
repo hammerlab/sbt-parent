@@ -3,10 +3,10 @@ package org.hammerlab.sbt.plugin
 import hammerlab.bytes
 import hammerlab.bytes._
 import hammerlab.show._
-import org.hammerlab.sbt.Lib
+import org.hammerlab.sbt.{ ContainerPlugin, Lib }
 import org.hammerlab.sbt.deps.Group._
 import org.hammerlab.sbt.deps.IsScalaJS
-import org.hammerlab.sbt.plugin.Deps.autoImport.deps
+import org.hammerlab.sbt.plugin.Deps.deps
 import org.hammerlab.sbt.plugin.Versions.autoImport.versions
 import sbt.Keys._
 import sbt.plugins.SbtPlugin
@@ -14,16 +14,17 @@ import sbt.{ Show ⇒ _, _ }
 import sourcecode.Name
 
 object Scala
-  extends Plugin(
+  extends ContainerPlugin(
     Deps,
     Versions
-  ) {
+  )
+{
 
   object autoImport
     extends bytes.syntax {
 
-    val scala_lang    = "org.scala-lang" ^ "scala-library"
-    val scala_reflect = "org.scala-lang" ^ "scala-reflect"
+    val scala_lang    = Lib("org.scala-lang" ^ "scala-library" ^ "")
+    val scala_reflect = Lib("org.scala-lang" ^ "scala-reflect" ^ "")
 
     def plugin(implicit name: Name): Project =
       Project(
@@ -48,15 +49,20 @@ object Scala
 
     val partialUnification = scalacOptions += "-Ypartial-unification"
 
-    object kindProjector
-      extends Lib(
-        "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
-      ) {
+    object kindProjector extends Lib(
+      "org.spire-math" ^^ "kind-projector" ^ "0.9.8"
+    ) {
       override val settings =
         _base.toModuleIDs(IsScalaJS.no) match {
           case Seq(dep) ⇒ addCompilerPlugin(dep)
         }
     }
+
+    val logImplicits = scalacOptions += "-Xlog-implicits"
+
+    // "Hidden" test-resources (resources whose basenames start with ".") are not moved into target/ dirs (and
+    // therefore not present on tests' classpath) by default; this setting overrides that behavior to include them
+    val includeHiddenTestResources = excludeFilter in sbt.Test := NothingFilter
 
     val scalameta: SettingsDefinition = Seq(
       addCompilerPlugin("org.scalameta" % "paradise" % "3.0.0-M10" cross CrossVersion.full),
@@ -101,6 +107,7 @@ object Scala
     case object `2.10` extends ScalaMajorVersion("2.10", "2.10.7")
     case object `2.11` extends ScalaMajorVersion("2.11", "2.11.12")
     case object `2.12` extends ScalaMajorVersion("2.12", "2.12.8")
+    case object `2.13` extends ScalaMajorVersion("2.13", "2.13.8-M5")
 
     object scalac {
       implicit val showBytes: Show[Bytes] = { _.toString.filter(_ != 'B').toLowerCase }
@@ -110,10 +117,11 @@ object Scala
 
     object ScalaVersion {
       val default = SettingKey[ScalaMajorVersion]("defaultScalaVersion", "Default scala major version; wrapper for scalaVersion")
-      val defaults =
+      val defaults: SettingsDefinition =
         `2.10`.defaults ++
         `2.11`.defaults ++
-        `2.12`.defaults
+        `2.12`.defaults ++
+        `2.13`.defaults
     }
 
     val scalaVersions = settingKey[Seq[ScalaMajorVersion]]("Wrapper for crossScalaVersions")
@@ -121,56 +129,52 @@ object Scala
 
   import autoImport._
 
-  override def globalSettings =
-    Seq(
-      // Primary Build is for Scala 2.12 by default
-      ScalaVersion.default := `2.12`,
+  globals(
+    // Primary Build is for Scala 2.12 by default
+    ScalaVersion.default := `2.12`,
 
-      // Build for Scala 2.12 only, by default
-      scalaVersions :=
-        Seq(
-          `2.12`
-        )
-    ) ++
-    kindProjector.global ++
-    ScalaVersion.defaults
-
-  override def projectSettings =
-    Seq(
-      scalaVersion  := (
-        ScalaVersion.default.value match {
-          case `2.10` ⇒ `2.10`.version.value
-          case `2.11` ⇒ `2.11`.version.value
-          case `2.12` ⇒ `2.12`.version.value
-        }
+    // Build for Scala 2.12 only, by default
+    scalaVersions :=
+      Seq(
+        `2.12`
       ),
-      crossScalaVersions := {
-        scalaVersions.value.map {
-          case `2.10` ⇒ `2.10`.version.value
-          case `2.11` ⇒ `2.11`.version.value
-          case `2.12` ⇒ `2.12`.version.value
-        }
-      },
+    ScalaVersion.defaults  // TODO: register this as a non-dep-related settings-provider
+  )
 
-      scalacOptions ++= Seq(
-        "-feature",
-        "-language:existentials",
-        "-language:implicitConversions",
-        "-language:postfixOps",
-        "-language:higherKinds",
-        "-language:reflectiveCalls"
-      ),
+  projects(
+    scalaVersion  := (
+      ScalaVersion.default.value match {
+        case `2.10` ⇒ `2.10`.version.value
+        case `2.11` ⇒ `2.11`.version.value
+        case `2.12` ⇒ `2.12`.version.value
+      }
+    ),
+    crossScalaVersions := {
+      scalaVersions.value.map {
+        case `2.10` ⇒ `2.10`.version.value
+        case `2.11` ⇒ `2.11`.version.value
+        case `2.12` ⇒ `2.12`.version.value
+      }
+    },
 
-      versions ++= Seq(
-        scala_lang    → scalaVersion.value,
-        scala_reflect → scalaVersion.value
-      ),
+    scalacOptions ++= Seq(
+      "-feature",
+      "-language:existentials",
+      "-language:implicitConversions",
+      "-language:postfixOps",
+      "-language:higherKinds",
+      "-language:reflectiveCalls"
+    ),
 
-      consolePkgs := Nil,
-      initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n"),
+    versions ++= Seq(
+      scala_lang    → scalaVersion.value,
+      scala_reflect → scalaVersion.value
+    ),
 
-      consoleImports := Nil,
-      initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
-    ) ++
-    kindProjector.project
+    consolePkgs := Nil,
+    initialCommands += consolePkgs.value.map(pkg ⇒ s"import $pkg._").mkString("", "\n", "\n"),
+
+    consoleImports := Nil,
+    initialCommands += consoleImports.value.map(i ⇒ s"import $i").mkString("", "\n", "\n")
+  )
 }
