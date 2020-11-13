@@ -10,7 +10,7 @@ import sbt._
 import sbtassembly.AssemblyKeys.assemblyOption
 import sbtassembly.AssemblyPlugin.autoImport._
 import sbtassembly.{ AssemblyPlugin, PathList }
-
+import com.eed3si9n.jarjarabrams.ShadeRule
 
 object Assembly
   extends Plugin(
